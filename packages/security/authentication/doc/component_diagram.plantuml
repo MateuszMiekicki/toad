@@ -1,0 +1,10 @@
+@startuml
+component "security" as alias <<component>> {
+   namespace toad::security::authentication {
+        class Authentication {
+
+        }
+
+    }
+}
+@enduml

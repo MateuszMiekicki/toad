@@ -1,0 +1,22 @@
+@startuml
+component "security" as alias <<component>> {
+   namespace toad::security::context {
+        class User {
+            - id: unisigned
+            - userName: string
+            - password: Password
+            - role: Role
+        }
+        class Password {
+            - algorithm: Algorithm
+            - password : string
+        }
+        enum Algorithm {
+
+        }
+        enum Role {
+
+        }
+    }
+}
+@enduml
