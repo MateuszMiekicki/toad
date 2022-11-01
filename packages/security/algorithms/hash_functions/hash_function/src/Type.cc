@@ -1,6 +1,6 @@
 #include <iostream>
-#include <security/algorithms/hash_functions/hash_function/HashFunction.hh>
 #include <security/algorithms/hash_functions/hash_function/Type.hh>
+#include <security/algorithms/hash_functions/interface/HashFunction.hh>
 
 namespace
 {
@@ -36,6 +36,6 @@ bool operator==(Type lhs, Type rhs)
 
 bool operator!=(Type lhs, Type rhs)
 {
-    return not(lhs == rhs);
+    return !(lhs == rhs);
 }
 } // namespace toad::security::algorithms::hash_functions
