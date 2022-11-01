@@ -75,8 +75,8 @@ EmptyLineAfterAccessModifier: Never
 LambdaBodyIndentation : OuterScope
 ReferenceAlignment: Right
 ShortNamespaceLines: 0
-# QualifierOrder: ['inline', 'static', 'type', 'const', 'volatile' ]
-# SeparateDefinitionBlocks: Always
-# InsertBraces: 'true'
+# QualifierOrder: ['inline', 'static', 'const', 'type']
+SeparateDefinitionBlocks: Always
+InsertBraces: 'true'
 ...
 
