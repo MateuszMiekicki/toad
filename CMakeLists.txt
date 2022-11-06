@@ -4,6 +4,7 @@ project(
   VERSION 0.1.0
   LANGUAGES CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 string(TIMESTAMP BUILD_TIME "%Y-%m-%d")
 set(CURRENT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${BUILD_TIME}")
@@ -32,3 +33,21 @@ include(enable_tests)
 
 add_subdirectory(packages/security)
 add_subdirectory(packages/communication)
+
+
+#app------------------
+add_executable(${CMAKE_PROJECT_NAME} app/main.cc)
+set_target_properties(
+  ${CMAKE_PROJECT_NAME}
+  PROPERTIES VERSION ${PROJECT_VERSION}
+             SOVERSION ${PROJECT_VERSION_MAJOR}
+             ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/
+             LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/
+             RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+             CXX_STANDARD 20
+             CXX_EXTENSIONS OFF
+             CXX_STANDARD_REQUIRED ON)
+target_compile_options(
+  ${CMAKE_PROJECT_NAME}
+  PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>
+  PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Debug>:${GCC_FLAGS_DEBUG}>>)
