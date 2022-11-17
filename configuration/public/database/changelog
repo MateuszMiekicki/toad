@@ -6,3 +6,10 @@ databaseChangeLog:
         path: configuration/public/database/schema/init.sql
       description:
         - 'Creation of an initial database structure: user, role'
+  - changeSet:
+      id: 2022-11-17T23:26:35Z_init.sql
+      author: Mateusz Miekicki
+      sqlFile:
+        path: configuration/public/database/schema/init.sql
+      description:
+        - 'Added table for device and unique id for each connected device'

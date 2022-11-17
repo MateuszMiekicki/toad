@@ -24,3 +24,27 @@ CREATE TABLE "user"
         FOREIGN KEY (role_id)
             REFERENCES "role" (id)
 );
+
+CREATE TABLE device
+{
+    id    INT,
+
+    alias VARCHAR NOT NULL,
+    short_description VARCHAR,
+
+    PRIMARY KEY (id)
+};
+
+CREATE TABLE device_identifier
+{
+    id        INT,
+    device_id INT NOT NULL
+
+    mac_address VARCHAR NOT NULL,
+    hash        VARCHAR NOT NULL UNIQUE
+
+    PRIMARY KEY (id),
+    CONSTRAINT device_id_fk
+    FOREIGN KEY (device_id)
+        REFERENCES "device" (id)
+};
