@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2022-11-17T23:14:19Z_init.sql
+      author: Mateusz Miekicki
+      sqlFile:
+        path: configuration/public/database/schema/init.sql
+      description:
+        - 'Creation of an initial database structure: user, role'
