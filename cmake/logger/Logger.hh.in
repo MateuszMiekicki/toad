@@ -22,8 +22,11 @@ struct Logger
     Logger(const Logger &) = delete;
     Logger &operator=(const Logger &) = delete;
 };
-
-#define DEBUG_LOG(...)    SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#ifndef DNDEBUG
+    #define DEBUG_LOG(...) SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#else
+    #define DEBUG_LOG(...) void();
+#endif
 #define INFO_LOG(...)     SPDLOG_LOGGER_INFO(spdlog::get(MODULE_NAME), __VA_ARGS__);
 #define TRACE_LOG(...)    SPDLOG_LOGGER_TRACE(spdlog::get(MODULE_NAME), __VA_ARGS__);
 #define WARN_LOG(...)     SPDLOG_LOGGER_WARN(spdlog::get(MODULE_NAME), __VA_ARGS__);

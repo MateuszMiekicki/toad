@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <toad/data_reader/environment_variable/EnvironmentVariable.hh>
 #include <toad/data_reader/environment_variable/ParseEnvironmentVariable.hh>
 
 class ParseCorrectFormatForEnvironmentVariable : public testing::TestWithParam<std::string>
@@ -10,7 +9,6 @@ TEST_P(ParseCorrectFormatForEnvironmentVariable, dsa)
 {
     auto input = GetParam();
     EXPECT_TRUE(toad::data_reader::parser::isCorrectFormat(input));
-    toad::data_reader::getEnvironmentVariable("sadfsavzx");
 }
 
 INSTANTIATE_TEST_SUITE_P(StandardCorrectFormatForEnvironmentVariables,
@@ -24,7 +22,7 @@ INSTANTIATE_TEST_SUITE_P(StandardCorrectFormatForEnvironmentVariables,
                                          "  ${1var_name} ",
                                          "  ${1varname} "));
 
-INSTANTIATE_TEST_SUITE_P(SyntaxForOptionalParameterIsIncorrect,
+INSTANTIATE_TEST_SUITE_P(SyntaxForOptionalParameterIsCorrect,
                          ParseCorrectFormatForEnvironmentVariable,
                          testing::Values("${var_name:asd}",
                                          "${varname:asd_asd}",
@@ -35,7 +33,7 @@ INSTANTIATE_TEST_SUITE_P(SyntaxForOptionalParameterIsIncorrect,
                                          "  ${1var:_name} ",
                                          "  ${1var:name} "));
 
-INSTANTIATE_TEST_SUITE_P(SyntaxForMandatoryParameterIsIncorrect,
+INSTANTIATE_TEST_SUITE_P(SyntaxForMandatoryParameterIsCorrect,
                          ParseCorrectFormatForEnvironmentVariable,
                          testing::Values("${var_name:?asd asd a?}",
                                          "${varname:?asd_asd as da}",
