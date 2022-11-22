@@ -24,16 +24,16 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+include(gcc_flags)
 include(enable_code_coverage)
 include(use_clang_tidy)
 include(use_sanitizer)
 include(enable_tests)
+include(logger/add_logger)
 
 # include(enable_docs) include(enable_benchmarks) include(enable_examples)
 
-add_subdirectory(packages/security)
-add_subdirectory(packages/communication)
-
+add_subdirectory(packages/data_reader)
 
 #app------------------
 add_executable(${CMAKE_PROJECT_NAME} app/main.cc)

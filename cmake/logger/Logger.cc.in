@@ -1,0 +1,3 @@
+#include <toad/Logger.hh>
+
+Logger logger;

@@ -745,3 +745,6 @@ FodyWeavers.xsd
 configuration/private/*
 !configuration/private/.gitkeep
 !configuration/private/template
+
+**/Logger.cc
+**/Logger.hh

@@ -1,0 +1,31 @@
+#pragma once
+#define COMPONENT_NAME "@COMPONENT_NAME@"
+#define MODULE_NAME    "@MODULE_NAME@"
+#define MODULE_VERSION "@PROJECT_VERSION@"
+#include <fmt/core.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
+
+struct Logger
+{
+    std::shared_ptr<spdlog::logger> basicLogger = spdlog::basic_logger_mt(
+        MODULE_NAME, fmt::format("logs/{}/{}_{}.log", COMPONENT_NAME, MODULE_NAME, MODULE_VERSION).data());
+
+    Logger()
+    {
+        basicLogger->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
+#ifndef DNDEBUG
+        basicLogger->set_level(spdlog::level::debug);
+#endif
+
+    }
+            Logger(const Logger &) = delete;
+        Logger& operator=(const Logger &) = delete;
+};
+
+#define DEBUG_LOG(...)    SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#define INFO_LOG(...)     SPDLOG_LOGGER_INFO(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#define TRACE_LOG(...)    SPDLOG_LOGGER_TRACE(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#define WARN_LOG(...)     SPDLOG_LOGGER_WARN(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#define CRITICAL_LOG(...) SPDLOG_LOGGER_CRITICAL(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#define ERROR_LOG(...)    SPDLOG_LOGGER_ERROR(spdlog::get(MODULE_NAME), __VA_ARGS__);
