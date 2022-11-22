@@ -7,6 +7,11 @@
 
 namespace
 {
+const auto beginFormat = std::string("${");
+const auto endFormat = std::string("}");
+const auto optionalDelimiter = std::string(":");
+const auto mandatoryDelimiter = std::string(":?");
+
 enum class EnvironmentVariableInputType
 {
     plain,
@@ -16,11 +21,11 @@ enum class EnvironmentVariableInputType
 
 EnvironmentVariableInputType identifyTypeOfInput(const std::string& input)
 {
-    if(input.find(":?") not_eq std::string::npos)
+    if(input.find(mandatoryDelimiter) not_eq std::string::npos)
     {
         return EnvironmentVariableInputType::mandatory;
     }
-    if(input.find(":") not_eq std::string::npos)
+    if(input.find(optionalDelimiter) not_eq std::string::npos)
     {
         return EnvironmentVariableInputType::optional;
     }
@@ -55,12 +60,10 @@ void trim(std::string& input)
     ltrim(input);
 }
 
-bool isBeginAndEndCorrect(const std::string& input,
-                          const std::string& expectedBegin = "${",
-                          const std::string& expectedEnd = "}")
+bool isBeginAndEndCorrect(const std::string& input)
 {
-    return input.substr(0, expectedBegin.length()) == expectedBegin &&
-           input.substr(input.length() - expectedEnd.length(), expectedEnd.length()) == expectedEnd;
+    return input.substr(0, beginFormat.length()) == beginFormat &&
+           input.substr(input.length() - endFormat.length(), endFormat.length()) == endFormat;
 }
 
 bool hasWhiteSpace(const std::string& input)
@@ -70,12 +73,12 @@ bool hasWhiteSpace(const std::string& input)
 
 bool hasOptionalParameterInCorrectFormat(const std::string& input)
 {
-    const auto pos = input.find(":");
-    if(std::isspace(input.at(pos - 1)) or std::isspace(input.at(pos + 1)))
+    const auto pos = input.find(optionalDelimiter);
+    if(std::isspace(input.at(pos - optionalDelimiter.length())) or std::isspace(input.at(pos + 1)))
     {
         return false;
     }
-    if(const auto optionalValue = input.substr(pos, input.length()); optionalValue.length() > 2)
+    if(const auto optionalValue = input.substr(pos, input.length()); optionalValue.length() > beginFormat.length())
     {
         return true;
     }
@@ -84,8 +87,9 @@ bool hasOptionalParameterInCorrectFormat(const std::string& input)
 
 bool hasMandatoryParameterInCorrectFormat(const std::string& input)
 {
-    if(const auto variableWithDollarSignAndBrace = input.substr(0, input.find(":?"));
-       hasWhiteSpace(variableWithDollarSignAndBrace) or variableWithDollarSignAndBrace.length() < 4)
+    if(const auto variableWithDollarSignAndBrace = input.substr(0, input.find(mandatoryDelimiter));
+       hasWhiteSpace(variableWithDollarSignAndBrace) or
+       (variableWithDollarSignAndBrace.length() < (beginFormat.length() + mandatoryDelimiter.length())))
     {
         return false;
     }
