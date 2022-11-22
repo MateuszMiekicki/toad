@@ -11,18 +11,18 @@ enum class EnvironmentVariableInputType
 {
     plain,
     optional,
-    error
+    mandatory
 };
 
 EnvironmentVariableInputType identifyTypeOfInput(const std::string& input)
 {
+    if(input.find(":?") not_eq std::string::npos)
+    {
+        return EnvironmentVariableInputType::mandatory;
+    }
     if(input.find(":") not_eq std::string::npos)
     {
         return EnvironmentVariableInputType::optional;
-    }
-    if(input.find(":?") not_eq std::string::npos)
-    {
-        return EnvironmentVariableInputType::error;
     }
     return EnvironmentVariableInputType::plain;
 }
@@ -71,8 +71,6 @@ bool hasWhiteSpace(const std::string& input)
 bool hasOptionalParameterInCorrectFormat(const std::string& input)
 {
     const auto pos = input.find(":");
-    INFO_LOG(pos);
-    return false;
     if(std::isspace(input.at(pos - 1)) or std::isspace(input.at(pos + 1)))
     {
         return false;
@@ -122,7 +120,7 @@ bool isCorrectFormat(std::string input)
             }
         }
         break;
-        case EnvironmentVariableInputType::error:
+        case EnvironmentVariableInputType::mandatory:
         {
             if(hasMandatoryParameterInCorrectFormat(input))
             {

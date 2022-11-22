@@ -1,7 +1,6 @@
 #pragma once
 #include <optional>
 #include <string>
-#include <toad/Logger.hh>
 
 namespace toad::data_reader::parser
 {
