@@ -1,6 +1,8 @@
 [requires]
 gtest/1.11.0
 yaml-cpp/0.7.0
+soci/4.0.3
+spdlog/1.11.0
 
 [generators]
 cmake

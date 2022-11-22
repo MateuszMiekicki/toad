@@ -78,6 +78,8 @@ for dir in "$@"; do
          -o -name '*.cpp' \
          -o -name '*.h' \
          -o -name '*.hh' \
+         -o -name '*.hh.in' \
+         -o -name '*.cc.in' \
          -o -name '*.hpp' \) \
          -exec "${FMT}" -style=file --verbose -i '{}' \;
     popd &>/dev/null

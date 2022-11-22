@@ -20,7 +20,13 @@ set(GCC_FLAGS
     -Wnon-virtual-dtor
     -pedantic
     -Wold-style-cast
-    -Wcast-align)
+    -Wcast-align
+    -Wundef
+    -Wpointer-arith
+    -Wstrict-overflow=5
+    -Wswitch-default
+    -Wunreachable-code)
 
 set(GCC_FLAGS_DEBUG ${GCC_FLAGS} -g3 -O0)
 set(GCC_FLAGS_RELEASE ${GCC_FLAGS} -DNDEBUG -O3)
+
