@@ -5,7 +5,7 @@ class ParseCorrectFormatForEnvironmentVariable : public testing::TestWithParam<s
 {
 };
 
-TEST_P(ParseCorrectFormatForEnvironmentVariable, dsa)
+TEST_P(ParseCorrectFormatForEnvironmentVariable, whenGivenAnInputWhichConsistsOfDollarSignAndTextBetweenBracketsWithAnOptionalColonAndValueImmediatelyAfterItOrColonAndQuestionMarkFormatShouldBeConsideredValid)
 {
     auto input = GetParam();
     EXPECT_TRUE(toad::data_reader::parser::isCorrectFormat(input));
@@ -48,7 +48,7 @@ class ParseIncorrectFormatForEnvironmentVariable : public testing::TestWithParam
 {
 };
 
-TEST_P(ParseIncorrectFormatForEnvironmentVariable, asd)
+TEST_P(ParseIncorrectFormatForEnvironmentVariable, whenAnInputIsGivenThatIsInconsistentOrDoesNotHaveValueAfterAColonItShouldBeConsideredInvalid)
 {
     auto input = GetParam();
     EXPECT_FALSE(toad::data_reader::parser::isCorrectFormat(input));
