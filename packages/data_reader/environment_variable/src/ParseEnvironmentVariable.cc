@@ -84,8 +84,8 @@ bool hasOptionalParameterInCorrectFormat(const std::string& input)
 
 bool hasMandatoryParameterInCorrectFormat(const std::string& input)
 {
-    const auto pos = input.find(":?");
-    if(hasWhiteSpace(input.substr(0, pos)))
+    if(const auto variableWithDollarSignAndBrace = input.substr(0, input.find(":?"));
+       hasWhiteSpace(variableWithDollarSignAndBrace) or variableWithDollarSignAndBrace.length() < 4)
     {
         return false;
     }

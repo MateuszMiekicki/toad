@@ -23,12 +23,12 @@ struct Logger
     Logger &operator=(const Logger &) = delete;
 };
 #ifndef DNDEBUG
-    #define DEBUG_LOG(...) SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__);
+    #define DEBUG_LOG(...) SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__)
 #else
-    #define DEBUG_LOG(...) void();
+    #define DEBUG_LOG(...) void()
 #endif
-#define INFO_LOG(...)     SPDLOG_LOGGER_INFO(spdlog::get(MODULE_NAME), __VA_ARGS__);
-#define TRACE_LOG(...)    SPDLOG_LOGGER_TRACE(spdlog::get(MODULE_NAME), __VA_ARGS__);
-#define WARN_LOG(...)     SPDLOG_LOGGER_WARN(spdlog::get(MODULE_NAME), __VA_ARGS__);
-#define CRITICAL_LOG(...) SPDLOG_LOGGER_CRITICAL(spdlog::get(MODULE_NAME), __VA_ARGS__);
-#define ERROR_LOG(...)    SPDLOG_LOGGER_ERROR(spdlog::get(MODULE_NAME), __VA_ARGS__);
+#define INFO_LOG(...)     SPDLOG_LOGGER_INFO(spdlog::get(MODULE_NAME), __VA_ARGS__)
+#define TRACE_LOG(...)    SPDLOG_LOGGER_TRACE(spdlog::get(MODULE_NAME), __VA_ARGS__)
+#define WARN_LOG(...)     SPDLOG_LOGGER_WARN(spdlog::get(MODULE_NAME), __VA_ARGS__)
+#define CRITICAL_LOG(...) SPDLOG_LOGGER_CRITICAL(spdlog::get(MODULE_NAME), __VA_ARGS__)
+#define ERROR_LOG(...)    SPDLOG_LOGGER_ERROR(spdlog::get(MODULE_NAME), __VA_ARGS__)
