@@ -35,7 +35,7 @@ include(logger/add_logger)
 
 add_subdirectory(packages/data_reader)
 
-#app------------------
+# app------------------
 add_executable(${CMAKE_PROJECT_NAME} app/main.cc)
 set_target_properties(
   ${CMAKE_PROJECT_NAME}

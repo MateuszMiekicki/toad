@@ -17,10 +17,10 @@ struct Logger
 #ifndef DNDEBUG
         basicLogger->set_level(spdlog::level::debug);
 #endif
-
     }
-            Logger(const Logger &) = delete;
-        Logger& operator=(const Logger &) = delete;
+
+    Logger(const Logger &) = delete;
+    Logger &operator=(const Logger &) = delete;
 };
 
 #define DEBUG_LOG(...)    SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__);
