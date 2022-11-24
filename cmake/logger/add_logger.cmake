@@ -1,4 +1,5 @@
 function(add_logger project_name)
+  find_package(spdlog REQUIRED)
   configure_file("${CMAKE_SOURCE_DIR}/cmake/logger/Logger.hh.in"
                  "${CMAKE_CURRENT_SOURCE_DIR}/../include/toad/Logger.hh")
 
