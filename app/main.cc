@@ -1,2 +1,2 @@
-int main()
+auto main() ->int
 {}

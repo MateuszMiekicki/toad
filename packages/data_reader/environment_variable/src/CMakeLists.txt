@@ -3,6 +3,8 @@ project(
   VERSION 0.1.0
   LANGUAGES CXX)
 
+use_clang_tidy()
+
 find_package(spdlog REQUIRED)
 aux_source_directory(. SOURCE)
 add_library(${PROJECT_NAME} ${SOURCE})

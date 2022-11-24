@@ -7,10 +7,10 @@
 
 namespace
 {
-const auto beginFormat = std::string("${");
-const auto endFormat = std::string("}");
-const auto optionalDelimiter = std::string(":");
-const auto mandatoryDelimiter = std::string(":?");
+const auto beginFormat = "${";
+const auto endFormat = "}";
+const auto optionalDelimiter = ":";
+const auto mandatoryDelimiter = ":?";
 
 enum class EnvironmentVariableInputType
 {
@@ -19,7 +19,7 @@ enum class EnvironmentVariableInputType
     mandatory
 };
 
-EnvironmentVariableInputType identifyTypeOfInput(const std::string& input)
+auto identifyTypeOfInput(const std::string& input) -> EnvironmentVariableInputType
 {
     if(input.find(mandatoryDelimiter) not_eq std::string::npos)
     {
@@ -60,36 +60,38 @@ void trim(std::string& input)
     ltrim(input);
 }
 
-bool isBeginAndEndCorrect(const std::string& input)
+auto isBeginAndEndCorrect(const std::string& input) -> bool
 {
-    return input.substr(0, beginFormat.length()) == beginFormat &&
-           input.substr(input.length() - endFormat.length(), endFormat.length()) == endFormat;
+    return input.substr(0, std::string(beginFormat).length()) == beginFormat &&
+           input.substr(input.length() - std::string(endFormat).length(), std::string(endFormat).length()) == endFormat;
 }
 
-bool hasWhiteSpace(const std::string& input)
+auto hasWhiteSpace(const std::string& input) -> bool
 {
     return input.find(" ") not_eq std::string::npos;
 }
 
-bool hasOptionalParameterInCorrectFormat(const std::string& input)
+auto hasOptionalParameterInCorrectFormat(const std::string& input) -> bool
 {
     const auto pos = input.find(optionalDelimiter);
-    if(std::isspace(input.at(pos - optionalDelimiter.length())) or std::isspace(input.at(pos + 1)))
+    if(std::isspace(input.at(pos - std::string(optionalDelimiter).length())) or std::isspace(input.at(pos + 1)))
     {
         return false;
     }
-    if(const auto optionalValue = input.substr(pos, input.length()); optionalValue.length() > beginFormat.length())
+    if(const auto optionalValue = input.substr(pos, input.length());
+       optionalValue.length() > std::string(beginFormat).length())
     {
         return true;
     }
     return false;
 }
 
-bool hasMandatoryParameterInCorrectFormat(const std::string& input)
+auto hasMandatoryParameterInCorrectFormat(const std::string& input) -> bool
 {
     if(const auto variableWithDollarSignAndBrace = input.substr(0, input.find(mandatoryDelimiter));
        hasWhiteSpace(variableWithDollarSignAndBrace) or
-       (variableWithDollarSignAndBrace.length() < (beginFormat.length() + mandatoryDelimiter.length())))
+       (variableWithDollarSignAndBrace.length() <
+        (std::string(beginFormat).length() + std::string(mandatoryDelimiter).length())))
     {
         return false;
     }
@@ -99,7 +101,7 @@ bool hasMandatoryParameterInCorrectFormat(const std::string& input)
 
 namespace toad::data_reader::parser
 {
-bool isCorrectFormat(std::string input)
+auto isCorrectFormat(std::string input) -> bool
 {
     trim(input);
     if(not isBeginAndEndCorrect(input))
