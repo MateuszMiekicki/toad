@@ -5,7 +5,7 @@
 
 namespace toad::data_reader
 {
-std::optional<std::string> getEnvironmentVariable(const std::string &name)
+auto getEnvironmentVariable(const std::string &name) -> EnvironmentVariable
 {
     if(const auto environmentVariable = std::getenv(name.data()))
     {

@@ -1,34 +1,43 @@
 #pragma once
-#define COMPONENT_NAME "@COMPONENT_NAME@"
-#define MODULE_NAME    "@MODULE_NAME@"
-#define MODULE_VERSION "@PROJECT_VERSION@"
+#define COMPONENT_NAME "@COMPONENT_NAME@" // NOLINT
+#define MODULE_NAME    "@MODULE_NAME@" // NOLINT
+#define MODULE_VERSION "@PROJECT_VERSION@" // NOLINT
 #include <fmt/core.h>
+#include <iostream>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-struct Logger
+struct Logger // NOLINT
 {
-    std::shared_ptr<spdlog::logger> basicLogger = spdlog::basic_logger_mt(
-        MODULE_NAME, fmt::format("logs/{}/{}_{}.log", COMPONENT_NAME, MODULE_NAME, MODULE_VERSION).data());
+    std::shared_ptr<spdlog::logger> basicLogger;
 
-    Logger()
+    Logger() noexcept
+    try : basicLogger{spdlog::basic_logger_mt(
+        MODULE_NAME, fmt::format("logs/{}/{}_{}.log", COMPONENT_NAME, MODULE_NAME, MODULE_VERSION).data())}
     {
         basicLogger->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
 #ifndef DNDEBUG
-        basicLogger->set_level(spdlog::level::debug);
+        basicLogger->set_level(spdlog::level::trace);
 #endif
     }
-
-    Logger(const Logger &) = delete;
-    Logger &operator=(const Logger &) = delete;
+    catch(const spdlog::spdlog_ex &ex)
+    {
+        std::cerr << "Log init failed: " << ex.what() << std::endl;
+    }
+    catch(const std::exception &e)
+    {
+        std::cout << "error occurred: " << e.what() << std::endl;
+    }
+    Logger(const Logger &) = delete; // NOLINT
+    Logger &operator=(const Logger &) = delete; // NOLINT
 };
 #ifndef DNDEBUG
-    #define DEBUG_LOG(...) SPDLOG_LOGGER_DEBUG(spdlog::get(MODULE_NAME), __VA_ARGS__)
+    #define DEBUG_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::debug, __VA_ARGS__) // NOLINT
 #else
-    #define DEBUG_LOG(...) void()
+    #define DEBUG_LOG(...) void() // NOLINT
 #endif
-#define INFO_LOG(...)     SPDLOG_LOGGER_INFO(spdlog::get(MODULE_NAME), __VA_ARGS__)
-#define TRACE_LOG(...)    SPDLOG_LOGGER_TRACE(spdlog::get(MODULE_NAME), __VA_ARGS__)
-#define WARN_LOG(...)     SPDLOG_LOGGER_WARN(spdlog::get(MODULE_NAME), __VA_ARGS__)
-#define CRITICAL_LOG(...) SPDLOG_LOGGER_CRITICAL(spdlog::get(MODULE_NAME), __VA_ARGS__)
-#define ERROR_LOG(...)    SPDLOG_LOGGER_ERROR(spdlog::get(MODULE_NAME), __VA_ARGS__)
+#define INFO_LOG(...)     SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::info, __VA_ARGS__) // NOLINT
+#define TRACE_LOG(...)    SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::trace, __VA_ARGS__) // NOLINT
+#define WARN_LOG(...)     SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::warn, __VA_ARGS__) // NOLINT
+#define CRITICAL_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::critical, __VA_ARGS__) // NOLINT
+#define ERROR_LOG(...)    SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::error, __VA_ARGS__) // NOLINT

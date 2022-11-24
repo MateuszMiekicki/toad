@@ -4,8 +4,8 @@
 
 namespace toad::data_reader::parser
 {
-bool isCorrectFormat(std::string input);
-bool isPlainEnvironmentVariable(const std::string& input);
-bool hasOptionalEnvironmentVariableSetting(const std::string& input);
-bool isMandatoryEnvironmentVariableSetting(const std::string& input);
+auto isCorrectFormat(std::string input) -> bool;
+auto isPlainEnvironmentVariable(const std::string& input) -> bool;
+auto hasOptionalEnvironmentVariableSetting(const std::string& input) -> bool;
+auto isMandatoryEnvironmentVariableSetting(const std::string& input) -> bool;
 } // namespace toad::data_reader::parser
