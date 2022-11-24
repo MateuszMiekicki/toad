@@ -1,0 +1,206 @@
+version: 2.1
+
+executors:
+  linux-docker:
+    docker:
+      - image: 0xd00d2bad/honeybadger_ci:latest
+
+jobs:
+  static_analysis:
+    executor: linux-docker
+    parallelism: 4
+    steps:
+      - checkout
+      - run:
+          name: "Formatting check"
+          command: |
+            bash ./scripts/format.sh packages
+            bash ./scripts/check_check_formatted.sh
+      - run:
+          name: "Configure"
+          command: |
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      - run:
+          name: "Build"
+          command: |
+            cmake --build build
+      - run:
+          name: "Run test"
+          command: |
+            ctest --test-dir build --no-compress-output -T Test --output-junit Testing/results.xml --rerun-failed --output-on-failure -V
+      - run:
+          name: "Run lcov coverage report generation"
+          command: |
+            lcov --capture --directory build/src --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
+            lcov --remove build/Testing/coverage.info '/usr/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter system-files
+            coveralls-lcov --repo-token $COVERALLS_TOKEN build/Testing/coverage.info
+      - run:
+          name: "Run gcovr coverage report generation"
+          command: |
+            gcovr --filter src/ --sonarqube build/Testing/coverage.xml --branches
+      - run:
+          name: "Run sonar scanner"
+          command: |
+            sonar-scanner -Dproject.settings=.cicd/sonar-project.properties -Dsonar.login=$SONAR_TOKEN
+      - store_test_results:
+          path: build/Testing
+      - store_artifacts:
+          path: build/Testing
+
+  build:
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    working_directory: ~/honeybadger_ci
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/honeybadger_ci
+      - run:
+          name: "Configure"
+          command: |
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - run:
+          name: "Build"
+          command: |
+            cmake --build build
+      - persist_to_workspace:
+          root: ~/honeybadger_ci
+          paths:
+            - ./build
+
+  test:
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    parallelism: 4
+    working_directory: ~/honeybadger_ci
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/honeybadger_ci
+      - run:
+          name: "Run tests"
+          command: |
+            ctest --test-dir build --no-compress-output -T Test --output-junit Testing/results.xml --rerun-failed --output-on-failure
+      - store_test_results:
+          path: build/Testing
+      - store_artifacts:
+          path: build/Testing
+      - persist_to_workspace:
+          root: ~/honeybadger_ci
+          paths:
+            - build
+
+  # deploy_docs:
+  #   docker:
+  #     - image: alpine:latest
+  #   working_directory: ~/honeybadger_ci
+  #   steps:
+  #     - attach_workspace:
+  #         at: ~/honeybadger_ci
+  #     - run:
+  #         name: Install and configure git
+  #         command: |
+  #           apk add git
+  #           git clone -b gh-pages https://github.com/MateuszMiekicki/honeybadger.git
+  #           cd honeybadger
+  #           git config user.email ""
+  #           git config user.name "ci-build"
+  #     - run:
+  #         name: Delete old docs and move new
+  #         command: |
+  #           cd honeybadger
+  #           rm -irf html
+  #           mv ../build/docs/html .
+  #     - run:
+  #         name: Deploy docs
+  #         command: |
+  #           cd honeybadger
+  #           git add -fA
+  #           git commit --allow-empty -m "auto commit [ci skip]<< pipeline.number >>"
+  #           git push https://$GITHUB_DEPLOY_TOKEN@github.com/MateuszMiekicki/honeybadger.git -f
+
+  delivery:
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    working_directory: ~/honeybadger_ci
+    steps:
+      - attach_workspace:
+          at: ~/honeybadger_ci
+      - run: |
+          ls -la
+          cd build
+          ls -la
+  deploy:
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    working_directory: ~/honeybadger_ci
+    steps:
+      - attach_workspace:
+          at: ~/honeybadger_ci
+      - run: |
+          ls -la
+          cd build
+          ls -la
+workflows:
+  ci-cd:
+    jobs:
+      - static_analysis:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - build:
+          matrix:
+            parameters:
+              os: [ linux-docker ]
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+          requires:
+            - static_analysis
+      - test:
+          matrix:
+            parameters:
+              os: [ linux-docker ]
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+          requires:
+            - build
+      - delivery:
+          matrix:
+            parameters:
+              os: [ linux-docker ]
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - test
+      - deploy:
+          matrix:
+            parameters:
+              os: [ linux-docker ]
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - test
+      # - deploy_docs:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - master
+      #     requires:
+      #       - test
