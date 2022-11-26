@@ -46,7 +46,6 @@ jobs:
           path: build/Testing
       - store_artifacts:
           path: build/Testing
-          path: build/bin/logs
 
   build:
     parameters:
