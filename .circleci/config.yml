@@ -14,7 +14,8 @@ jobs:
       - run:
           name: "Formatting check"
           command: |
-            bash ./scripts/format.sh packages
+            bash ./scripts/format_code.sh packages
+            bash ./scripts/format_cmake.sh
             bash ./scripts/check_check_formatted.sh
       - run:
           name: "Configure"
@@ -46,6 +47,8 @@ jobs:
           path: build/Testing
       - store_artifacts:
           path: build/Testing
+      - store_artifacts:
+          path: build/bin/logs
 
   build:
     parameters:
