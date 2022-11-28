@@ -32,7 +32,6 @@ include(logger/add_logger)
 
 # include(enable_docs) include(enable_benchmarks) include(enable_examples)
 add_subdirectory(packages/data_reader)
-add_subdirectory(packages/storage)
 
 # app------------------
 add_executable(${CMAKE_PROJECT_NAME} app/main.cc)
