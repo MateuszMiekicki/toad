@@ -3,9 +3,13 @@ gtest/1.11.0
 yaml-cpp/0.7.0
 soci/4.0.3
 spdlog/1.11.0
+libpq/14.5
 
 [generators]
-cmake
+cmake_find_package
+cmake_paths
+CMakeDeps
+CMakeToolchain
 
 [options]
 gtest:shared=True

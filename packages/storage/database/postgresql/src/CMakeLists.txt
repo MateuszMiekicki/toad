@@ -1,10 +1,12 @@
 project(
-  ${MODULE_NAME}
+  postgresql
   VERSION 0.1.0
   LANGUAGES CXX)
 
-aux_source_directory(. SOURCE)
-add_library(${PROJECT_NAME} ${SOURCE})
+aux_source_directory(. SOURCES)
+add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${CMAKE_PROJECT_NAME}::${PACKAGE_NAME}::${COMPONENT_NAME}::${MODULE_NAME}::${PROJECT_NAME} ALIAS
+            ${PROJECT_NAME})
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES VERSION ${PROJECT_VERSION}
@@ -16,10 +18,13 @@ set_target_properties(
              CXX_STANDARD 17
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
-add_library(${CMAKE_PROJECT_NAME}::${PACKAGE_NAME}::${COMPONENT_NAME}::${MODULE_NAME}::${PROJECT_NAME} ALIAS
-            ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-add_logger(${MODULE_NAME})
+target_link_libraries(${PROJECT_NAME}
+PRIVATE toad::storage::database::database_interface::database_interface)
+find_package(Soci 4 REQUIRED)
+find_package(PostgreSQL 14 REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE SOCI::soci_core)
+add_logger(${PROJECT_NAME})
 target_compile_options(
   ${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>

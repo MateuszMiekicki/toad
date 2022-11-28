@@ -4,13 +4,13 @@ project(
   VERSION 0.1.0
   LANGUAGES CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+set(BUILD_SHARED_LIBS ON)
 
 string(TIMESTAMP BUILD_TIME "%Y-%m-%d")
 set(CURRENT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${BUILD_TIME}")
 message(STATUS "version: ${CURRENT_VERSION}")
-option(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(CMAKE_DEBUG_POSTFIX "-debug")
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -26,14 +26,13 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 include(gcc_flags)
 include(enable_code_coverage)
-include(use_clang_tidy)
 include(use_sanitizer)
 include(enable_tests)
 include(logger/add_logger)
 
 # include(enable_docs) include(enable_benchmarks) include(enable_examples)
-
 add_subdirectory(packages/data_reader)
+add_subdirectory(packages/storage)
 
 # app------------------
 add_executable(${CMAKE_PROJECT_NAME} app/main.cc)

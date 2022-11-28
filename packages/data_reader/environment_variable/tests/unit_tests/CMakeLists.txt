@@ -1,6 +1,7 @@
 project(unit_tests_${MODULE_NAME} LANGUAGES CXX)
 
 find_package(GTest REQUIRED)
+include(GoogleTest)
 aux_source_directory(. SOURCE)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(
