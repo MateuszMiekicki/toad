@@ -2,7 +2,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <toad/Logger.hh>
 #include <toad/data_reader/environment_variable/ParseEnvironmentVariable.hh>
 
 namespace
@@ -21,7 +20,7 @@ enum class EnvironmentVariableInputType
 
 auto identifyTypeOfInput(const std::string& input) -> EnvironmentVariableInputType
 {
-    if(input.find(mandatoryDelimiter) not_eq std::string::npos)
+    if(input.find(mandatoryDelimiter) not_eq std::string::npos) 
     {
         return EnvironmentVariableInputType::mandatory;
     }

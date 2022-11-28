@@ -1,4 +1,5 @@
 #pragma once
+#define PACKAGE_NAME "@PACKAGE_NAME@"// NOLINT
 #define COMPONENT_NAME "@COMPONENT_NAME@" // NOLINT
 #define MODULE_NAME    "@MODULE_NAME@" // NOLINT
 #define MODULE_VERSION "@PROJECT_VERSION@" // NOLINT
@@ -6,14 +7,17 @@
 #include <iostream>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
-
+#include <fmt/ostream.h>
+#include <spdlog/fmt/ostr.h>
+namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
+{
 struct Logger // NOLINT
 {
     std::shared_ptr<spdlog::logger> basicLogger;
 
     Logger() noexcept
     try : basicLogger{spdlog::basic_logger_mt(
-        MODULE_NAME, fmt::format("logs/{}/{}_{}.log", COMPONENT_NAME, MODULE_NAME, MODULE_VERSION).data())}
+        MODULE_NAME, fmt::format("logs/{}/{}/{}_{}.log", PACKAGE_NAME, COMPONENT_NAME, MODULE_NAME, MODULE_VERSION).data())}
     {
         basicLogger->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
 #ifndef DNDEBUG
@@ -26,11 +30,15 @@ struct Logger // NOLINT
     }
     catch(const std::exception &e)
     {
-        std::cout << "error occurred: " << e.what() << std::endl;
+        std::cerr << "error occurred: " << e.what() << std::endl;
+    }
+    catch(...)
+    {
+        std::cerr << "undefined error occurred\n";
     }
     Logger(const Logger &) = delete; // NOLINT
     Logger &operator=(const Logger &) = delete; // NOLINT
-};
+};}
 #ifndef DNDEBUG
     #define DEBUG_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::debug, __VA_ARGS__) // NOLINT
 #else

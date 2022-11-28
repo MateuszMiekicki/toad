@@ -9,7 +9,7 @@ modernize-*
 
 WarningsAsErrors: '*'
 
-HeaderFilterRegex: 'include/[A-Z][A-Za-z0-9]*\.hh'
+HeaderFilterRegex: 'include/[A-Z][A-Za-z0-9]*/*.hh'
 AnalyzeTemporaryDtors: false
 InheritParentConfig: false
 FormatStyle: file
