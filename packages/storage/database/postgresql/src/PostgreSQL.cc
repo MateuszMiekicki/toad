@@ -1,21 +1,22 @@
-#include <toad/storage/database/Configuration.hh>
-#include <toad/storage/database/postgresql/PostgreSQL.hh>
-#include <toad/storage/database/Logger.hh>
 #include <soci/soci.h>
+#include <toad/storage/database/Configuration.hh>
+#include <toad/storage/database/Logger.hh>
+#include <toad/storage/database/postgresql/PostgreSQL.hh>
 
 namespace toad::storage::database::postgresql
 {
-PostgreSQL::PostgreSQL(database::Configuration configuration): session_(std::make_unique<soci::session>()),
-configuration_{std::move(configuration)}
+PostgreSQL::PostgreSQL(database::Configuration configuration) :
+    session_(std::make_unique<soci::session>()), configuration_{std::move(configuration)}
 {
     INFO_LOG("PostgreSQL configuration: {}", configuration);
 }
 
-PostgreSQL::PostgreSQL(PostgreSQL&& postgreSQL)  noexcept :session_{std::move(postgreSQL.session_)}, configuration_{std::move(postgreSQL.configuration_)}
+PostgreSQL::PostgreSQL(PostgreSQL&& postgreSQL) noexcept :
+    session_{std::move(postgreSQL.session_)}, configuration_{std::move(postgreSQL.configuration_)}
 {
 }
 
-auto PostgreSQL::operator=(PostgreSQL&& postgreSQL)  noexcept -> PostgreSQL&
+auto PostgreSQL::operator=(PostgreSQL&& postgreSQL) noexcept -> PostgreSQL&
 {
     session_ = std::move(postgreSQL.session_);
     configuration_ = std::move(postgreSQL.configuration_);
@@ -39,12 +40,12 @@ auto PostgreSQL::connect() -> bool
 
 auto PostgreSQL::isConnected() -> bool
 {
-return false;
+    return false;
 }
 
 auto PostgreSQL::reconnect() -> bool
 {
-return false;
+    return false;
 }
 
 auto PostgreSQL::disconnect() -> bool

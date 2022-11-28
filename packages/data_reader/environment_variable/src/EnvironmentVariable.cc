@@ -1,7 +1,7 @@
 #include <optional>
 #include <string>
-#include <toad/data_reader/environment_variable/Logger.hh>
 #include <toad/data_reader/environment_variable/EnvironmentVariable.hh>
+#include <toad/data_reader/environment_variable/Logger.hh>
 
 namespace toad::data_reader
 {

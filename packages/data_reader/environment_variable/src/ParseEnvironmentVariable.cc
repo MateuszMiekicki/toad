@@ -20,7 +20,7 @@ enum class EnvironmentVariableInputType
 
 auto identifyTypeOfInput(const std::string& input) -> EnvironmentVariableInputType
 {
-    if(input.find(mandatoryDelimiter) not_eq std::string::npos) 
+    if(input.find(mandatoryDelimiter) not_eq std::string::npos)
     {
         return EnvironmentVariableInputType::mandatory;
     }

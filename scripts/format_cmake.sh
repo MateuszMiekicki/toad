@@ -1,4 +1,5 @@
-for dir in . cmake packages; do
+exec "cmake-format" --config-files .cmake-format -i CMakeLists.txt
+for dir in cmake packages; do
     find . \
          \( -name 'CMakeLists.txt' \
          -o -name '*.cmake' \) \

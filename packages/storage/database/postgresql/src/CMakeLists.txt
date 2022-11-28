@@ -19,8 +19,7 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-target_link_libraries(${PROJECT_NAME}
-PRIVATE toad::storage::database::database_interface::database_interface)
+target_link_libraries(${PROJECT_NAME} PRIVATE toad::storage::database::database_interface::database_interface)
 find_package(Soci 4 REQUIRED)
 find_package(PostgreSQL 14 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE SOCI::soci_core)
