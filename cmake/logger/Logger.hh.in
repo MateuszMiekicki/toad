@@ -9,9 +9,16 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
-namespace toad::@PACKAGE_NAME @ ::@COMPONENT_NAME @{struct Logger // NOLINT
-                                                    {std::shared_ptr<spdlog::logger> basicLogger;
-
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/fmt/ostr.h>
+#include <fmt/format.h>
+namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
+{
+struct Logger // NOLINT
+{
+std::shared_ptr<spdlog::logger> basicLogger;
+~Logger(){}
 Logger() noexcept
 try : basicLogger{spdlog::basic_logger_mt(
     MODULE_NAME, fmt::format("logs/{}/{}/{}_{}.log", PACKAGE_NAME, COMPONENT_NAME, MODULE_NAME, MODULE_VERSION).data())}
@@ -35,8 +42,7 @@ catch(...)
 }
 Logger(const Logger &) = delete; // NOLINT
 Logger &operator=(const Logger &) = delete; // NOLINT
-}
-;
+};
 }
 #ifndef DNDEBUG
     #define DEBUG_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(MODULE_NAME), spdlog::level::debug, __VA_ARGS__) // NOLINT

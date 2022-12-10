@@ -4,12 +4,12 @@ yaml-cpp/0.7.0
 soci/4.0.3
 spdlog/1.11.0
 libpq/14.5
+redboltz-mqtt_cpp/13.1.0
 
 [generators]
-cmake_find_package
-cmake_paths
 CMakeDeps
 CMakeToolchain
+cmake_find_package
 
 [options]
 gtest:shared=True
