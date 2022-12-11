@@ -1,16 +1,16 @@
 #include "toad/broker/mqtt/Mqtt.hh"
 
-toad::broker::Mqtt::Mqtt(toad::server::interface::Server *a) : server_(a)
-{
 
-}
 namespace toad::broker
 {
 Mqtt::~Mqtt()
 {
 }
 
+Mqtt::Mqtt(std::unique_ptr<toad::server::interface::Server> server) : server_(std::move(server))
+{
 
+}
 
 bool Mqtt::start()
 {

@@ -18,11 +18,11 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-# find_package(mqtt_cpp 13 REQUIRED)
+find_package(mqtt_cpp 13 REQUIRED)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
-  # PRIVATE mqtt_cpp::mqtt_cpp
+  PRIVATE mqtt_cpp::mqtt_cpp
   PRIVATE OpenSSL::Crypto
   PRIVATE OpenSSL::SSL)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)

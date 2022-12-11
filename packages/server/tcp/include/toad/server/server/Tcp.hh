@@ -5,8 +5,10 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl/context.hpp>
 #include <memory>
+#ifdef _WIN32
 #include <windows.h>
 #include <winsock2.h>
+#endif
 
 namespace toad::server
 {

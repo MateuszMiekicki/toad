@@ -29,7 +29,6 @@ target_link_libraries(
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.79.0 REQUIRED COMPONENTS system)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${Boost_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${Boost_INCLUDE_DIRS})
 
 find_package(OpenSSL 1.1 REQUIRED)
 target_link_libraries(

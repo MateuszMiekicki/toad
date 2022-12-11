@@ -19,7 +19,17 @@ set_target_properties(
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_link_libraries(${PROJECT_NAME} PRIVATE toad::server::server)
-target_link_libraries(${PROJECT_NAME} PRIVATE toad::broker::broker::mqtt::mqtt)
+target_link_libraries(${PROJECT_NAME} PRIVATE toad::broker::broker)
+
+find_package(mqtt_cpp 13 REQUIRED)
+find_package(OpenSSL REQUIRED)
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE mqtt_cpp::mqtt_cpp
+  PRIVATE OpenSSL::Crypto
+  PRIVATE OpenSSL::SSL)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
+
 target_compile_options(
   ${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>
