@@ -18,15 +18,15 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-find_package(mqtt_cpp 13 REQUIRED)
+find_package(mqtt_cpp_iface 13 REQUIRED)
 find_package(OpenSSL REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
-  PRIVATE mqtt_cpp::mqtt_cpp
+  PRIVATE mqtt_cpp_iface::mqtt_cpp_iface
   PRIVATE OpenSSL::Crypto
   PRIVATE OpenSSL::SSL)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
-target_link_libraries(${PROJECT_NAME} PRIVATE toad::server::server)
+target_link_libraries(${PROJECT_NAME} PRIVATE toad::network::network)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 # add_logger(${PROJECT_NAME})
 target_compile_options(

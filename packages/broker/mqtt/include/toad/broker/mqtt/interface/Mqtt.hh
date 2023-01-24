@@ -1,6 +1,6 @@
 #pragma once
 
-namespace toad::broker::interface
+namespace toad::broker::mqtt::interface
 {
 class Mqtt
 {
@@ -10,4 +10,4 @@ class Mqtt
     virtual bool stop() = 0;
     virtual bool restart() = 0;
 };
-} // namespace toad::broker::interface
+} // namespace toad::broker::mqtt::interface

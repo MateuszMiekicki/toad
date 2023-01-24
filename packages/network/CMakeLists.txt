@@ -1,7 +1,6 @@
-set(PACKAGE_NAME "server")
-set(COMPONENT_NAME "server")
-add_subdirectory(server)
-add_subdirectory(tcp)
+set(PACKAGE_NAME "network")
+set(COMPONENT_NAME "network")
+add_subdirectory(endpoint)
 
 project(
   ${COMPONENT_NAME}
@@ -18,9 +17,7 @@ set_target_properties(
              ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
              LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
              RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-             CXX_STANDARD 17
+             CXX_STANDARD 20
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
-target_link_libraries(${PROJECT_NAME}
-INTERFACE toad::server::server::server_interface::server_interface
-INTERFACE toad::server::server::tcp::tcp)
+target_link_libraries(${PROJECT_NAME} INTERFACE toad::network::network::endpoint::endpoint)

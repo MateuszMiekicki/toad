@@ -1,16 +1,24 @@
 #pragma once
 #include "toad/broker/mqtt/interface/Mqtt.hh"
-#include "toad/server/server/interface/Server.hh"
+#include "toad/broker/mqtt/interface/EventHandler.hh"
 #include <memory>
-#include <set>
+#include <mqtt_server_cpp.hpp>
+#include "toad/network/endpoint/Endpoint.hh"
 
-namespace toad::broker
+namespace toad::network
+{
+  using mqttServer_t = MQTT_NS::server<endpoint_t>;
+}
+
+namespace toad::broker::mqtt
 {
 class Mqtt : public interface::Mqtt
 {
   private:
-  std::unique_ptr<toad::server::interface::Server> server_;
-  // std::set<> sessions_;
+  boost::asio::io_context brokerContext_;
+  toad::network::mqttServer_t broker_;
+  std::unique_ptr<interface::EventHandler> eventHandler_{nullptr};
+
   public:
     Mqtt(const Mqtt&) = delete;
     Mqtt& operator=(const Mqtt&) = delete;
@@ -18,7 +26,7 @@ class Mqtt : public interface::Mqtt
     ~Mqtt();
     Mqtt(Mqtt&&);
     Mqtt& operator=(Mqtt&&);
-    Mqtt(std::unique_ptr<toad::server::interface::Server>);
+    Mqtt(const toad::network::Endpoint&, std::unique_ptr<interface::EventHandler>);
 
     bool start() override;
     bool stop() override;
