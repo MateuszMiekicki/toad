@@ -23,22 +23,18 @@ using unsubscribeEntries_t = std::vector<MQTT_NS::unsubscribe_entry>;
 using con_t = MQTT_NS::server<>::endpoint_t;
 using con_sp_t = std::shared_ptr<con_t>;
 using packet_id_t = typename std::remove_reference_t<con_t>::packet_id_t;
-
+using endpointServer_t = MQTT_NS::server<>::endpoint_t;
 
 namespace toad::broker::mqtt::interface
 {
-class EventHandler
+class ClientEventHandler
 {
   public:
-    virtual ~EventHandler() = default;
-
-    // todo: move to other, independent class related with server abstract
-    virtual void onAccept(std::shared_ptr<toad::network::endpoint_t>) = 0;
-    virtual void onError(errorCode_t) = 0;
+    virtual ~ClientEventHandler() = default;
 
     // connection handlers
     virtual void onClose() = 0;
-    virtual void onClientError(errorCode_t) = 0;
+    virtual void onError(errorCode_t) = 0;
     virtual bool onConnect(buffer_t,
                    optional_t<buffer_t> const&,
                    optional_t<buffer_t> const&,

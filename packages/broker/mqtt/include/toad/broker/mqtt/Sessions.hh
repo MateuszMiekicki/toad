@@ -1,22 +1,21 @@
 #pragma once
 #include <set>
-
+#include "toad/broker/mqtt/Session.hh"
 namespace toad::broker::mqtt
 {
-class Session;
 class Sessions
 {
-  bool operator<(const Session&);
+  // bool operator<(const Session&);
   std::set<Session> sessions_;
   public:
-    Sessions(const Sessions&) = delete;
-    Sessions& operator=(const Sessions&) = delete;
-
-    ~Sessions();
-    Sessions(Sessions&&);
-    Sessions& operator=(Sessions&&);
+    // Sessions(const Sessions&) = delete;
+    // Sessions& operator=(const Sessions&) = delete;
+    Sessions() =default;
+    ~Sessions()=default;
+    // Sessions(Sessions&&);
+    // Sessions& operator=(Sessions&&);
     
-    bool addSession(Session&&);
-    bool closeSession(Session&&);
+    bool addSession(Session);
+    bool closeSession(Session);
 };
 } // namespace toad::server::broker

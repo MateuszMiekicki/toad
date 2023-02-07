@@ -15,6 +15,7 @@ class Endpoint
     endpoint_t endpoint_;
 
   public:
+    Endpoint();
     Endpoint(const ipAddress_t&, port_t);
 
     endpoint_t endpoint() const;
