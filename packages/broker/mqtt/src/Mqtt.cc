@@ -16,6 +16,7 @@ Mqtt::Mqtt(const toad::network::Endpoint& endpoint, std::unique_ptr<interface::B
     broker_.set_error_handler(std::bind(&interface::BrokerEventHandler::onError, eventHandler_.get(), std::placeholders::_1));
     broker_.set_accept_handler(std::bind(&interface::BrokerEventHandler::onAccept, eventHandler_.get(), std::placeholders::_1));
     // MQTT_NS::setup_log();
+    
 }
 
 bool Mqtt::start()

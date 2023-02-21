@@ -1,6 +1,6 @@
-#pragma once
 #include "toad/broker/mqtt/ClientEventHandler.hh"
 
+using namespace MQTT_NS::literals;
 namespace toad::broker::mqtt
 {
 // connection handlers
@@ -12,15 +12,18 @@ void ClientEventHandler::onError(errorCode_t)
 {
 }
 
-bool ClientEventHandler::onConnect(buffer_t,
-                                   optional_t<buffer_t> const&,
-                                   optional_t<buffer_t> const&,
+bool ClientEventHandler::onConnect(buffer_t client_id,
+                                   optional_t<buffer_t> const& username,
+                                   optional_t<buffer_t> const& password,
                                    optional_t<will_t>,
                                    bool, // todo: use alias
                                    std::uint16_t, // todo: use alias
                                    properties_t)
 {
-  
+
+                    std::cout << "[server] client_id    : " << client_id << std::endl;
+                    std::cout << "[server] username     : " << (username ? username.value() : "none"_mb) << std::endl;
+                    std::cout << "[server] password     : " << (password ? password.value() : "none"_mb) << std::endl;
 }
 
 void ClientEventHandler::onDisconnect(disconnectReasonCode_t, properties_t)
