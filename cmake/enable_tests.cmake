@@ -3,6 +3,6 @@ if(${ENABLE_TESTS})
   include(CTest)
   enable_testing()
 
-  find_package(GTest 1.11 REQUIRED)
+  find_package(GTest 1.11 QUIET REQUIRED)
   include(GoogleTest)
 endif()

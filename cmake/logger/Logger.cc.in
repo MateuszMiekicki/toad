@@ -1,3 +1,0 @@
-#include <toad/@PACKAGE_NAME@/@COMPONENT_NAME@/Logger.hh>
-
-extern const toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger logger; // NOLINT

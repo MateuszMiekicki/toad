@@ -32,8 +32,8 @@ FMT=""
 # that the version number be part of the command. We prefer clang-format if
 # that's present, otherwise we work backwards from highest version to lowest
 # version.
-for clangfmt in clang-format{,-{4,3}.{9,8,7,6,5,4,3,2,1,0}}; do
-    if which "$clangfmt" &>/dev/null; then
+for clangfmt in clang-format{-{15,16,17},}; do
+    if which "$clangfmt" >/dev/null 2>&1; then
         FMT="$clangfmt"
         break
     fi
