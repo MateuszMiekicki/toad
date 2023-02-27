@@ -33,7 +33,6 @@ include(logger/add_logger)
 
 # include(enable_docs) include(enable_benchmarks) include(enable_examples) add_subdirectory(packages/data_reader)
 
-add_subdirectory(packages/network)
 add_subdirectory(packages/communication_protocol)
 
 add_subdirectory(services/collector)
