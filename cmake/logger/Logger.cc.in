@@ -1,0 +1,5 @@
+#include "toad/@PACKAGE_NAME@/@COMPONENT_NAME@/Logger.hh"
+namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
+{
+Logger Logger::instance_;
+}

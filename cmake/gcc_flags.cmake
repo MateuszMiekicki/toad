@@ -1,5 +1,5 @@
 set(GCC_FLAGS
-    # -Werror
+    -Werror
     -Wall
     -Wduplicated-cond
     -Wformat=2

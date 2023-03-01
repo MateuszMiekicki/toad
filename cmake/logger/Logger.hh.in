@@ -5,14 +5,15 @@
 #define MODULE_VERSION "@PROJECT_VERSION@" // NOLINT
 #include <fmt/core.h>
 #include <fmt/ostream.h>
-#include <iostream>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/spdlog.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/fmt/ostr.h>
 #include <fmt/format.h>
+#include "spdlog/cfg/env.h"
+#include "spdlog/async.h"
+
 namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
 {
 class Logger {
@@ -28,20 +29,25 @@ public:
 
 private:
     std::shared_ptr<spdlog::logger> logger_;
-    std::mutex mutex_;
+    std::mutex mutex_{};
     static Logger instance_;
-
-    Logger() {
+    
+    std::shared_ptr<spdlog::logger> initLogger()
+    {
         std::lock_guard<std::mutex> lock(mutex_);
-        logger_ = spdlog::basic_logger_mt(
+        auto logger = spdlog::basic_logger_mt<spdlog::async_factory>(
             COMPONENT_NAME,
             fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
-        logger_->flush_on(spdlog::level::err); // flush po każdym logowaniu o poziomie info lub wyższym
+        logger_->flush_on(spdlog::level::err);
 #ifndef DNDEBUG
         logger_->set_level(spdlog::level::debug);
         logger_->info("debug mode enable");
 #endif
         logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
+        spdlog::cfg::load_env_levels();
+        return logger;
+    }
+    Logger() :logger_{initLogger()} {
     }
 
     ~Logger()
@@ -49,7 +55,6 @@ private:
         logger_->flush();
     }
 };
-Logger Logger::instance_;
 #define LOGGER Logger::getInstance().getLogger()
 }
 

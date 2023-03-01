@@ -3,6 +3,8 @@
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
 
+#include <iostream>
+
 namespace toad::communication_protocol::mqtt
 {
 BrokerEventHandler::BrokerEventHandler(
@@ -14,6 +16,7 @@ BrokerEventHandler::BrokerEventHandler(
 
 void BrokerEventHandler::onAccept(Connection connection)
 {
+    std::cout << "BrokerEventHandler::onAccept\n";
     clientConnectionHandler_->onConnect(connection);
 }
 

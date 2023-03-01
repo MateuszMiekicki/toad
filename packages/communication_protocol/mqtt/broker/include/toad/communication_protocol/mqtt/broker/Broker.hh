@@ -21,9 +21,9 @@ class Broker : public interface::Broker
     using mqttServer_t = ::MQTT_NS::server<>;
     mqttServer_t broker_;
 
-    bool listen();
-    bool accept();
-    void onAccept();
+    void listen();
+    void accept();
+    void prepareAcceptHandler();
     void onError();
 
   public:
