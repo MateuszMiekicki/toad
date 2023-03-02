@@ -3,13 +3,8 @@
 #define COMPONENT_NAME "@COMPONENT_NAME@" // NOLINT
 #define MODULE_NAME    "@MODULE_NAME@" // NOLINT
 #define MODULE_VERSION "@PROJECT_VERSION@" // NOLINT
-#include <fmt/core.h>
-#include <fmt/ostream.h>
-#include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/fmt/ostr.h>
 #include <fmt/format.h>
 #include "spdlog/cfg/env.h"
 #include "spdlog/async.h"
@@ -28,26 +23,23 @@ public:
     }
 
 private:
-    std::shared_ptr<spdlog::logger> logger_;
+    std::shared_ptr<spdlog::logger> logger_{nullptr};
     std::mutex mutex_{};
     static Logger instance_;
     
-    std::shared_ptr<spdlog::logger> initLogger()
-    {
+    Logger() {
         std::lock_guard<std::mutex> lock(mutex_);
-        auto logger = spdlog::basic_logger_mt<spdlog::async_factory>(
+        logger_ = spdlog::basic_logger_mt<spdlog::async_factory>(
             COMPONENT_NAME,
             fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
-        logger_->flush_on(spdlog::level::err);
 #ifndef DNDEBUG
         logger_->set_level(spdlog::level::debug);
         logger_->info("debug mode enable");
 #endif
         logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
         spdlog::cfg::load_env_levels();
-        return logger;
-    }
-    Logger() :logger_{initLogger()} {
+        // note(miekicki): Check for performance issues
+        spdlog::flush_every(std::chrono::milliseconds(100));
     }
 
     ~Logger()
