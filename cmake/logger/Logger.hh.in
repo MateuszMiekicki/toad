@@ -32,14 +32,16 @@ private:
         logger_ = spdlog::basic_logger_mt<spdlog::async_factory>(
             COMPONENT_NAME,
             fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
+        // note(miekicki): Check for performance issues, timer and flush_on
+        logger_->flush_on(spdlog::level::warn);
+        spdlog::flush_every(std::chrono::milliseconds(100));
 #ifndef DNDEBUG
         logger_->set_level(spdlog::level::debug);
+        logger_->flush_on(spdlog::level::trace);
         logger_->info("debug mode enable");
 #endif
         logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
         spdlog::cfg::load_env_levels();
-        // note(miekicki): Check for performance issues
-        spdlog::flush_every(std::chrono::milliseconds(100));
     }
 
     ~Logger()
