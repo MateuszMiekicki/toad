@@ -5,19 +5,19 @@ executors:
     docker:
       - image: 0xd00d2bad/honeybadger_ci:latest
     resource_class: medium
+    parallelism: 4
 
 jobs:
   static_analysis:
     executor: linux-docker
-    parallelism: 4
     steps:
       - checkout
-      # - run:
-      #     name: "Formatting check"
-      #     command: |
-      #       bash ./scripts/format_code.sh packages
-      #       bash ./scripts/format_cmake.sh
-      #       bash ./scripts/check_check_formatted.sh
+      - run:
+          name: "Formatting check"
+          command: |
+            bash ./scripts/format_code.sh packages
+            bash ./scripts/format_cmake.sh
+            bash ./scripts/check_check_formatted.sh
       - run:
           name: "Configure"
           command: |
