@@ -23,17 +23,19 @@ RUN gem install coveralls-lcov
 #install pacakge menager for c++
 RUN pip install conan
 
-#install CMake
-COPY scripts/install-cmake.sh /scripts/install-cmake.sh
-RUN chmod +x /scripts/install-cmake.sh
-RUN /scripts/install-cmake.sh
+#preapare for install tools from scripts
+COPY scripts /cicd/scripts
+WORKDIR /cicd/scripts
 
-#install sonar scanner
-COPY scripts/install-sonar_scanner.sh /scripts/install-sonar_scanner.sh
-RUN chmod +x /scripts/install-sonar_scanner.sh
-RUN /scripts/install-sonar_scanner.sh
+# #install CMake
+RUN chmod +x install-cmake.sh
+RUN ./install-cmake.sh
 
-#clean
+# #install sonar scanner
+RUN chmod +x install-sonar_scanner.sh
+RUN ./install-sonar_scanner.sh
+
+# #clean
 RUN apt-get autoremove && \
     apt-get autoclean && \
     apt-get clean
