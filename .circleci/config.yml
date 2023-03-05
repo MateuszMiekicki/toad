@@ -5,11 +5,11 @@ executors:
     docker:
       - image: 0xd00d2bad/honeybadger_ci:latest
     resource_class: medium
-    parallelism: 4
 
 jobs:
   static_analysis:
     executor: linux-docker
+    parallelism: 4
     steps:
       - checkout
       - run:
@@ -21,6 +21,8 @@ jobs:
       - run:
           name: "Configure"
           command: |
+            mkdir -p build 
+            cd build && conan install ..
             cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
       - run:
           name: "Build"
