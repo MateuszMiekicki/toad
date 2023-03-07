@@ -42,7 +42,7 @@ jobs:
       - run:
           name: "Run gcovr coverage report generation"
           command: |
-            gcovr --filter src/ --sonarqube build/Testing/coverage.xml --branches
+            gcovr --sonarqube build/Testing/coverage.xml --branches
       - run:
           name: "Run sonar scanner"
           command: |
