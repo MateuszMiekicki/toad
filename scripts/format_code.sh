@@ -18,13 +18,14 @@
 
 function usage {
     echo "Usage: $0 DIR..."
-    exit 1
+    # exit 1
 }
-
+dirs="$@"
 if [ $# -eq 0 ]; then
     usage
+    dirs="./packages"
 fi
-
+echo $dirs
 # Variable that will hold the name of the clang-format command
 FMT=""
 
@@ -66,7 +67,7 @@ find-dominating-file() {
 }
 
 # Run clang-format -i on all of the things
-for dir in "$@"; do
+for dir in "$dirs"; do
     pushd "${dir}" &>/dev/null
     if ! find-dominating-file . .clang-format; then
         echo "Failed to find dominating .clang-format starting at $PWD"

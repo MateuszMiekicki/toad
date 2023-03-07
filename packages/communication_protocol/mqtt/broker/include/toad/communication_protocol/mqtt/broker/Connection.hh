@@ -13,6 +13,7 @@ struct Connection
     }
 
     con_sp_t connection;
+
     void start()
     {
         connection->start_session();

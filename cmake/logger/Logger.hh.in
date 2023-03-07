@@ -26,7 +26,7 @@ private:
     std::shared_ptr<spdlog::logger> logger_{nullptr};
     std::mutex mutex_{};
     static Logger instance_;
-    
+
     Logger() {
         std::lock_guard<std::mutex> lock(mutex_);
         logger_ = spdlog::basic_logger_mt<spdlog::async_factory>(

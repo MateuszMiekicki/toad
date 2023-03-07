@@ -15,18 +15,18 @@ jobs:
       - run:
           name: "Formatting check"
           command: |
-            bash ./scripts/format_code.sh packages
+            bash ./scripts/format_code.sh
             bash ./scripts/format_cmake.sh
             bash ./scripts/check_formatted.sh
       - run:
           name: "Dependency installation"
           command: |
-            mkdir -p build 
+            mkdir -p build
             cd build && conan install ..
       - run:
           name: "Configuration"
           command: |
-            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug            
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
       - run:
           name: "Build"
           command: |
