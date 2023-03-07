@@ -16,4 +16,4 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-# gtest_discover_tests(${PROJECT_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+gtest_discover_tests(${PROJECT_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
