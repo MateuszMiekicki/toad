@@ -17,7 +17,7 @@ jobs:
           command: |
             bash ./scripts/format_code.sh packages
             bash ./scripts/format_cmake.sh
-            bash ./scripts/check_check_formatted.sh
+            bash ./scripts/check_formatted.sh
       - run:
           name: "Configure"
           command: |
