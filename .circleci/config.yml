@@ -23,7 +23,6 @@ jobs:
           command: |
             mkdir -p build 
             cd build && conan install ..
-            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
       - run:
           name: "Configuration"
           command: |
