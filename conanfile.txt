@@ -1,5 +1,5 @@
 [requires]
-gtest/1.11.0
+gtest/1.13.0
 yaml-cpp/0.7.0
 soci/4.0.3
 spdlog/1.11.0
@@ -12,5 +12,3 @@ CMakeDeps
 CMakeToolchain
 cmake_find_package
 
-[options]
-gtest:shared=True
