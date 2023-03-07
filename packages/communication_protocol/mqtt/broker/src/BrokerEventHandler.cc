@@ -16,7 +16,7 @@ BrokerEventHandler::BrokerEventHandler(
 
 void BrokerEventHandler::onAccept(Connection connection)
 {
-    std::cout << "BrokerEventHandler::onAccept\n";
+    connection.start();
     clientConnectionHandler_->onConnect(connection);
 }
 

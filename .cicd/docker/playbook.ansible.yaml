@@ -1,27 +1,25 @@
-- name: Budowanie i przesyłanie obrazów Docker do Docker Hub
+- name: Building and uploading Docker images to Docker Hub
   hosts: localhost
+  gather_facts: no
 
   vars:
     docker_repository: "0xd00d2bad/toad_cicd"
+    docker_date_tag: "{{ ansible_date_time.date }}"
 
   tasks:
-    - name: Build image
-      community.docker.docker_image:
-        name: "{{ docker_repository }}"
-        build:
-          path: .
-        source: build
-    - name: Tag and push to docker hub
-      community.docker.docker_image:
-        name: "{{ docker_repository }}"
-        repository: "{{ docker_repository }}:{{ ansible_date_time.date }}"
-        push: true
-        source: local
-    - name: Add tag latest to image
-      community.docker.docker_image:
-        name: "{{ docker_repository }}:{{ ansible_date_time.date }}"
-        repository: "{{docker_repository}}:latest"
-        force_tag: true
-        source: local
-        push: true
+    # - name: Logowanie do Docker Hub
+    #   docker_login:
+    #     username: "{{ docker_username }}"
+    #     password: "{{ docker_password }}"
 
+    - name: Building an image with the latest tag
+      docker_image:
+        source: build
+        build:
+          path: ./
+          dockerfile: Dockerfile
+          pull: yes
+          nocache: yes
+        name: "{{ docker_repository }}:latest"
+        tag: latest
+        push: yes

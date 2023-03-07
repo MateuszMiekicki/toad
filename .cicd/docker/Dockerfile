@@ -14,14 +14,18 @@ RUN apt-get update && \
     apt-get install -y unzip && \
     apt-get install -y lcov && \
     apt-get install -y python3 pip && \
-    apt-get install -y ruby-dev
+    apt-get install -y ruby-dev && \
+    apt-get install -y clang-format-15
 
 #install tools for check coverage
 RUN pip install gcovr
 RUN gem install coveralls-lcov
 
 #install pacakge menager for c++
-RUN pip install conan
+RUN pip install "conan<2"
+
+#install formater for CMake
+RUN pip install cmake-format
 
 #preapare for install tools from scripts
 COPY scripts /cicd/scripts

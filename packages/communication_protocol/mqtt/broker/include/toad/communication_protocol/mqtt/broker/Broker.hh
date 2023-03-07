@@ -23,8 +23,8 @@ class Broker : public interface::Broker
 
     void listen();
     void accept();
-    void prepareAcceptHandler();
-    void onError();
+    void setHandleOnConnection();
+    void setHandleOnError();
 
   public:
     Broker(const Endpoint&, std::unique_ptr<interface::BrokerEventHandler>);
