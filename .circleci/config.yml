@@ -4,7 +4,6 @@ executors:
   linux-docker:
     docker:
       - image: 0xd00d2bad/toad_cicd:latest
-    resource_class: medium
 
 jobs:
   static_analysis:
