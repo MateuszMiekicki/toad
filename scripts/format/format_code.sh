@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # clang-format-all: a tool to run clang-format on an entire project
 # Copyright (C) 2016 Evan Klitzke <evan@eklitzke.org>
@@ -20,12 +20,12 @@ function usage {
     echo "Usage: $0 DIR..."
     # exit 1
 }
-dirs="$@"
+dir="$@"
 if [ $# -eq 0 ]; then
     usage
-    dirs="./packages"
+    dir=("./packages ./services ./cmake")
 fi
-echo $dirs
+dirs=( $dir )
 # Variable that will hold the name of the clang-format command
 FMT=""
 
@@ -67,7 +67,7 @@ find-dominating-file() {
 }
 
 # Run clang-format -i on all of the things
-for dir in "$dirs"; do
+for dir in "${dirs[@]}"; do
     pushd "${dir}" &>/dev/null
     if ! find-dominating-file . .clang-format; then
         echo "Failed to find dominating .clang-format starting at $PWD"

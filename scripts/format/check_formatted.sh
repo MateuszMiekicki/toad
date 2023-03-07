@@ -1,3 +1,4 @@
+#!/bin/sh
 if [ -n "$(git status --porcelain)" ]; then
   echo "Correct the formatting in the files above";
   exit 1;

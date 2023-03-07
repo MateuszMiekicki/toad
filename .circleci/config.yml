@@ -15,9 +15,7 @@ jobs:
       - run:
           name: "Formatting check"
           command: |
-            bash ./scripts/format_code.sh
-            bash ./scripts/format_cmake.sh
-            bash ./scripts/check_formatted.sh
+            bash ./scripts/format_all.sh
       - run:
           name: "Dependency installation"
           command: |
