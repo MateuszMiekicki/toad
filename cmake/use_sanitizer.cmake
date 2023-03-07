@@ -1,4 +1,4 @@
-option(USE_SANITIZATION "If ON is compiled with sanitization." OFF)
+option(USE_SANITIZATION "If ON is compiled with sanitization" OFF)
 if(USE_SANITIZATION)
   if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     message(STATUS "Adding sanitization for GNU compiler.")

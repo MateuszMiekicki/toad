@@ -23,7 +23,7 @@ jobs:
       - run:
           name: "Configuration"
           command: |
-            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_CODE_COVERAGE=ON
       - run:
           name: "Build"
           command: |
@@ -35,7 +35,7 @@ jobs:
       - run:
           name: "Run lcov coverage report generation"
           command: |
-            lcov --capture --directory build/src --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
+            lcov --capture --directory build/packages --directory build/services --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
             lcov --remove build/Testing/coverage.info '/usr/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter system-files
             coveralls-lcov --repo-token $COVERALLS_TOKEN build/Testing/coverage.info
       - run:
