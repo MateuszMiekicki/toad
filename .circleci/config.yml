@@ -35,7 +35,7 @@ jobs:
       - run:
           name: "Run lcov coverage report generation"
           command: |
-            lcov --capture --directory build/packages --directory build/services --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
+            lcov --capture --base-directory build/packages --base-directory build/services --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
             lcov --remove build/Testing/coverage.info '/usr/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter system files
             lcov --remove build/Testing/coverage.info '/**/.conan/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter conan files
             coveralls-lcov --repo-token $COVERALLS_TOKEN build/Testing/coverage.info
