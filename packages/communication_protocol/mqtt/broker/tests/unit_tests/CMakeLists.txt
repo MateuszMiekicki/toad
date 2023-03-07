@@ -1,13 +1,12 @@
 project(${MODULE_NAME}_ut LANGUAGES CXX)
-
+find_package(GTest 1.13 QUIET REQUIRED)
+include(GoogleTest)
 aux_source_directory(. SOURCE)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE GTest::gtest
-  PRIVATE GTest::gmock_main
-  PRIVATE GTest::gtest_main
-  PRIVATE GTest::gmock)
+  PRIVATE GTest::gtest_main)
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
