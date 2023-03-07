@@ -23,6 +23,8 @@ RUN gem install coveralls-lcov
 
 #install pacakge menager for c++
 RUN pip install "conan<2"
+RUN conan profile new default --detect
+RUN conan profile update settings.compiler.libcxx=libstdc++11 default
 
 #install formater for CMake
 RUN pip install cmake-format
