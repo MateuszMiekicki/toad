@@ -19,11 +19,15 @@ jobs:
             bash ./scripts/format_cmake.sh
             bash ./scripts/check_formatted.sh
       - run:
-          name: "Configure"
+          name: "Dependency installation"
           command: |
             mkdir -p build 
             cd build && conan install ..
             cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      - run:
+          name: "Configuration"
+          command: |
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug            
       - run:
           name: "Build"
           command: |
