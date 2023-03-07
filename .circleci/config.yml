@@ -58,11 +58,16 @@ jobs:
       os:
         type: executor
     executor: << parameters.os >>
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - checkout
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
+      - run:
+          name: "Dependency installation"
+          command: |
+            mkdir -p build
+            cd build && conan install ..
       - run:
           name: "Configure"
           command: |
@@ -72,7 +77,7 @@ jobs:
           command: |
             cmake --build build
       - persist_to_workspace:
-          root: ~/honeybadger_ci
+          root: ~/toad_cicd
           paths:
             - ./build
 
@@ -82,11 +87,11 @@ jobs:
         type: executor
     executor: << parameters.os >>
     parallelism: 4
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - checkout
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
       - run:
           name: "Run tests"
           command: |
@@ -96,17 +101,17 @@ jobs:
       - store_artifacts:
           path: build/Testing
       - persist_to_workspace:
-          root: ~/honeybadger_ci
+          root: ~/toad_cicd
           paths:
             - build
 
   # deploy_docs:
   #   docker:
   #     - image: alpine:latest
-  #   working_directory: ~/honeybadger_ci
+  #   working_directory: ~/toad_cicd
   #   steps:
   #     - attach_workspace:
-  #         at: ~/honeybadger_ci
+  #         at: ~/toad_cicd
   #     - run:
   #         name: Install and configure git
   #         command: |
@@ -134,10 +139,10 @@ jobs:
       os:
         type: executor
     executor: << parameters.os >>
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
       - run: |
           ls -la
           cd build
@@ -147,10 +152,10 @@ jobs:
       os:
         type: executor
     executor: << parameters.os >>
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
       - run: |
           ls -la
           cd build
