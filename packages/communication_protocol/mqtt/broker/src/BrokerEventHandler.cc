@@ -14,7 +14,7 @@ BrokerEventHandler::BrokerEventHandler(
 {
 }
 
-void BrokerEventHandler::onAccept(Connection connection)
+void BrokerEventHandler::onAccept(Connection& connection)
 {
     connection.start();
     clientConnectionHandler_->onConnect(connection);

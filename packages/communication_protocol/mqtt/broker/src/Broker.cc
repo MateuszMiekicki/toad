@@ -6,6 +6,7 @@
 #include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
 
 #include <iostream>
+#include <vector>
 
 namespace toad::communication_protocol::mqtt
 {
@@ -29,8 +30,9 @@ void Broker::setHandleOnConnection()
     broker_.set_accept_handler(
         [&](Connection::con_sp_t con)
         {
-        Connection connection(con);
+        Connection connection(std::move(con));
         brokerEventHandler_->onAccept(connection);
+        connections_.push_back(std::move(connection));
     });
 }
 

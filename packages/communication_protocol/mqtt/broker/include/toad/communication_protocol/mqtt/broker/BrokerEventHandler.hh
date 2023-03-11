@@ -23,7 +23,7 @@ class BrokerEventHandler : public interface::BrokerEventHandler
 
   public:
     BrokerEventHandler(std::unique_ptr<interface::ClientConnectionHandler>);
-    void onAccept(Connection) override;
+    void onAccept(Connection&) override;
     void onError(ErrorCode) override;
 };
 } // namespace toad::communication_protocol::mqtt

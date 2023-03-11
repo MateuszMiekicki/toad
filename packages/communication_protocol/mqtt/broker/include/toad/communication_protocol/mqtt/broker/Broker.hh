@@ -1,4 +1,5 @@
 #pragma once
+#include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/interface/Broker.hh"
 #include "toad/communication_protocol/mqtt/broker/interface/BrokerEventHandler.hh"
 
@@ -15,9 +16,11 @@ namespace toad::communication_protocol::mqtt
 class Broker : public interface::Broker
 {
   private:
-    std::unique_ptr<interface::BrokerEventHandler> brokerEventHandler_;
+    std::vector<Connection> connections_{};
 
-    boost::asio::io_context brokerAcceptor_;
+    std::unique_ptr<interface::BrokerEventHandler> brokerEventHandler_{};
+
+    boost::asio::io_context brokerAcceptor_{};
     using mqttServer_t = ::MQTT_NS::server<>;
     mqttServer_t broker_;
 
