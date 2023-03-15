@@ -1,9 +1,7 @@
 #include "toad/communication_protocol/mqtt/broker/ClientConnectionHandler.hh"
-
 #include "toad/communication_protocol/mqtt/Logger.hh"
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
 
-#include <iostream>
 
 namespace toad::communication_protocol::mqtt
 {
