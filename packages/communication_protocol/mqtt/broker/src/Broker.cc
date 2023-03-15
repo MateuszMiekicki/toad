@@ -32,7 +32,6 @@ void Broker::setHandleOnConnection()
         {
         Connection connection(std::move(con));
         brokerEventHandler_->onAccept(connection);
-        connections_.push_back(std::move(connection));
     });
 }
 

@@ -1,7 +1,6 @@
 #pragma once
-#include "toad/communication_protocol/mqtt/Logger.hh"
-
 #include <mqtt_server_cpp.hpp>
+#include <vector>
 
 namespace toad::communication_protocol::mqtt
 {
@@ -21,8 +20,11 @@ struct Connection
         return *this;
     }
 
+    // Connection& operator(Connection&& con)
+
     using con_t = ::MQTT_NS::server<>::endpoint_t;
     using con_sp_t = std::shared_ptr<con_t>;
+    using con_wp_t = std::weak_ptr<con_t>;
 
     Connection(con_sp_t&& con) : connection(std::move(con))
     {
@@ -30,9 +32,21 @@ struct Connection
 
     con_sp_t connection;
 
+    con_sp_t& get()
+    {
+        return connection;
+    }
+
+    con_wp_t getWp()
+    {
+        return {connection};
+    }
+
     void start()
     {
         connection->start_session(/*std::move(wp)*/);
     }
 };
+
+using connections_t = std::set<Connection::con_sp_t>;
 } // namespace toad::communication_protocol::mqtt
