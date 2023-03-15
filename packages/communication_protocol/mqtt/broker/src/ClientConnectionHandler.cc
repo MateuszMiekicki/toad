@@ -25,28 +25,7 @@ void ClientConnectionHandler::onConnect(Connection& connection)
             wp.lock()->connack(false, ::MQTT_NS::v5::connect_reason_code::client_identifier_not_valid);
             return false;
         }
-        // using namespace ::MQTT_NS::literals;
-        // ::MQTT_NS::v5::properties connack_ps {
-        //     ::MQTT_NS::v5::property::session_expiry_interval(10),
-        //     ::MQTT_NS::v5::property::receive_maximum(10),
-        //     ::MQTT_NS::v5::property::maximum_qos(::MQTT_NS::qos::exactly_once),
-        //     ::MQTT_NS::v5::property::retain_available(true),
-        //     ::MQTT_NS::v5::property::maximum_packet_size(100),
-        //     ::MQTT_NS::v5::property::assigned_client_identifier("test cid"_mb),
-        //     ::MQTT_NS::v5::property::topic_alias_maximum(0),
-        //     ::MQTT_NS::v5::property::reason_string("test connect success"_mb),
-        //     ::MQTT_NS::v5::property::user_property("key1"_mb, "val1"_mb),
-        //     ::MQTT_NS::v5::property::user_property("key2"_mb, "val2"_mb),
-        //     ::MQTT_NS::v5::property::wildcard_subscription_available(false),
-        //     ::MQTT_NS::v5::property::subscription_identifier_available(false),
-        //     ::MQTT_NS::v5::property::shared_subscription_available(false),
-        //     ::MQTT_NS::v5::property::server_keep_alive(5),
-        //     ::MQTT_NS::v5::property::response_information("test response information"_mb),
-        //     ::MQTT_NS::v5::property::server_reference("test server reference"_mb),
-        //     ::MQTT_NS::v5::property::authentication_method("test authentication method"_mb),
-        //     ::MQTT_NS::v5::property::authentication_data("test authentication data"_mb)
-        // };
-        wp.lock()->connack(false, ::MQTT_NS::v5::connect_reason_code::success /*,std::move(connack_ps)*/);
+        wp.lock()->connack(false, ::MQTT_NS::v5::connect_reason_code::success);
         connectionManager_.addConnection(wp.lock());
         return true;
     });
