@@ -2,7 +2,6 @@
 #pragma once
 #define PACKAGE_NAME   "communication_protocol" // NOLINT
 #define COMPONENT_NAME "mqtt" // NOLINT
-#define MODULE_NAME    "broker" // NOLINT
 #define MODULE_VERSION "0.1.0" // NOLINT
 #include "spdlog/async.h"
 #include "spdlog/cfg/env.h"
@@ -35,9 +34,16 @@ static Logger instance_;
 Logger()
 {
     std::lock_guard<std::mutex> lock(mutex_);
+    if(auto logger = spdlog::get(COMPONENT_NAME))
+    {
+        logger_ = logger;
+    }
+    else
+    {
     logger_ = spdlog::basic_logger_mt<spdlog::async_factory>(
         COMPONENT_NAME,
         fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
+    }
     // note(miekicki): Check for performance issues, timer and flush_on
     logger_->flush_on(spdlog::level::warn);
     spdlog::flush_every(std::chrono::milliseconds(100));

@@ -6,7 +6,8 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE GTest::gtest
-  PRIVATE GTest::gtest_main)
+  PRIVATE GTest::gtest_main
+  PRIVATE toad::communication_protocol::mqtt::broker)
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
