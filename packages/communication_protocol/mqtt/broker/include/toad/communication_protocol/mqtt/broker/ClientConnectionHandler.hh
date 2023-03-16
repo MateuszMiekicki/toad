@@ -11,5 +11,6 @@ class ClientConnectionHandler : public interface::ClientConnectionHandler
 
   public:
     void onConnect(Connection&) override;
+    void onDisconnect(Connection&) override;
 };
 } // namespace toad::communication_protocol::mqtt

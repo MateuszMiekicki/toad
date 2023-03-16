@@ -27,6 +27,7 @@ void BrokerEventHandler::onAccept(Connection& connection)
 {
     connection.start();
     clientConnectionHandler_->onConnect(connection);
+    clientConnectionHandler_->onDisconnect(connection);
 }
 
 void BrokerEventHandler::onError(ErrorCode)
