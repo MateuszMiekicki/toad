@@ -7,6 +7,7 @@ class Connection;
 
 namespace toad::communication_protocol::mqtt::interface
 {
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class ClientConnectionHandler
 {
   public:

@@ -23,10 +23,15 @@ class Broker : public interface::Broker
 
     void listen();
     void accept();
-    void setHandleOnConnection();
-    void setHandleOnError();
+    void setupHandleOnConnection();
+    void setupHandleOnError();
 
   public:
+    Broker(const Broker&) = delete;
+    Broker& operator=(const Broker&) = delete;
+    Broker(Broker&&) = delete;
+    Broker& operator=(Broker&&) = delete;
+    ~Broker() = default;
     Broker(const Endpoint&, std::unique_ptr<interface::BrokerEventHandler>);
     bool start() override;
 };

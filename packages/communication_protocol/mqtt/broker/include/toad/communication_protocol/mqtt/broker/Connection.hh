@@ -5,46 +5,47 @@
 namespace toad::communication_protocol::mqtt
 {
 // todo(miekicki): refactoring, split into separate files; look at the start and start_session functions
-struct Connection
+class Connection
 {
+  public:
+    using con_t = ::MQTT_NS::server<>::endpoint_t;
+    using con_sp_t = std::shared_ptr<con_t>;
+    using con_wp_t = std::weak_ptr<con_t>;
+
+  private:
+    con_sp_t connection_;
+
+  public:
     Connection(const Connection&) = delete;
     Connection& operator=(const Connection&) = delete;
 
-    Connection(Connection&& con) : connection{std::move(con.connection)}
+    Connection(Connection&& con) : connection_{std::move(con.connection_)}
     {
     }
 
     Connection& operator=(Connection&& con)
     {
-        connection = std::move(con.connection);
+        connection_ = std::move(con.connection_);
         return *this;
     }
 
-    // Connection& operator(Connection&& con)
-
-    using con_t = ::MQTT_NS::server<>::endpoint_t;
-    using con_sp_t = std::shared_ptr<con_t>;
-    using con_wp_t = std::weak_ptr<con_t>;
-
-    Connection(con_sp_t&& con) : connection(std::move(con))
+    Connection(con_sp_t&& con) : connection_(std::move(con))
     {
     }
 
-    con_sp_t connection;
-
     con_sp_t& get()
     {
-        return connection;
+        return connection_;
     }
 
     con_wp_t getWp()
     {
-        return {connection};
+        return {connection_};
     }
 
     void start()
     {
-        connection->start_session(/*std::move(wp)*/);
+        connection_->start_session(/*std::move(wp)*/);
     }
 };
 

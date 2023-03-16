@@ -8,6 +8,7 @@ using clientId_t = std::string_view;
 
 namespace toad::communication_protocol::mqtt::interface
 {
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class ClientIdValidator
 {
   public:

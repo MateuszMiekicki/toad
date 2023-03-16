@@ -3,18 +3,22 @@
 #define PACKAGE_NAME   "communication_protocol" // NOLINT
 #define COMPONENT_NAME "mqtt" // NOLINT
 #define MODULE_VERSION "0.1.0" // NOLINT
-#include "spdlog/async.h"
-#include "spdlog/cfg/env.h"
-
+#include <spdlog/async.h>
+#include <spdlog/cfg/env.h>
 #include <fmt/format.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
+#include <iostream>
 
 namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
 {
 class Logger{
-public: Logger(const Logger &) = delete;
+public:
+Logger(const Logger &) = delete;
+Logger(Logger &&) = delete;
+
 Logger &operator=(const Logger &) = delete;
+Logger &operator=(Logger &&) = delete;
 
 static Logger &getInstance()
 {
@@ -29,10 +33,13 @@ std::shared_ptr<spdlog::logger> getLogger()
 private:
 std::shared_ptr<spdlog::logger> logger_{nullptr};
 std::mutex mutex_{};
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 static Logger instance_;
 
 Logger()
 {
+    try
+    {
     std::lock_guard<std::mutex> lock(mutex_);
     if(auto logger = spdlog::get(COMPONENT_NAME))
     {
@@ -54,14 +61,18 @@ Logger()
 #endif
     logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
     spdlog::cfg::load_env_levels();
+    }
+    catch (const spdlog::spdlog_ex &ex)
+    {
+        std::cerr << "Log init failed: " << ex.what() << std::endl;
+    }
 }
 
 ~Logger()
 {
     logger_->flush();
 }
-}
-;
+};
 #define LOGGER Logger::getInstance().getLogger()
 }
 
@@ -74,6 +85,7 @@ Logger()
 #define INFO_LOG(...)  SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::info, __VA_ARGS__) // NOLINT
 #define WARN_LOG(...)  SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::warn, __VA_ARGS__) // NOLINT
 #define ERROR_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::err, __VA_ARGS__) // NOLINT
+// NOLINTNEXTLINE
 #define CRITICAL_LOG(...) \
     SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::critical, __VA_ARGS__) // NOLINT
 // clang-format on

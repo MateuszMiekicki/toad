@@ -1,15 +1,16 @@
-#modernize-pass-by-value,
 Checks: '
 cppcoreguidelines-*,
 cert-*,
 clang-analyzer-*,
 bugprone-*,
-modernize-*
+modernize-*,
+-modernize-use-trailing-return-type,
+-modernize-use-nodiscard
 '
 
 WarningsAsErrors: '*'
 
-HeaderFilterRegex: 'include/[A-Z][A-Za-z0-9]*/*.hh'
+HeaderFilterRegex: 'include/toad/[A-Z][A-Za-z0-9]*/*.hh'
 AnalyzeTemporaryDtors: false
 InheritParentConfig: false
 FormatStyle: file
