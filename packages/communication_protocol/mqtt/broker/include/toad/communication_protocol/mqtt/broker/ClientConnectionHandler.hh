@@ -10,6 +10,8 @@ class ClientConnectionHandler : public interface::ClientConnectionHandler
     ConnectionManager connectionManager_;
 
   public:
+    void onClose(Connection& connection) override;
+    void onError(Connection& connection) override;
     void onConnect(Connection&) override;
     void onDisconnect(Connection&) override;
 };
