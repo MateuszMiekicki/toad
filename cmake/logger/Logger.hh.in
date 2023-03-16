@@ -1,80 +1,82 @@
 // clang-format off
 #pragma once
-#define PACKAGE_NAME   "communication_protocol" // NOLINT
-#define COMPONENT_NAME "mqtt" // NOLINT
-#define MODULE_VERSION "0.1.0" // NOLINT
+#define PACKAGE_NAME "@PACKAGE_NAME@"// NOLINT
+#define COMPONENT_NAME "@COMPONENT_NAME@" // NOLINT
+#define MODULE_VERSION "@PROJECT_VERSION@" // NOLINT
+#include <fmt/format.h>
+#include <iostream>
 #include <spdlog/async.h>
 #include <spdlog/cfg/env.h>
-#include <fmt/format.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
-#include <iostream>
 
 namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
 {
-class Logger{
-public:
-Logger(const Logger &) = delete;
-Logger(Logger &&) = delete;
-
-Logger &operator=(const Logger &) = delete;
-Logger &operator=(Logger &&) = delete;
-
-static Logger &getInstance()
+class Logger
 {
-    return instance_;
-}
+  public:
+    Logger(const Logger &) = delete;
+    Logger(Logger &&) = delete;
 
-std::shared_ptr<spdlog::logger> getLogger()
-{
-    return logger_;
-}
+    Logger &operator=(const Logger &) = delete;
+    Logger &operator=(Logger &&) = delete;
 
-private:
-std::shared_ptr<spdlog::logger> logger_{nullptr};
-std::mutex mutex_{};
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-static Logger instance_;
-
-Logger()
-{
-    try
+    static Logger &getInstance()
     {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if(auto logger = spdlog::get(COMPONENT_NAME))
-    {
-        logger_ = logger;
+        return instance_;
     }
-    else
+
+    std::shared_ptr<spdlog::logger> getLogger()
     {
-    logger_ = spdlog::basic_logger_mt<spdlog::async_factory>(
-        COMPONENT_NAME,
-        fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
+        return logger_;
     }
-    // note(miekicki): Check for performance issues, timer and flush_on
-    logger_->flush_on(spdlog::level::warn);
-    spdlog::flush_every(std::chrono::milliseconds(100));
+
+  private:
+    std::shared_ptr<spdlog::logger> logger_{nullptr};
+    std::mutex mutex_{};
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+    static Logger instance_;
+
+    Logger()
+    {
+        try
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if(auto logger = spdlog::get(COMPONENT_NAME))
+            {
+                logger_ = logger;
+            }
+            else
+            {
+                logger_ = spdlog::basic_logger_mt<spdlog::async_factory>(
+                    COMPONENT_NAME,
+                    fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
+            }
+            // note(miekicki): Check for performance issues, timer and flush_on
+            logger_->flush_on(spdlog::level::warn);
+            spdlog::flush_every(std::chrono::milliseconds(100));
 #ifndef DNDEBUG
-    logger_->set_level(spdlog::level::debug);
-    logger_->flush_on(spdlog::level::trace);
-    logger_->info("debug mode enable");
+            logger_->set_level(spdlog::level::debug);
+            logger_->flush_on(spdlog::level::trace);
+            logger_->info("debug mode enable");
 #endif
-    logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
-    spdlog::cfg::load_env_levels();
+            logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
+            spdlog::cfg::load_env_levels();
+        }
+        catch(const spdlog::spdlog_ex &ex)
+        {
+            std::cerr << "Log init failed: " << ex.what() << std::endl;
+        }
     }
-    catch (const spdlog::spdlog_ex &ex)
-    {
-        std::cerr << "Log init failed: " << ex.what() << std::endl;
-    }
-}
 
-~Logger()
-{
-    logger_->flush();
-}
+    ~Logger()
+    {
+        logger_->flush();
+    }
 };
+
 #define LOGGER Logger::getInstance().getLogger()
-}
+} // namespace toad::communication_protocol::mqtt
 
 #define TRACE_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::trace, __VA_ARGS__) // NOLINT
 #ifndef DNDEBUG
@@ -88,4 +90,5 @@ Logger()
 // NOLINTNEXTLINE
 #define CRITICAL_LOG(...) \
     SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::critical, __VA_ARGS__) // NOLINT
+
 // clang-format on
