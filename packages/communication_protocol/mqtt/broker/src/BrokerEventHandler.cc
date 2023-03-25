@@ -23,11 +23,18 @@ BrokerEventHandler::BrokerEventHandler(
 {
 }
 
-void BrokerEventHandler::onAccept(Connection& connection)
+void BrokerEventHandler::setupHandlersForClient(std::shared_ptr<Connection>& connection)
 {
-    connection.start();
     clientConnectionHandler_->onConnect(connection);
     clientConnectionHandler_->onDisconnect(connection);
+    clientConnectionHandler_->onPublish(connection);
+    clientConnectionHandler_->onSubscribe(connection);
+}
+
+void BrokerEventHandler::onAccept(std::shared_ptr<Connection>& connection)
+{
+    connection->start();
+    setupHandlersForClient(connection);
 }
 
 void BrokerEventHandler::onError(ErrorCode)

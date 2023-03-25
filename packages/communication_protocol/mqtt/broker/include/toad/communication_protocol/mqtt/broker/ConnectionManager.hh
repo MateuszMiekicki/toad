@@ -13,9 +13,10 @@ class ConnectionManager
     connections_t connections_;
 
   public:
-    void addConnection(Connection::con_sp_t);
-    void removeConnection(Connection::con_sp_t);
-    void closeConnection(Connection::con_sp_t);
-    bool acceptConnection(const clientId_t&) const;
+    void addConnection(std::shared_ptr<Connection>&);
+    void removeConnection(std::shared_ptr<Connection>&);
+    void closeConnection(std::shared_ptr<Connection>&);
+    bool acceptConnection(
+        const clientId_t&) const; // todo(miekicki): remove from it and make better solution with more dynamic rules
 };
 } // namespace toad::communication_protocol::mqtt

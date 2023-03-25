@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 namespace toad::communication_protocol
 {
@@ -17,7 +18,7 @@ class BrokerEventHandler
 {
   public:
     virtual ~BrokerEventHandler() = default;
-    virtual void onAccept(Connection&) = 0;
+    virtual void onAccept(std::shared_ptr<Connection>&) = 0;
     virtual void onError(ErrorCode) = 0;
 };
 } // namespace toad::communication_protocol::mqtt::interface

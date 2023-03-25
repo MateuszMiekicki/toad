@@ -27,7 +27,7 @@ void Broker::setupHandleOnConnection()
     broker_.set_accept_handler(
         [&](Connection::con_sp_t con)
         {
-        Connection connection(std::move(con));
+        auto connection = std::make_shared<Connection>(std::move(con));
         brokerEventHandler_->onAccept(connection);
     });
 }

@@ -10,9 +10,11 @@ class ClientConnectionHandler : public interface::ClientConnectionHandler
     ConnectionManager connectionManager_;
 
   public:
-    void onClose(Connection& connection) override;
-    void onError(Connection& connection) override;
-    void onConnect(Connection&) override;
-    void onDisconnect(Connection&) override;
+    void onClose(std::shared_ptr<Connection>& connection) override;
+    void onError(std::shared_ptr<Connection>& connection) override;
+    void onConnect(std::shared_ptr<Connection>&) override;
+    void onDisconnect(std::shared_ptr<Connection>&) override;
+    void onPublish(std::shared_ptr<Connection>&) override;
+    void onSubscribe(std::shared_ptr<Connection>&) override;
 };
 } // namespace toad::communication_protocol::mqtt

@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 namespace toad::communication_protocol::mqtt
 {
@@ -17,9 +18,11 @@ class ClientConnectionHandler
 {
   public:
     virtual ~ClientConnectionHandler() = default;
-    virtual void onClose(Connection&) = 0;
-    virtual void onError(Connection&) = 0;
-    virtual void onConnect(Connection&) = 0;
-    virtual void onDisconnect(Connection&) = 0;
+    virtual void onClose(std::shared_ptr<Connection>&) = 0;
+    virtual void onError(std::shared_ptr<Connection>&) = 0;
+    virtual void onConnect(std::shared_ptr<Connection>&) = 0;
+    virtual void onDisconnect(std::shared_ptr<Connection>&) = 0;
+    virtual void onPublish(std::shared_ptr<Connection>&) = 0;
+    virtual void onSubscribe(std::shared_ptr<Connection>&) = 0;
 };
 } // namespace toad::communication_protocol::mqtt::interface

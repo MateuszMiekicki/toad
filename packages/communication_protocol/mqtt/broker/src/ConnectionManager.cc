@@ -4,17 +4,17 @@
 
 namespace toad::communication_protocol::mqtt
 {
-void ConnectionManager::addConnection(Connection::con_sp_t connection)
+void ConnectionManager::addConnection(std::shared_ptr<Connection>& connection)
 {
     connections_.insert(connection);
 }
 
-void ConnectionManager::removeConnection(Connection::con_sp_t connection)
+void ConnectionManager::removeConnection(std::shared_ptr<Connection>& connection)
 {
     connections_.erase(connection);
 }
 
-void ConnectionManager::closeConnection(Connection::con_sp_t)
+void ConnectionManager::closeConnection(std::shared_ptr<Connection>&)
 {
 }
 
