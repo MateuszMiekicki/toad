@@ -48,5 +48,6 @@ class Connection
         connection_->start_session(/*std::move(wp)*/);
     }
 };
+
 using connections_t = std::set<std::shared_ptr<Connection>>;
 } // namespace toad::communication_protocol::mqtt

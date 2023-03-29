@@ -1,15 +1,16 @@
 #pragma once
+#include "toad/communication_protocol/mqtt/broker/Subscription.hh"
 
 namespace toad::communication_protocol::mqtt
 {
-class Subscription;
-
 class SubscriptionManager
 {
   private:
+    subscriptions_t subscriptions_;
+
   public:
-    void publish(const topic_t&, const message_t&, );
+    void publish(const topic_t&, const SubscriptionOptions&);
     void subscribe(const Subscription&);
-    void unsubscribe();
+    void unsubscribe(const Subscription&);
 };
 } // namespace toad::communication_protocol::mqtt
