@@ -9,7 +9,7 @@ class SubscriptionManager
     subscriptions_t subscriptions_;
 
   public:
-    void publish(const topic_t&, const SubscriptionOptions&);
+    void publish( topic_t,  topic_t, const SubscriptionOptions&);
     void subscribe(const Subscription&);
     void unsubscribe(const Subscription&);
 };

@@ -113,8 +113,9 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
 {
     using packet_id_t = typename std::remove_reference_t<decltype(*connection->get())>::packet_id_t;
     connection->get()->set_publish_handler(
-        [this](::MQTT_NS::optional<packet_id_t>, ::MQTT_NS::publish_options, ::MQTT_NS::buffer, ::MQTT_NS::buffer)
+        [this](::MQTT_NS::optional<packet_id_t>, ::MQTT_NS::publish_options, ::MQTT_NS::buffer topic, ::MQTT_NS::buffer content)
         {
+            subscriptionManager_.publish(std::string_view(topic.data(), topic.size()), std::string_view(content.data(), content.size()), {});
         // TRACE_LOG("publish received:\n"
         // "dup: {}\n"
         // "qos: {}\n"
