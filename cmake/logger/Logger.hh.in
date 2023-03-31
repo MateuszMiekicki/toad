@@ -60,7 +60,8 @@ class Logger
             logger_->flush_on(spdlog::level::trace);
             logger_->info("debug mode enable");
 #endif
-            logger_->set_pattern("[%Y-%m-%dT%T.%e %z] [%n] [%l] [thread %t] %@: %v");
+            logger_->set_pattern("[%Y-%m-%dT%T.%eZ] [%n] [%l] [%P:%t] @PACKAGE_NAME@/@COMPONENT_NAME@/%s:%#: %v",
+                                 spdlog::pattern_time_type::utc);
             spdlog::cfg::load_env_levels();
         }
         catch(const spdlog::spdlog_ex &ex)
