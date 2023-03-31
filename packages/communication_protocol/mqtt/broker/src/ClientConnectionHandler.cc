@@ -2,6 +2,7 @@
 
 #include "toad/communication_protocol/mqtt/Logger.hh"
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
+#include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
 #include "toad/communication_protocol/mqtt/broker/Subscription.hh"
 #include "toad/communication_protocol/mqtt/broker/SubscriptionOptions.hh"
 
@@ -40,17 +41,56 @@ toad::communication_protocol::mqtt::RetainAsPublished convert(const ::MQTT_NS::r
     }
 }
 
-toad::communication_protocol::mqtt::SubscriptionOptions buildSubscriptionOptions(const ::MQTT_NS::qos& qos,
-                                                                                 const ::MQTT_NS::rap& rap)
+toad::communication_protocol::mqtt::SubscriptionOptions convertToSubscriptionOptions(const ::MQTT_NS::qos& qos,
+                                                                                     const ::MQTT_NS::rap& rap)
 {
     return {convert(qos), convert(rap)};
 }
 
-toad::communication_protocol::mqtt::Subscription
-buildSubscription(std::shared_ptr<toad::communication_protocol::mqtt::Connection> connection,
-                  const ::MQTT_NS::buffer& topic, const ::MQTT_NS::qos& qos, const ::MQTT_NS::rap& rap)
+toad::communication_protocol::mqtt::Duplicate convert(const ::MQTT_NS::dup& dup)
 {
-    return {connection, topic.data(), buildSubscriptionOptions(qos, rap)};
+    using namespace toad::communication_protocol::mqtt;
+    switch(dup)
+    {
+        case ::MQTT_NS::dup::no:
+            return Duplicate::no;
+        case ::MQTT_NS::dup::yes:
+            return Duplicate::yes;
+        default:
+            throw std::exception();
+    }
+}
+
+toad::communication_protocol::mqtt::RetainAsPublished convert(const ::MQTT_NS::retain& retain)
+{
+    using namespace toad::communication_protocol::mqtt;
+    switch(retain)
+    {
+        case ::MQTT_NS::retain::no:
+            return RetainAsPublished::discard;
+        case ::MQTT_NS::retain::yes:
+            return RetainAsPublished::retain;
+        default:
+            throw std::exception();
+    }
+}
+
+toad::communication_protocol::mqtt::PublishOptions
+convertToPublishOptions(const ::MQTT_NS::publish_options& publishOptions)
+{
+    return {convert(publishOptions.get_qos()), convert(publishOptions.get_retain()), convert(publishOptions.get_dup())};
+}
+
+toad::communication_protocol::mqtt::Subscription
+convertToSubscription(std::shared_ptr<toad::communication_protocol::mqtt::Connection> connection,
+                      const ::MQTT_NS::buffer& topic, const ::MQTT_NS::qos& qos, const ::MQTT_NS::rap& rap)
+{
+    return {connection, topic.data(), convertToSubscriptionOptions(qos, rap)};
+}
+
+std::string_view toStringView(const ::MQTT_NS::buffer& buffer)
+{
+    return {buffer.data(), buffer.size()};
 }
 } // namespace
 
@@ -113,9 +153,14 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
 {
     using packet_id_t = typename std::remove_reference_t<decltype(*connection->get())>::packet_id_t;
     connection->get()->set_publish_handler(
-        [this](::MQTT_NS::optional<packet_id_t>, ::MQTT_NS::publish_options, ::MQTT_NS::buffer topic, ::MQTT_NS::buffer content)
+        [this](::MQTT_NS::optional<packet_id_t>,
+               ::MQTT_NS::publish_options publishOptions,
+               ::MQTT_NS::buffer topic,
+               ::MQTT_NS::buffer content)
         {
-            subscriptionManager_.publish(std::string_view(topic.data(), topic.size()), std::string_view(content.data(), content.size()), {});
+        subscriptionManager_.publish(toStringView(topic),
+                                     toStringView(content),
+                                     convertToPublishOptions(publishOptions));
         // TRACE_LOG("publish received:\n"
         // "dup: {}\n"
         // "qos: {}\n"
@@ -124,24 +169,7 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
         // "topic name: {}\n"
         // "content: {}", publishOptions.get_dup(), publishOptions.get_qos(),
         // publishOptions.get_retain(), packedId?std::to_string(*packedId):"empty", topicName, content);
-
-        // auto const& idx = subs.get<tag_topic>();
-        // auto r = idx.equal_range(topic_name);
-        // for(; r.first != r.second; ++r.first)
-        // {
-        //     auto retain = [&]
-        //     {
-        //         if(r.first->rap_value == MQTT_NS::rap::retain)
-        //         {
-        //             return pubopts.get_retain();
-        //         }
-        //         return MQTT_NS::retain::no;
-        //     }();
-        //     r.first->con->publish(topic_name,
-        //                           contents,
-        //                           std::min(r.first->qos_value, pubopts.get_qos()) | retain,
-        //                           std::move(props));
-        // }
+        TRACE_LOG("{}", convertToPublishOptions(publishOptions).qualityOfService);
         return true;
     });
 }
@@ -159,7 +187,7 @@ void ClientConnectionHandler::onSubscribe(std::shared_ptr<Connection> connection
         {
             res.emplace_back(::MQTT_NS::qos_to_suback_return_code(entry.subopts.get_qos()));
             auto sub =
-                buildSubscription(connection, entry.topic_filter, entry.subopts.get_qos(), entry.subopts.get_rap());
+                convertToSubscription(connection, entry.topic_filter, entry.subopts.get_qos(), entry.subopts.get_rap());
             subscriptionManager_.subscribe(sub);
         }
         connection->get()->suback(packet_id, res);

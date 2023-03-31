@@ -3,13 +3,15 @@
 
 namespace toad::communication_protocol::mqtt
 {
+struct PublishOptions;
+
 class SubscriptionManager
 {
   private:
     subscriptions_t subscriptions_;
 
   public:
-    void publish( topic_t,  topic_t, const SubscriptionOptions&);
+    void publish(topic_t, topic_t, const PublishOptions&);
     void subscribe(const Subscription&);
     void unsubscribe(const Subscription&);
 };
