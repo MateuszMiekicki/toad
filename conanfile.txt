@@ -1,15 +1,14 @@
 [requires]
-gtest/1.11.0
+gtest/1.13.0
 yaml-cpp/0.7.0
 soci/4.0.3
 spdlog/1.11.0
 libpq/14.5
 redboltz-mqtt_cpp/13.0.0
+openssl/1.1.1t
 
 [generators]
 CMakeDeps
 CMakeToolchain
 cmake_find_package
 
-[options]
-gtest:shared=True

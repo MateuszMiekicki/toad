@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "unordered_map": "cpp",
+        "iosfwd": "cpp",
+        "*.tpp": "cpp",
+        "bitset": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "cstddef": "cpp",
+        "vector": "cpp",
+        "functional": "cpp",
+        "new": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp"
+    }
+}

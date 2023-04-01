@@ -33,18 +33,6 @@ include(logger/add_logger)
 
 # include(enable_docs) include(enable_benchmarks) include(enable_examples) add_subdirectory(packages/data_reader)
 
-add_subdirectory(packages/network)
 add_subdirectory(packages/communication_protocol)
 
 add_subdirectory(services/collector)
-
-# # app------------------ find_package(mqtt_cpp REQUIRED) find_package(spdlog REQUIRED) find_package(SOCI REQUIRED)
-# find_package(gtest REQUIRED) find_package(yaml-cpp REQUIRED) add_executable(${CMAKE_PROJECT_NAME} app/main.cc)
-# set_target_properties( ${CMAKE_PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR}
-# ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/ LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/
-# RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CXX_STANDARD 17 CXX_EXTENSIONS OFF CXX_STANDARD_REQUIRED ON)
-# target_link_libraries(${CMAKE_PROJECT_NAME} mqtt_cpp::mqtt_cpp)
-
-# target_compile_options( ${CMAKE_PROJECT_NAME} PRIVATE
-# $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>> PRIVATE
-# $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Debug>:${GCC_FLAGS_DEBUG}>>)

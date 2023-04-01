@@ -1,0 +1,25 @@
+- name: Building and uploading Docker images to Docker Hub
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    docker_repository: "0xd00d2bad/toad_cicd"
+    docker_date_tag: "{{ ansible_date_time.date }}"
+
+  tasks:
+    # - name: Logowanie do Docker Hub
+    #   docker_login:
+    #     username: "{{ docker_username }}"
+    #     password: "{{ docker_password }}"
+
+    - name: Building an image with the latest tag
+      docker_image:
+        source: build
+        build:
+          path: ./
+          dockerfile: Dockerfile
+          pull: yes
+          nocache: yes
+        name: "{{ docker_repository }}:latest"
+        tag: latest
+        push: yes

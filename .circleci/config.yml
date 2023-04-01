@@ -3,7 +3,7 @@ version: 2.1
 executors:
   linux-docker:
     docker:
-      - image: 0xd00d2bad/honeybadger_ci:latest
+      - image: 0xd00d2bad/toad_cicd:latest
 
 jobs:
   static_analysis:
@@ -14,13 +14,16 @@ jobs:
       - run:
           name: "Formatting check"
           command: |
-            bash ./scripts/format_code.sh packages
-            bash ./scripts/format_cmake.sh
-            bash ./scripts/check_check_formatted.sh
+            bash ./scripts/format_all.sh
       - run:
-          name: "Configure"
+          name: "Dependency installation"
           command: |
-            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug
+            mkdir -p build
+            cd build && conan install ..
+      - run:
+          name: "Configuration"
+          command: |
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_CODE_COVERAGE=ON
       - run:
           name: "Build"
           command: |
@@ -32,13 +35,17 @@ jobs:
       - run:
           name: "Run lcov coverage report generation"
           command: |
-            lcov --capture --directory build/src --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
-            lcov --remove build/Testing/coverage.info '/usr/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter system-files
-            coveralls-lcov --repo-token $COVERALLS_TOKEN build/Testing/coverage.info
+            lcov --capture --directory build/packages --directory build/services --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1
+            lcov --remove build/Testing/coverage.info '/usr/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter system files
+            lcov --remove build/Testing/coverage.info '/**/.conan/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter conan files
+            lcov --remove build/Testing/coverage.info '**/packages/**/tests/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter conan files
+            lcov --remove build/Testing/coverage.info '**/services/**/tests/*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter conan files
+            lcov --remove build/Testing/coverage.info '**/build/**/Logger.*' --output-file build/Testing/coverage.info --rc lcov_branch_coverage=1 # filter conan files
+            coveralls-lcov --service_name=CircleCI --repo-token $COVERALLS_TOKEN build/Testing/coverage.info
       - run:
           name: "Run gcovr coverage report generation"
           command: |
-            gcovr --filter src/ --sonarqube build/Testing/coverage.xml --branches
+            gcovr --sonarqube build/Testing/coverage.xml --branches
       - run:
           name: "Run sonar scanner"
           command: |
@@ -55,11 +62,16 @@ jobs:
       os:
         type: executor
     executor: << parameters.os >>
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - checkout
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
+      - run:
+          name: "Dependency installation"
+          command: |
+            mkdir -p build
+            cd build && conan install ..
       - run:
           name: "Configure"
           command: |
@@ -69,7 +81,7 @@ jobs:
           command: |
             cmake --build build
       - persist_to_workspace:
-          root: ~/honeybadger_ci
+          root: ~/toad_cicd
           paths:
             - ./build
 
@@ -79,11 +91,11 @@ jobs:
         type: executor
     executor: << parameters.os >>
     parallelism: 4
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - checkout
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
       - run:
           name: "Run tests"
           command: |
@@ -93,17 +105,17 @@ jobs:
       - store_artifacts:
           path: build/Testing
       - persist_to_workspace:
-          root: ~/honeybadger_ci
+          root: ~/toad_cicd
           paths:
             - build
 
   # deploy_docs:
   #   docker:
   #     - image: alpine:latest
-  #   working_directory: ~/honeybadger_ci
+  #   working_directory: ~/toad_cicd
   #   steps:
   #     - attach_workspace:
-  #         at: ~/honeybadger_ci
+  #         at: ~/toad_cicd
   #     - run:
   #         name: Install and configure git
   #         command: |
@@ -131,10 +143,10 @@ jobs:
       os:
         type: executor
     executor: << parameters.os >>
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
       - run: |
           ls -la
           cd build
@@ -144,10 +156,10 @@ jobs:
       os:
         type: executor
     executor: << parameters.os >>
-    working_directory: ~/honeybadger_ci
+    working_directory: ~/toad_cicd
     steps:
       - attach_workspace:
-          at: ~/honeybadger_ci
+          at: ~/toad_cicd
       - run: |
           ls -la
           cd build
