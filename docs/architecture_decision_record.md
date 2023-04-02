@@ -4,7 +4,6 @@
 
 * Status: [proposed | rejected | accepted | deprecated | … | superseded by [ADR-0005](0005-example.md)]
 * Stakeholders: [Parties materially affected by the requirement]
-
 * Author: [The person that wrote the requirement]
 * Deciders: [list everyone involved in the decision]
 * Date: [YYYY-MM-DD when the decision was last updated]
@@ -20,7 +19,7 @@ Technical Story: [description | ticket/issue URL]
 
 * [driver 1, e.g., a force, facing concern, …]
 * [driver 2, e.g., a force, facing concern, …]
-* [MoSCoW method]
+* MoSCoW method
     * M - MUST: Describes a requirement that must be met in the final, final solution.
     * S - SHOULD (should be): Represents a high-priority item that should be included in the solution if possible.
     * C - COULD (could be): Describes a requirement that is seen as desirable but not necessary. It will be included if time and resources allow.
