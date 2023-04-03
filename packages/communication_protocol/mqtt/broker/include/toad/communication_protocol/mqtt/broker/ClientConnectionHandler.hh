@@ -1,7 +1,7 @@
 #pragma once
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
-#include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
 #include "toad/communication_protocol/mqtt/broker/interface/ClientConnectionHandler.hh"
+#include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
 
 namespace toad::communication_protocol::mqtt
 {

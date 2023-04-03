@@ -1,5 +1,4 @@
 #include "toad/communication_protocol/mqtt/broker/BrokerEventHandler.hh"
-
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
 

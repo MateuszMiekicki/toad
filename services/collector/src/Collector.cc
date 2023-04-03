@@ -2,7 +2,6 @@
 #include "toad/communication_protocol/mqtt/broker/Broker.hh"
 #include "toad/communication_protocol/mqtt/broker/BrokerEventHandler.hh"
 #include "toad/communication_protocol/mqtt/broker/ClientConnectionHandler.hh"
-
 #include <memory>
 #include <thread>
 

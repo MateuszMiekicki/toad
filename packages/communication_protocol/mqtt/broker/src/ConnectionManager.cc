@@ -1,5 +1,5 @@
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
-
+#include "toad/communication_protocol/mqtt/client_validator/Client.hh"
 #include "toad/communication_protocol/mqtt/Logger.hh"
 
 namespace toad::communication_protocol::mqtt
@@ -18,8 +18,9 @@ void ConnectionManager::closeConnection(std::shared_ptr<Connection>)
 {
 }
 
-bool ConnectionManager::acceptConnection(const clientId_t& clientId) const
+bool ConnectionManager::acceptConnection(const Client&) const
 {
-    return not clientId.empty();
+    // return not clientId.empty();
+    return true;
 }
 } // namespace toad::communication_protocol::mqtt

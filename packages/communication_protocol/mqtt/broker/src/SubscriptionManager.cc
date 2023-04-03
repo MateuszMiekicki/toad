@@ -1,5 +1,4 @@
 #include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
-
 #include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
 
 namespace

@@ -1,7 +1,6 @@
 #pragma once
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/SubscriptionOptions.hh"
-
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -18,8 +17,6 @@ class Subscription
     std::shared_ptr<Connection> connection_;
     topic_t topic_;
     SubscriptionOptions subscriptionOptions_;
-
-    // Subscription(std::shared_ptr<Connection>, const topic_t&, const SubscriptionOptions&);
 };
 
 struct tag_topic

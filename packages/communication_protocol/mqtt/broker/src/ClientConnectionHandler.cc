@@ -1,11 +1,10 @@
 #include "toad/communication_protocol/mqtt/broker/ClientConnectionHandler.hh"
-
-#include "toad/communication_protocol/mqtt/Logger.hh"
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
 #include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
 #include "toad/communication_protocol/mqtt/broker/Subscription.hh"
 #include "toad/communication_protocol/mqtt/broker/SubscriptionOptions.hh"
-
+#include "toad/communication_protocol/mqtt/client_validator/Client.hh"
+#include "toad/communication_protocol/mqtt/Logger.hh"
 #include <exception>
 #include <mqtt/reason_code.hpp>
 
@@ -92,6 +91,26 @@ std::string_view toStringView(const ::MQTT_NS::buffer& buffer)
 {
     return {buffer.data(), buffer.size()};
 }
+
+toad::communication_protocol::mqtt::optionalAuthn
+convertToAuthenticationData(const ::MQTT_NS::optional<::MQTT_NS::buffer>& username,
+                            const ::MQTT_NS::optional<::MQTT_NS::buffer>& password)
+{
+    if(username)
+    {
+        return toad::communication_protocol::mqtt::AuthenticationData{
+            username.value().data(),
+            password.get_value_or(::MQTT_NS::buffer()).data()};
+    }
+    return std::nullopt;
+}
+
+toad::communication_protocol::mqtt::Client buildClient(const ::MQTT_NS::buffer& clientId,
+                                                       const ::MQTT_NS::optional<::MQTT_NS::buffer>& username,
+                                                       const ::MQTT_NS::optional<::MQTT_NS::buffer>& password)
+{
+    return {clientId.data(), convertToAuthenticationData(username, password)};
+}
 } // namespace
 
 namespace toad::communication_protocol::mqtt
@@ -100,14 +119,14 @@ void ClientConnectionHandler::onConnect(std::shared_ptr<Connection> connection)
 {
     connection->get()->set_connect_handler(
         [this, connection](::MQTT_NS::buffer clientId,
-                           ::MQTT_NS::optional<::MQTT_NS::buffer> const&,
-                           ::MQTT_NS::optional<::MQTT_NS::buffer> const&,
+                           const ::MQTT_NS::optional<::MQTT_NS::buffer>& username,
+                           const ::MQTT_NS::optional<::MQTT_NS::buffer>& password,
                            ::MQTT_NS::optional<::MQTT_NS::will>,
                            bool,
                            std::uint16_t)
         {
         INFO_LOG("new connection clientId: {}", clientId.data());
-        if(not connectionManager_.acceptConnection(clientId.data()))
+        if(not connectionManager_.acceptConnection(buildClient(clientId, username, password)))
         {
             connection->get()->connack(false, ::MQTT_NS::connect_return_code::identifier_rejected);
             return false;

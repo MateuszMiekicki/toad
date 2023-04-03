@@ -1,7 +1,6 @@
 #pragma once
 #include "toad/communication_protocol/mqtt/broker/interface/BrokerEventHandler.hh"
 #include "toad/communication_protocol/mqtt/broker/interface/ClientConnectionHandler.hh"
-
 #include <memory>
 
 namespace toad::communication_protocol
