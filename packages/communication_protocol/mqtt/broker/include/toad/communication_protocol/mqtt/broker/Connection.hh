@@ -13,7 +13,7 @@ class Connection
     using con_wp_t = std::weak_ptr<con_t>;
 
   private:
-    con_sp_t connection_;
+    con_sp_t connection_{nullptr};
 
   public:
     Connection(const Connection&) = delete;

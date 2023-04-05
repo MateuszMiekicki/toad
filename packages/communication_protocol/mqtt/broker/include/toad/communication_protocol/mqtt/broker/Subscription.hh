@@ -11,10 +11,9 @@ namespace toad::communication_protocol::mqtt
 {
 using topic_t = std::string_view;
 
-class Subscription
+struct Subscription
 {
-  public:
-    std::shared_ptr<Connection> connection_;
+    std::shared_ptr<Connection> connection_{nullptr};
     topic_t topic_;
     SubscriptionOptions subscriptionOptions_;
 };

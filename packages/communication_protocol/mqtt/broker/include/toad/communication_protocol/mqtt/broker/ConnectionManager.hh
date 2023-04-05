@@ -9,9 +9,11 @@ struct Client;
 class ConnectionManager
 {
   private:
-    connections_t connections_;
-    // std::vector<std::unique_ptr<interface::IncomingClientValidator> incomingClientValidator_;
+    connections_t connections_{};
+    std::vector<std::unique_ptr<interface::IncomingClientValidator>> incomingClientValidator_{};
+
   public:
+    ConnectionManager(std::vector<std::unique_ptr<interface::IncomingClientValidator>>);
     void addConnection(std::shared_ptr<Connection>);
     void removeConnection(std::shared_ptr<Connection>);
     void closeConnection(std::shared_ptr<Connection>);

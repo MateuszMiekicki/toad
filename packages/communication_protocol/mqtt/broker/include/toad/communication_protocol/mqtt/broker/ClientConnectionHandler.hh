@@ -8,10 +8,11 @@ namespace toad::communication_protocol::mqtt
 class ClientConnectionHandler : public interface::ClientConnectionHandler
 {
   private:
-    ConnectionManager connectionManager_;
-    SubscriptionManager subscriptionManager_;
+    std::unique_ptr<ConnectionManager> connectionManager_{nullptr};
+    SubscriptionManager subscriptionManager_{};
 
   public:
+    ClientConnectionHandler(std::unique_ptr<ConnectionManager>);
     void onClose(std::shared_ptr<Connection> connection) override;
     void onError(std::shared_ptr<Connection> connection) override;
     void onConnect(std::shared_ptr<Connection>) override;

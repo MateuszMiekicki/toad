@@ -115,6 +115,11 @@ toad::communication_protocol::mqtt::Client buildClient(const ::MQTT_NS::buffer& 
 
 namespace toad::communication_protocol::mqtt
 {
+ClientConnectionHandler::ClientConnectionHandler(std::unique_ptr<ConnectionManager> connectionManager) :
+    connectionManager_{std::move(connectionManager)}, subscriptionManager_{}
+{
+}
+
 void ClientConnectionHandler::onConnect(std::shared_ptr<Connection> connection)
 {
     connection->get()->set_connect_handler(
@@ -126,14 +131,14 @@ void ClientConnectionHandler::onConnect(std::shared_ptr<Connection> connection)
                            std::uint16_t)
         {
         INFO_LOG("new connection clientId: {}", clientId.data());
-        if(not connectionManager_.acceptConnection(buildClient(clientId, username, password)))
+        if(not connectionManager_->acceptConnection(buildClient(clientId, username, password)))
         {
             connection->get()->connack(false, ::MQTT_NS::connect_return_code::identifier_rejected);
             return false;
         }
         connection->get()->connack(false, ::MQTT_NS::connect_return_code::accepted);
 
-        connectionManager_.addConnection(connection);
+        connectionManager_->addConnection(connection);
         return true;
     });
 }
@@ -144,7 +149,7 @@ void ClientConnectionHandler::onDisconnect(std::shared_ptr<Connection> connectio
         [this, connection]()
         {
         INFO_LOG("Client: {} disconnect", connection->get()->get_client_id());
-        connectionManager_.removeConnection(connection);
+        connectionManager_->removeConnection(connection);
     });
 }
 
@@ -154,7 +159,7 @@ void ClientConnectionHandler::onClose(std::shared_ptr<Connection> connection)
         [this, connection]()
         {
         INFO_LOG("SERVER CLOSED");
-        connectionManager_.removeConnection(connection);
+        connectionManager_->removeConnection(connection);
     });
 }
 
@@ -164,7 +169,7 @@ void ClientConnectionHandler::onError(std::shared_ptr<Connection> connection)
         [this, connection](::MQTT_NS::error_code ec)
         {
         INFO_LOG("SERVER error_code {}", ec.message());
-        connectionManager_.removeConnection(connection);
+        connectionManager_->removeConnection(connection);
     });
 }
 

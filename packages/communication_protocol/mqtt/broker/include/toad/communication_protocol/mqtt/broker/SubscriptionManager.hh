@@ -8,7 +8,7 @@ struct PublishOptions;
 class SubscriptionManager
 {
   private:
-    subscriptions_t subscriptions_;
+    subscriptions_t subscriptions_{};
 
   public:
     void publish(topic_t, topic_t, const PublishOptions&);
