@@ -30,7 +30,7 @@ getPreferredValueOfQualityOfService(const toad::communication_protocol::mqtt::Su
 
 namespace toad::communication_protocol::mqtt
 {
-void SubscriptionManager::publish(topic_t topic_name, topic_t contents, const PublishOptions& publishOptions)
+void SubscriptionManager::publish(topic_t topic_name, content_t content, const PublishOptions& publishOptions)
 {
     auto const& idx = subscriptions_.get<tag_topic>();
     auto r = idx.equal_range(topic_name);
@@ -38,7 +38,7 @@ void SubscriptionManager::publish(topic_t topic_name, topic_t contents, const Pu
     {
         r.first->connection_->get()->publish(0,
                                              std::string(topic_name.data(), topic_name.size()),
-                                             std::string(contents.data(), contents.size()),
+                                             std::string(content.data(), content.size()),
                                              getPreferredValueOfQualityOfService(*(r.first), publishOptions));
     }
 }
@@ -48,7 +48,17 @@ void SubscriptionManager::subscribe(const Subscription& subscription)
     subscriptions_.emplace(std::move(subscription));
 }
 
-void SubscriptionManager::unsubscribe(const Subscription&)
+auto SubscriptionManager::isSubscriberToTopic(const Subscription& subscription)const
 {
+    return subscriptions_.find(std::make_tuple(subscription.connection_, subscription.topic_));
+}
+
+void SubscriptionManager::unsubscribe(const Subscription& subscription)
+{
+    if(auto it =isSubscriberToTopic(subscription);
+    it != subscriptions_.end())
+    {
+        subscriptions_.erase(it);
+    }
 }
 } // namespace toad::communication_protocol::mqtt

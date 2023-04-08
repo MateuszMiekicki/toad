@@ -45,7 +45,6 @@ void ConnectionManager::closeConnection(std::shared_ptr<Connection>)
 
 bool ConnectionManager::acceptConnection(const Client& client) const
 {
-    // return not clientId.empty();
     return runChecks(incomingClientValidator_, client);
 }
 } // namespace toad::communication_protocol::mqtt

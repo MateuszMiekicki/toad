@@ -87,6 +87,13 @@ convertToSubscription(std::shared_ptr<toad::communication_protocol::mqtt::Connec
     return {connection, topic.data(), convertToSubscriptionOptions(qos, rap)};
 }
 
+toad::communication_protocol::mqtt::Subscription
+convertToSubscription(std::shared_ptr<toad::communication_protocol::mqtt::Connection> connection,
+                      const ::MQTT_NS::buffer& topic)
+{
+    return {connection, topic.data(), {}};
+}
+
 std::string_view toStringView(const ::MQTT_NS::buffer& buffer)
 {
     return {buffer.data(), buffer.size()};
@@ -215,6 +222,21 @@ void ClientConnectionHandler::onSubscribe(std::shared_ptr<Connection> connection
             subscriptionManager_.subscribe(sub);
         }
         connection->get()->suback(packet_id, res);
+        return true;
+    });
+}
+
+void ClientConnectionHandler::onUnsubscribe(std::shared_ptr<Connection> connection)
+{
+    connection->get()->set_unsubscribe_handler(
+        [this, connection](short unsigned int packet_id, std::vector<::MQTT_NS::unsubscribe_entry> entries)
+        {
+        for(auto const& entry: entries)
+        {
+            auto sub = convertToSubscription(connection, entry.topic_filter);
+            subscriptionManager_.unsubscribe(sub);
+        }
+        connection->get()->unsuback(packet_id);
         return true;
     });
 }
