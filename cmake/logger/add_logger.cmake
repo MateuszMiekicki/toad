@@ -1,5 +1,4 @@
 function(add_logger project_name)
-
   find_package(spdlog QUIET REQUIRED)
   find_package(fmt QUIET REQUIRED)
   configure_file("${CMAKE_SOURCE_DIR}/cmake/logger/Logger.hh.in"

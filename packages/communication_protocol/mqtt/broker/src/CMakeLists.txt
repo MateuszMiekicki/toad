@@ -22,7 +22,7 @@ find_package(mqtt_cpp 13 QUIET REQUIRED)
 find_package(OpenSSL QUIET REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
-  PRIVATE mqtt_cpp::mqtt_cpp
+  PUBLIC mqtt_cpp::mqtt_cpp
   PRIVATE OpenSSL::Crypto
   PRIVATE OpenSSL::SSL)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)

@@ -10,12 +10,17 @@
 namespace toad::communication_protocol::mqtt
 {
 using topic_t = std::string_view;
+using subscriber_t = std::shared_ptr<Connection>;
 
 struct Subscription
 {
-    std::shared_ptr<Connection> connection_{nullptr};
+    subscriber_t subscriber_{nullptr};
     topic_t topic_;
     SubscriptionOptions subscriptionOptions_;
+};
+
+struct tag_con_topic
+{
 };
 
 struct tag_topic
@@ -26,21 +31,27 @@ struct tag_con
 {
 };
 
-struct tag_con_topic
-{
-};
-
+// clang-format off
 using subscriptions_t = boost::multi_index::multi_index_container<
     Subscription,
     boost::multi_index::indexed_by<
         boost::multi_index::ordered_unique<
             boost::multi_index::tag<tag_con_topic>,
             boost::multi_index::composite_key<
-                Subscription, BOOST_MULTI_INDEX_MEMBER(Subscription, std::shared_ptr<Connection>, connection_),
-                BOOST_MULTI_INDEX_MEMBER(Subscription, topic_t, topic_)>>,
-        boost::multi_index::ordered_non_unique<boost::multi_index::tag<tag_topic>,
-                                               BOOST_MULTI_INDEX_MEMBER(Subscription, topic_t, topic_)>,
-        boost::multi_index::ordered_non_unique<boost::multi_index::tag<tag_con>,
-                                               BOOST_MULTI_INDEX_MEMBER(Subscription, std::shared_ptr<Connection>,
-                                                                        connection_)>>>;
+                Subscription,
+                BOOST_MULTI_INDEX_MEMBER(Subscription, subscriber_t, subscriber_),
+                BOOST_MULTI_INDEX_MEMBER(Subscription, topic_t, topic_)
+            >
+        >,
+        boost::multi_index::ordered_non_unique<
+            boost::multi_index::tag<tag_topic>,
+            BOOST_MULTI_INDEX_MEMBER(Subscription, topic_t, topic_)
+        >,
+        boost::multi_index::ordered_non_unique<
+            boost::multi_index::tag<tag_con>,
+            BOOST_MULTI_INDEX_MEMBER(Subscription, subscriber_t, subscriber_)
+        >
+    >
+>;
+// clang-format on
 } // namespace toad::communication_protocol::mqtt

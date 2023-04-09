@@ -69,11 +69,6 @@ class Logger
             std::cerr << "Log init failed: " << ex.what() << std::endl;
         }
     }
-
-    ~Logger()
-    {
-        logger_->flush();
-    }
 };
 
 #define LOGGER Logger::getInstance().getLogger()
@@ -91,5 +86,4 @@ class Logger
 // NOLINTNEXTLINE
 #define CRITICAL_LOG(...) \
     SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::critical, __VA_ARGS__) // NOLINT
-
 // clang-format on
