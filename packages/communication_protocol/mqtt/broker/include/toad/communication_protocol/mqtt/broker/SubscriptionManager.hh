@@ -4,7 +4,6 @@
 namespace toad::communication_protocol::mqtt
 {
 struct PublishOptions;
-using content_t = std::string_view;
 
 class SubscriptionManager
 {

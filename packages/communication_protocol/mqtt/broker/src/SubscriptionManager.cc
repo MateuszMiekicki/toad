@@ -4,43 +4,60 @@
 
 namespace
 {
-::MQTT_NS::qos convert(toad::communication_protocol::mqtt::QualityOfService qos)
-{
-    using namespace toad::communication_protocol::mqtt;
-    switch(qos)
-    {
-        case QualityOfService::atMostOnce:
-            return ::MQTT_NS::qos::at_most_once;
-        case QualityOfService::atLeastOnce:
-            return ::MQTT_NS::qos::at_least_once;
-        case QualityOfService::exactlyOnce:
-            return ::MQTT_NS::qos::exactly_once;
-        default:
-            throw std::exception();
-    }
-}
-
-::MQTT_NS::qos
-getPreferredValueOfQualityOfService(const toad::communication_protocol::mqtt::Subscription& subscription,
+toad::communication_protocol::mqtt::QualityOfService
+getPreferredValueOfQualityOfService(const toad::communication_protocol::mqtt::SubscriptionOptions& subscriptionOptions,
                                     const toad::communication_protocol::mqtt::PublishOptions& publishOptions)
 {
-    return std::min(convert(subscription.subscriptionOptions_.qualityOfService),
-                    convert(publishOptions.qualityOfService));
+    return std::min(subscriptionOptions.qualityOfService, publishOptions.qualityOfService);
+}
+
+toad::communication_protocol::mqtt::PublishOptions
+buildLowImpactPublishOptions(toad::communication_protocol::mqtt::QualityOfService qos)
+{
+    using namespace toad::communication_protocol::mqtt;
+    return {qos, RetainAsPublished::discard, Duplicate::no};
+}
+
+template<typename It>
+struct Range
+{
+    It begin_, end_;
+
+    It begin() const
+    {
+        return begin_;
+    }
+
+    It end() const
+    {
+        return end_;
+    }
+};
+
+template<typename It>
+Range<It> toRange(const std::pair<It, It>& p)
+{
+    return {p.first, p.second};
+}
+
+auto findAllSubscribersTopic(const toad::communication_protocol::mqtt::subscriptions_t& subscriptions,
+                             const toad::communication_protocol::mqtt::topic_t& topic_name)
+{
+    auto const& idx = subscriptions.get<toad::communication_protocol::mqtt::tag_topic>();
+    return toRange(idx.equal_range(topic_name));
 }
 } // namespace
 
 namespace toad::communication_protocol::mqtt
 {
-void SubscriptionManager::publish(topic_t topic_name, content_t content, const PublishOptions& publishOptions)
+void SubscriptionManager::publish(topic_t topicName, content_t content, const PublishOptions& publishOptions)
 {
-    auto const& idx = subscriptions_.get<tag_topic>();
-    auto r = idx.equal_range(topic_name);
-    for(; r.first != r.second; ++r.first)
+    for(const auto& [subscriber, _, subscriptionOptions]: findAllSubscribersTopic(subscriptions_, topicName))
     {
-        r.first->subscriber_->get()->publish(0,
-                                             std::string(topic_name.data(), topic_name.size()),
-                                             std::string(content.data(), content.size()),
-                                             getPreferredValueOfQualityOfService(*(r.first), publishOptions));
+        subscriber->publish(
+            topicName,
+            content,
+            buildLowImpactPublishOptions(getPreferredValueOfQualityOfService(subscriptionOptions, publishOptions)));
     }
 }
 
