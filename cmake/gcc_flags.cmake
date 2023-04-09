@@ -23,7 +23,7 @@ set(GCC_FLAGS
     -Wcast-align
     -Wundef
     -Wpointer-arith
-    -Wstrict-overflow=5
+    -Wstrict-overflow=2
     -Wswitch-default
     -Wunreachable-code)
 
