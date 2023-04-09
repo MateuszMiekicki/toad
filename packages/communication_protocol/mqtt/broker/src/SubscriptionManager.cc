@@ -70,7 +70,5 @@ std::size_t SubscriptionManager::getNumberActiveSubscribers() const
         unique_subscribers.insert(subscription.subscriber_);
     }
     return unique_subscribers.size();
-    // return subscriptions_.get<tag_con_topic>().size();
-    // return subscriptions_.size();
 }
 } // namespace toad::communication_protocol::mqtt
