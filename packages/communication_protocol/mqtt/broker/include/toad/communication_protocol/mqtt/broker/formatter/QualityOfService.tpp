@@ -1,8 +1,6 @@
 #pragma once
 #include <fmt/format.h>
 
-namespace toad::communication_protocol::mqtt
-{
 template<>
 struct fmt::formatter<toad::communication_protocol::mqtt::QualityOfService>
 {
@@ -36,4 +34,3 @@ struct fmt::formatter<toad::communication_protocol::mqtt::QualityOfService>
         return format_to(ctx.out(), std::string("mqtt::QualityOfService::") + toString(qualityOfService));
     }
 };
-} // namespace toad::communication_protocol::mqtt
