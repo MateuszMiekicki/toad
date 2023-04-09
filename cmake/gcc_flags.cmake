@@ -18,7 +18,6 @@ set(GCC_FLAGS
     -Wextra
     -Wshadow
     -Wnon-virtual-dtor
-    -pedantic
     -Wold-style-cast
     -Wcast-align
     -Wundef
