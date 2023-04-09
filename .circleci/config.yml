@@ -23,7 +23,7 @@ jobs:
       - run:
           name: "Configuration"
           command: |
-            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_CODE_COVERAGE=ON 
+            cmake -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Debug -DENABLE_CODE_COVERAGE=ON
       - run:
           name: "Build"
           command: |

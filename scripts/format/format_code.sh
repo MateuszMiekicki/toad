@@ -77,6 +77,7 @@ for dir in "${dirs[@]}"; do
          \( -name '*.c' \
          -o -name '*.cc' \
          -o -name '*.cpp' \
+         -o -name '*.tpp' \
          -o -name '*.h' \
          -o -name '*.hh' \
          -o -name '*.hh.in' \
