@@ -21,7 +21,8 @@ buildLowImpactPublishOptions(toad::communication_protocol::mqtt::QualityOfServic
 template<typename It>
 struct Range
 {
-    It begin_, end_;
+    It begin_;
+    It end_;
 
     It begin() const
     {
