@@ -18,7 +18,7 @@ set_target_properties(
              CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-# add_logger(${PROJECT_NAME})
+add_logger(${PROJECT_NAME})
 
 find_package(Boost QUIET REQUIRED COMPONENTS system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)

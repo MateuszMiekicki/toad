@@ -3,12 +3,14 @@
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
 #include "toad/communication_protocol/mqtt/Logger.hh"
+#include "toad/communication_protocol/mqtt/Logger.hh"
 
 namespace toad::communication_protocol::mqtt
 {
 Broker::Broker(const Endpoint& endpoint, std::unique_ptr<interface::BrokerEventHandler> brokerEventHandler) :
     brokerEventHandler_{std::move(brokerEventHandler)}, brokerAcceptor_{}, broker_(endpoint.endpoint(), brokerAcceptor_)
 {
+    INFO_LOG("MQTT broker: {{\"mqtt_broker:\":{{ \"version\": \"3.1.1\", {} }}}}", endpoint);
     broker_.set_protocol_version(::MQTT_NS::protocol_version::v3_1_1);
 }
 
@@ -16,6 +18,7 @@ bool Broker::start()
 {
     setupHandleOnConnection();
     setupHandleOnError();
+    INFO_LOG("MQTT broker: start lisen and accept connection");
     listen();
     accept();
     return true;

@@ -5,10 +5,19 @@
 #include <memory>
 #include <thread>
 
-int main()
+int main(int argc, char* argv[])
 {
+
     using namespace toad::communication_protocol;
     using namespace toad::communication_protocol::mqtt;
+    auto endpoint = Endpoint();
+    if(argc==3)
+    {
+        auto address = argv[2];
+        auto port = std::stoi(argv[3]);
+        endpoint=Endpoint(address, port);
+    }
+
     std::vector<std::unique_ptr<interface::IncomingClientValidator>> incomingClientValidator;
 
     auto connectionManager = std::make_unique<ConnectionManager>(std::move(incomingClientValidator));
@@ -17,6 +26,6 @@ int main()
         std::make_unique<ClientConnectionHandler>(std::move(connectionManager));
     std::unique_ptr<interface::BrokerEventHandler> brokerEventHandler =
         std::make_unique<BrokerEventHandler>(std::move(clientConnectionHandler));
-    std::unique_ptr<interface::Broker> broker = std::make_unique<Broker>(Endpoint(), std::move(brokerEventHandler));
+    std::unique_ptr<interface::Broker> broker = std::make_unique<Broker>(endpoint, std::move(brokerEventHandler));
     broker->start();
 }
