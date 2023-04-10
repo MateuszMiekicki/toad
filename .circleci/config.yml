@@ -174,7 +174,7 @@ jobs:
 workflows:
   ci-cd:
     jobs:
-      - static_analysis:
+      - analysis:
           filters:
             branches:
               ignore:
@@ -188,7 +188,7 @@ workflows:
               ignore:
                 - gh-pages
           requires:
-            - static_analysis
+            - analysis
       - test:
           matrix:
             parameters:
