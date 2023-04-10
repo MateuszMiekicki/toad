@@ -58,7 +58,7 @@ jobs:
             mv build/Testing
           when: on_fail
       - store_test_results:
-          path: build/Testing/results.xml 
+          path: build/Testing/results.xml
       # - store_artifacts:
       #     path: build/Testing
       # - store_artifacts:
