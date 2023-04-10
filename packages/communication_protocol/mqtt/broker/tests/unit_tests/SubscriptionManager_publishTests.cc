@@ -11,8 +11,6 @@ using toad::communication_protocol::mqtt::RetainAsPublished;
 using toad::communication_protocol::mqtt::Subscription;
 using toad::communication_protocol::mqtt::topic_t;
 
-using ::testing::StrictMock;
-
 class MockSubscriber : public Connection
 {
   public:
