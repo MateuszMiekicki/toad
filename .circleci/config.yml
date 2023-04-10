@@ -27,7 +27,7 @@ jobs:
       - run:
           name: "Build"
           command: |
-            cmake --build build --parallel 1
+            cmake --build build --parallel 2
       - run:
           name: "Run test"
           command: |
@@ -85,7 +85,7 @@ jobs:
           paths:
             - ./build
 
-  test:
+  tests:
     parameters:
       os:
         type: executor
@@ -101,9 +101,9 @@ jobs:
           command: |
             ctest --test-dir build --no-compress-output -T Test --output-junit Testing/results.xml --rerun-failed --output-on-failure
       - store_test_results:
-          path: build/Testing
-      - store_artifacts:
-          path: build/Testing
+          path: build/Testing/results.xml
+      # - store_artifacts:
+      #     path: build/Testing
       - persist_to_workspace:
           root: ~/toad_cicd
           paths:
