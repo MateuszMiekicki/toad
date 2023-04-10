@@ -1,9 +1,8 @@
 #include "toad/communication_protocol/mqtt/broker/Broker.hh"
-
 #include "toad/communication_protocol/endpoint/Endpoint.hh"
-#include "toad/communication_protocol/mqtt/Logger.hh"
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
+#include "toad/communication_protocol/mqtt/Logger.hh"
 
 namespace toad::communication_protocol::mqtt
 {

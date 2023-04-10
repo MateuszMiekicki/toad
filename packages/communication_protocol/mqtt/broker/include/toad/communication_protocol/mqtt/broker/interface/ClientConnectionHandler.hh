@@ -24,5 +24,6 @@ class ClientConnectionHandler
     virtual void onDisconnect(std::shared_ptr<Connection>) = 0;
     virtual void onPublish(std::shared_ptr<Connection>) = 0;
     virtual void onSubscribe(std::shared_ptr<Connection>) = 0;
+    virtual void onUnsubscribe(std::shared_ptr<Connection>) = 0;
 };
 } // namespace toad::communication_protocol::mqtt::interface

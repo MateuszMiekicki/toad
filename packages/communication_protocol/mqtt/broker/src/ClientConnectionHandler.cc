@@ -1,11 +1,10 @@
 #include "toad/communication_protocol/mqtt/broker/ClientConnectionHandler.hh"
-
-#include "toad/communication_protocol/mqtt/Logger.hh"
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
 #include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
 #include "toad/communication_protocol/mqtt/broker/Subscription.hh"
 #include "toad/communication_protocol/mqtt/broker/SubscriptionOptions.hh"
-
+#include "toad/communication_protocol/mqtt/client_validator/Client.hh"
+#include "toad/communication_protocol/mqtt/Logger.hh"
 #include <exception>
 #include <mqtt/reason_code.hpp>
 
@@ -88,33 +87,65 @@ convertToSubscription(std::shared_ptr<toad::communication_protocol::mqtt::Connec
     return {connection, topic.data(), convertToSubscriptionOptions(qos, rap)};
 }
 
+toad::communication_protocol::mqtt::Subscription
+convertToSubscription(std::shared_ptr<toad::communication_protocol::mqtt::Connection> connection,
+                      const ::MQTT_NS::buffer& topic)
+{
+    return {connection, topic.data(), {}};
+}
+
 std::string_view toStringView(const ::MQTT_NS::buffer& buffer)
 {
     return {buffer.data(), buffer.size()};
+}
+
+toad::communication_protocol::mqtt::optionalAuthn
+convertToAuthenticationData(const ::MQTT_NS::optional<::MQTT_NS::buffer>& username,
+                            const ::MQTT_NS::optional<::MQTT_NS::buffer>& password)
+{
+    if(username)
+    {
+        return toad::communication_protocol::mqtt::AuthenticationData{
+            username.value().data(),
+            password.get_value_or(::MQTT_NS::buffer()).data()};
+    }
+    return std::nullopt;
+}
+
+toad::communication_protocol::mqtt::Client buildClient(const ::MQTT_NS::buffer& clientId,
+                                                       const ::MQTT_NS::optional<::MQTT_NS::buffer>& username,
+                                                       const ::MQTT_NS::optional<::MQTT_NS::buffer>& password)
+{
+    return {clientId.data(), convertToAuthenticationData(username, password)};
 }
 } // namespace
 
 namespace toad::communication_protocol::mqtt
 {
+ClientConnectionHandler::ClientConnectionHandler(std::unique_ptr<ConnectionManager> connectionManager) :
+    connectionManager_{std::move(connectionManager)}, subscriptionManager_{}
+{
+}
+
 void ClientConnectionHandler::onConnect(std::shared_ptr<Connection> connection)
 {
     connection->get()->set_connect_handler(
         [this, connection](::MQTT_NS::buffer clientId,
-                           ::MQTT_NS::optional<::MQTT_NS::buffer> const&,
-                           ::MQTT_NS::optional<::MQTT_NS::buffer> const&,
+                           const ::MQTT_NS::optional<::MQTT_NS::buffer>& username,
+                           const ::MQTT_NS::optional<::MQTT_NS::buffer>& password,
                            ::MQTT_NS::optional<::MQTT_NS::will>,
                            bool,
                            std::uint16_t)
         {
         INFO_LOG("new connection clientId: {}", clientId.data());
-        if(not connectionManager_.acceptConnection(clientId.data()))
+        if(not connectionManager_->acceptConnection(buildClient(clientId, username, password)))
         {
             connection->get()->connack(false, ::MQTT_NS::connect_return_code::identifier_rejected);
             return false;
         }
         connection->get()->connack(false, ::MQTT_NS::connect_return_code::accepted);
 
-        connectionManager_.addConnection(connection);
+        connectionManager_->addConnection(connection);
         return true;
     });
 }
@@ -125,7 +156,7 @@ void ClientConnectionHandler::onDisconnect(std::shared_ptr<Connection> connectio
         [this, connection]()
         {
         INFO_LOG("Client: {} disconnect", connection->get()->get_client_id());
-        connectionManager_.removeConnection(connection);
+        connectionManager_->removeConnection(connection);
     });
 }
 
@@ -135,7 +166,7 @@ void ClientConnectionHandler::onClose(std::shared_ptr<Connection> connection)
         [this, connection]()
         {
         INFO_LOG("SERVER CLOSED");
-        connectionManager_.removeConnection(connection);
+        connectionManager_->removeConnection(connection);
     });
 }
 
@@ -145,7 +176,7 @@ void ClientConnectionHandler::onError(std::shared_ptr<Connection> connection)
         [this, connection](::MQTT_NS::error_code ec)
         {
         INFO_LOG("SERVER error_code {}", ec.message());
-        connectionManager_.removeConnection(connection);
+        connectionManager_->removeConnection(connection);
     });
 }
 
@@ -161,15 +192,6 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
         subscriptionManager_.publish(toStringView(topic),
                                      toStringView(content),
                                      convertToPublishOptions(publishOptions));
-        // TRACE_LOG("publish received:\n"
-        // "dup: {}\n"
-        // "qos: {}\n"
-        // "retain: {}\n"
-        // "packed id: {}\n"
-        // "topic name: {}\n"
-        // "content: {}", publishOptions.get_dup(), publishOptions.get_qos(),
-        // publishOptions.get_retain(), packedId?std::to_string(*packedId):"empty", topicName, content);
-        TRACE_LOG("{}", convertToPublishOptions(publishOptions).qualityOfService);
         return true;
     });
 }
@@ -191,6 +213,21 @@ void ClientConnectionHandler::onSubscribe(std::shared_ptr<Connection> connection
             subscriptionManager_.subscribe(sub);
         }
         connection->get()->suback(packet_id, res);
+        return true;
+    });
+}
+
+void ClientConnectionHandler::onUnsubscribe(std::shared_ptr<Connection> connection)
+{
+    connection->get()->set_unsubscribe_handler(
+        [this, connection](short unsigned int packet_id, std::vector<::MQTT_NS::unsubscribe_entry> entries)
+        {
+        for(auto const& entry: entries)
+        {
+            auto sub = convertToSubscription(connection, entry.topic_filter);
+            subscriptionManager_.unsubscribe(sub);
+        }
+        connection->get()->unsuback(packet_id);
         return true;
     });
 }

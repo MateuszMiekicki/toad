@@ -1,9 +1,32 @@
 #pragma once
+#include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
 #include <mqtt_server_cpp.hpp>
 #include <vector>
 
+namespace
+{
+::MQTT_NS::qos convert(toad::communication_protocol::mqtt::QualityOfService qos)
+{
+    using namespace toad::communication_protocol::mqtt;
+    switch(qos)
+    {
+        case QualityOfService::atMostOnce:
+            return ::MQTT_NS::qos::at_most_once;
+        case QualityOfService::atLeastOnce:
+            return ::MQTT_NS::qos::at_least_once;
+        case QualityOfService::exactlyOnce:
+            return ::MQTT_NS::qos::exactly_once;
+        default:
+            throw std::exception();
+    }
+}
+} // namespace
+
 namespace toad::communication_protocol::mqtt
 {
+using topic_t = std::string_view;
+using content_t = std::string_view;
+
 // todo(miekicki): refactoring, split into separate files; look at the start and start_session functions
 class Connection
 {
@@ -13,9 +36,10 @@ class Connection
     using con_wp_t = std::weak_ptr<con_t>;
 
   private:
-    con_sp_t connection_;
+    con_sp_t connection_{nullptr};
 
   public:
+    virtual ~Connection() = default;
     Connection(const Connection&) = delete;
     Connection& operator=(const Connection&) = delete;
 
@@ -46,6 +70,14 @@ class Connection
     void start()
     {
         connection_->start_session(/*std::move(wp)*/);
+    }
+
+    virtual void publish(topic_t topic_name, content_t content, const PublishOptions& publishOptions)
+    {
+        get()->publish(0,
+                       std::string(topic_name.data(), topic_name.size()),
+                       std::string(content.data(), content.size()),
+                       convert(publishOptions.qualityOfService));
     }
 };
 

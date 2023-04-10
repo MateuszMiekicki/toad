@@ -1,5 +1,4 @@
 #include "toad/communication_protocol/mqtt/broker/BrokerEventHandler.hh"
-
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
 #include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
 
@@ -29,6 +28,7 @@ void BrokerEventHandler::setupHandlersForClient(std::shared_ptr<Connection> conn
     clientConnectionHandler_->onDisconnect(connection);
     clientConnectionHandler_->onPublish(connection);
     clientConnectionHandler_->onSubscribe(connection);
+    clientConnectionHandler_->onUnsubscribe(connection);
 }
 
 void BrokerEventHandler::onAccept(std::shared_ptr<Connection> connection)

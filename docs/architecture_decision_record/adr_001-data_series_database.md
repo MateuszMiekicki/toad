@@ -3,7 +3,7 @@
 * Status: **accepted**
 * Stakeholders: developers responsible for the REST API and the MQTT broker service. In addition, those responsible for continuous delivery.
 * Author: Mateusz Miekicki <miekickimateusz@gmail.com>
-* Deciders: 
+* Deciders:
 * Date: 2023-04-02
 * Gist: The decision on which time series database to choose for storing sensor data.
 

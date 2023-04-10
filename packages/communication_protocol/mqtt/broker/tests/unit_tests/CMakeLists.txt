@@ -7,6 +7,8 @@ target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE GTest::gtest
   PRIVATE GTest::gtest_main
+  PRIVATE GTest::gmock
+  PRIVATE GTest::gmock_main
   PRIVATE toad::communication_protocol::mqtt::broker)
 set_target_properties(
   ${PROJECT_NAME}

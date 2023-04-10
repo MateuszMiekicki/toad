@@ -1,7 +1,6 @@
 #pragma once
 #include "toad/communication_protocol/mqtt/broker/interface/BrokerEventHandler.hh"
 #include "toad/communication_protocol/mqtt/broker/interface/ClientConnectionHandler.hh"
-
 #include <memory>
 
 namespace toad::communication_protocol
@@ -19,7 +18,7 @@ namespace toad::communication_protocol::mqtt
 class BrokerEventHandler : public interface::BrokerEventHandler
 {
   private:
-    std::unique_ptr<interface::ClientConnectionHandler> clientConnectionHandler_;
+    std::unique_ptr<interface::ClientConnectionHandler> clientConnectionHandler_{nullptr};
     void setupHandlersForClient(std::shared_ptr<Connection>);
 
   public:
