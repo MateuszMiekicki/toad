@@ -13,7 +13,7 @@ class SubscriptionManager
 
   public:
     void publish(topic_t, content_t, const PublishOptions&);
-    void subscribe(const Subscription&);
+    void subscribe(Subscription);
     void unsubscribe(const Subscription&);
     std::size_t getNumberActiveSubscribers() const;
 };

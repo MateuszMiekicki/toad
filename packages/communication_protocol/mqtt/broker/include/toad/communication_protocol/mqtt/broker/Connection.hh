@@ -39,6 +39,7 @@ class Connection
     con_sp_t connection_{nullptr};
 
   public:
+    virtual ~Connection() = default;
     Connection(const Connection&) = delete;
     Connection& operator=(const Connection&) = delete;
 
@@ -71,7 +72,7 @@ class Connection
         connection_->start_session(/*std::move(wp)*/);
     }
 
-    void publish(topic_t topic_name, content_t content, const PublishOptions& publishOptions)
+    virtual void publish(topic_t topic_name, content_t content, const PublishOptions& publishOptions)
     {
         get()->publish(0,
                        std::string(topic_name.data(), topic_name.size()),

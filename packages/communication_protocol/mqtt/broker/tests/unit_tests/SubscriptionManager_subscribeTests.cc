@@ -1,13 +1,7 @@
-#include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include "SubscriptionManagerTestFixture.hh"
 
-using namespace toad::communication_protocol::mqtt;
-
-struct SubscriptionManagerTestFixture : public ::testing::Test
-{
-    SubscriptionManager sut;
-};
+using toad::communication_protocol::mqtt::Connection;
+using toad::communication_protocol::mqtt::Subscription;
 
 TEST_F(SubscriptionManagerTestFixture, addingNewSubscriberShouldIncreaseNumberOfActiveSubscribersByOne)
 {

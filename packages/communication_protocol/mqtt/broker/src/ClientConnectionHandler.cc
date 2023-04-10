@@ -192,15 +192,6 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
         subscriptionManager_.publish(toStringView(topic),
                                      toStringView(content),
                                      convertToPublishOptions(publishOptions));
-        // TRACE_LOG("publish received:\n"
-        // "dup: {}\n"
-        // "qos: {}\n"
-        // "retain: {}\n"
-        // "packed id: {}\n"
-        // "topic name: {}\n"
-        // "content: {}", publishOptions.get_dup(), publishOptions.get_qos(),
-        // publishOptions.get_retain(), packedId?std::to_string(*packedId):"empty", topicName, content);
-        TRACE_LOG("{}", convertToPublishOptions(publishOptions).qualityOfService);
         return true;
     });
 }

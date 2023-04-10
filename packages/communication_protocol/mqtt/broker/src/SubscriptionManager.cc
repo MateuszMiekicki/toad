@@ -61,7 +61,7 @@ void SubscriptionManager::publish(topic_t topicName, content_t content, const Pu
     }
 }
 
-void SubscriptionManager::subscribe(const Subscription& subscription)
+void SubscriptionManager::subscribe(Subscription subscription)
 {
     subscriptions_.emplace(std::move(subscription));
 }
