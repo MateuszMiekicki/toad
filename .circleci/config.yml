@@ -85,7 +85,7 @@ jobs:
           paths:
             - ./build
 
-  tests:
+  test:
     parameters:
       os:
         type: executor
@@ -102,8 +102,8 @@ jobs:
             ctest --test-dir build --no-compress-output -T Test --output-junit Testing/results.xml --rerun-failed --output-on-failure
       - store_test_results:
           path: build/Testing/results.xml
-      # - store_artifacts:
-      #     path: build/Testing
+      - store_artifacts:
+          path: build/Testing
       - persist_to_workspace:
           root: ~/toad_cicd
           paths:
