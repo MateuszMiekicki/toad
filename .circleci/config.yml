@@ -6,7 +6,7 @@ executors:
       - image: 0xd00d2bad/toad_cicd:latest
 
 jobs:
-  static_analysis:
+  analysis:
     executor: linux-docker
     parallelism: 4
     steps:
@@ -49,13 +49,20 @@ jobs:
       - run:
           name: "Run sonar scanner"
           command: |
-            sonar-scanner -Dproject.settings=.cicd/sonar-project.properties -Dsonar.login=$SONAR_TOKEN
+            sonar-scanner -Dproject.settings=.cicd/sonar-project.properties -Dsonar.login=$SONAR_TOKEN > sonar-scanner.log 2>&1
+      - run:
+          command: |
+            mkdir -p /dump
+            mv sonar-scanner.log /dump
+            mv build/bin/logs /dump
+            mv build/Testing
+          when: on_fail
       - store_test_results:
-          path: build/Testing
-      - store_artifacts:
-          path: build/Testing
-      - store_artifacts:
-          path: build/bin/logs
+          path: build/Testing/results.xml 
+      # - store_artifacts:
+      #     path: build/Testing
+      # - store_artifacts:
+      #     path: build/bin/logs
 
   build:
     parameters:
@@ -79,7 +86,7 @@ jobs:
       - run:
           name: "Build"
           command: |
-            cmake --build build
+            cmake --build build --parallel 2
       - persist_to_workspace:
           root: ~/toad_cicd
           paths:
@@ -102,8 +109,8 @@ jobs:
             ctest --test-dir build --no-compress-output -T Test --output-junit Testing/results.xml --rerun-failed --output-on-failure
       - store_test_results:
           path: build/Testing/results.xml
-      - store_artifacts:
-          path: build/Testing
+      # - store_artifacts:
+      #     path: build/Testing
       - persist_to_workspace:
           root: ~/toad_cicd
           paths:
