@@ -22,16 +22,6 @@ class Logger
     Logger &operator=(const Logger &) = delete;
     Logger &operator=(Logger &&) = delete;
 
-    static Logger &getInstance()
-    {
-        return instance_;
-    }
-
-    std::shared_ptr<spdlog::logger> getLogger()
-    {
-        return logger_;
-    }
-
   private:
     std::shared_ptr<spdlog::logger> logger_{nullptr};
     std::mutex mutex_{};
@@ -54,12 +44,13 @@ class Logger
             auto stdoutSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt >();
             static auto threadPool = spdlog::thread_pool();
             logger_ = std::make_shared<spdlog::async_logger>(COMPONENT_NAME,
-                spdlog::sinks_init_list{stdoutSink,asyncSinkFile},threadPool);
+                spdlog::sinks_init_list{stdoutSink,asyncSinkFile}, threadPool);
+            spdlog::register_logger(logger_);
         }
         // note(miekicki): Check for performance issues, timer and flush_on
         logger_->flush_on(spdlog::level::warn);
         spdlog::flush_every(std::chrono::milliseconds(100));
-#ifndef DNDEBUG
+#ifndef NDEBUG
         logger_->set_level(spdlog::level::trace);
         logger_->flush_on(spdlog::level::trace);
 #endif
@@ -72,12 +63,10 @@ class Logger
         std::cerr << "Log init failed: " << ex.what() << std::endl;
     }
 };
-
-#define LOGGER Logger::getInstance().getLogger()
 } // namespace toad::communication_protocol::mqtt
 
 #define TRACE_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::trace, __VA_ARGS__) // NOLINT
-#ifndef DNDEBUG
+#ifndef NDEBUG
     #define DEBUG_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::debug, __VA_ARGS__) // NOLINT
 #else
     #define DEBUG_LOG(...) void() // NOLINT
