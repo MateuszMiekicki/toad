@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
     auto endpoint = Endpoint();
     if(argc==3)
     {
-        auto address = argv[2];
-        auto port = std::stoi(argv[3]);
+        auto address = argv[1];
+        auto port = std::stoi(argv[2]);
         endpoint=Endpoint(address, port);
     }
 
