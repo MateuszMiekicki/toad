@@ -9,3 +9,5 @@ enum class RetainAsPublished : std::uint8_t
     retain
 };
 } // namespace toad::communication_protocol::mqtt
+
+#include "toad/communication_protocol/mqtt/broker/formatter/RetainAsPublished.tpp"

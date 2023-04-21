@@ -144,7 +144,6 @@ void ClientConnectionHandler::onConnect(std::shared_ptr<Connection> connection)
             return false;
         }
         connection->get()->connack(false, ::MQTT_NS::connect_return_code::accepted);
-
         connectionManager_->addConnection(connection);
         return true;
     });
@@ -184,11 +183,15 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
 {
     using packet_id_t = typename std::remove_reference_t<decltype(*connection->get())>::packet_id_t;
     connection->get()->set_publish_handler(
-        [this](::MQTT_NS::optional<packet_id_t>,
+        [this, connection](::MQTT_NS::optional<packet_id_t>,
                ::MQTT_NS::publish_options publishOptions,
                ::MQTT_NS::buffer topic,
                ::MQTT_NS::buffer content)
         {
+        INFO_LOG("clientId: {} publishes in {}", connection->get()->get_client_id(),toStringView(topic));
+
+        TRACE_LOG(R"({{{}:{{"topic": {}, "content": {}, "publish_options": {}}}}})",
+        connection->get()->get_client_id(), toStringView(topic), toStringView(content), convertToPublishOptions(publishOptions));
         subscriptionManager_.publish(toStringView(topic),
                                      toStringView(content),
                                      convertToPublishOptions(publishOptions));
