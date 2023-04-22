@@ -21,3 +21,5 @@ class Endpoint
     endpoint_t endpoint() const;
 };
 } // namespace toad::communication_protocol
+
+#include "toad/communication_protocol/endpoint/formatter/Endpoint.tpp"

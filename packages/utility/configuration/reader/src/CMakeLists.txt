@@ -1,18 +1,15 @@
-set(PACKAGE_NAME "service")
-set(COMPONENT_NAME "collector")
-
 project(
-  ${SERVICE_NAME}
+  ${MODULE_NAME}
   VERSION 0.1.0
   LANGUAGES CXX)
-
 aux_source_directory(. SOURCE)
-add_executable(${PROJECT_NAME} ${SOURCE})
+add_library(${PROJECT_NAME} ${SOURCE})
+add_library(${CMAKE_PROJECT_NAME}::${PACKAGE_NAME}::${COMPONENT_NAME}::${MODULE_NAME} ALIAS ${PROJECT_NAME})
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES VERSION ${PROJECT_VERSION}
              SOVERSION ${PROJECT_VERSION_MAJOR}
-             OUTPUT_NAME "${PROJECT_NAME}"
+             OUTPUT_NAME "${PACKAGE_NAME}-${COMPONENT_NAME}-${MODULE_NAME}"
              ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
              LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
              RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
@@ -20,10 +17,9 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-target_link_libraries(${PROJECT_NAME} PRIVATE toad::communication_protocol::mqtt)
 add_logger(${PROJECT_NAME})
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_options(
   ${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>

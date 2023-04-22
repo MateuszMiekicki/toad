@@ -1,5 +1,6 @@
 #include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
 #include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
+#include "toad/communication_protocol/mqtt/Logger.hh"
 #include <unordered_set>
 
 namespace

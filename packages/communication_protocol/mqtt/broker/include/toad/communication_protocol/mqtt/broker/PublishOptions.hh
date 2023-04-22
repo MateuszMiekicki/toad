@@ -24,3 +24,5 @@ struct PublishOptions
     }
 };
 } // namespace toad::communication_protocol::mqtt
+
+#include "toad/communication_protocol/mqtt/broker/formatter/PublishOptions.tpp"
