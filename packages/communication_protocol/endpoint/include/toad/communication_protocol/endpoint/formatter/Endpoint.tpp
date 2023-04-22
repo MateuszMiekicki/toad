@@ -13,6 +13,9 @@ struct fmt::formatter<toad::communication_protocol::Endpoint>
     template<typename FormatContext>
     auto format(const toad::communication_protocol::Endpoint& endpoint, FormatContext& ctx)
     {
-        return format_to(ctx.out(), "\"endpoint\": {{\"address\": \"{}\", \"port\": \"{}\"}}",endpoint.endpoint().address().to_string(),endpoint.endpoint().port()  );
+        return format_to(ctx.out(),
+                         "\"endpoint\": {{\"address\": \"{}\", \"port\": \"{}\"}}",
+                         endpoint.endpoint().address().to_string(),
+                         endpoint.endpoint().port());
     }
 };

@@ -1,3 +1,6 @@
+set(PACKAGE_NAME "service")
+set(COMPONENT_NAME "collector")
+
 project(
   ${SERVICE_NAME}
   VERSION 0.1.0
@@ -19,16 +22,9 @@ set_target_properties(
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_link_libraries(${PROJECT_NAME} PRIVATE toad::communication_protocol::mqtt)
+add_logger(${PROJECT_NAME})
 
-find_package(mqtt_cpp 13 QUIET REQUIRED)
-find_package(OpenSSL QUIET REQUIRED)
-target_link_libraries(
+target_compile_options(
   ${PROJECT_NAME}
-  PRIVATE mqtt_cpp::mqtt_cpp
-  PRIVATE OpenSSL::Crypto
-  PRIVATE OpenSSL::SSL)
-target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
-
-# target_compile_options( ${PROJECT_NAME} PRIVATE
-# $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>> PRIVATE
-# $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Debug>:${GCC_FLAGS_DEBUG}>>)
+  PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>
+  PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Debug>:${GCC_FLAGS_DEBUG}>>)
