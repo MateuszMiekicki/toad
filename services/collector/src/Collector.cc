@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[])
 {
-    spdlog::set_level(spdlog::level::info);
+    spdlog::set_level(spdlog::level::trace);
     using namespace toad::communication_protocol;
     using namespace toad::communication_protocol::mqtt;
     auto endpoint = Endpoint();

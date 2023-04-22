@@ -207,9 +207,12 @@ void ClientConnectionHandler::onSubscribe(std::shared_ptr<Connection> connection
     connection->get()->set_subscribe_handler(
         [this, connection](packet_id_t packet_id, std::vector<::MQTT_NS::subscribe_entry> entries)
         {
+        INFO_LOG("clientId: {} subscribe {}",
+                 connection->get()->get_client_id(),
+                 toStringView(entries.back().topic_filter));
+
         std::vector<::MQTT_NS::suback_return_code> res;
         res.reserve(entries.size());
-
         for(auto const& entry: entries)
         {
             res.emplace_back(::MQTT_NS::qos_to_suback_return_code(entry.subopts.get_qos()));
