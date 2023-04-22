@@ -1,6 +1,5 @@
 #include "SubscriptionManagerTestFixture.hh"
 #include "toad/communication_protocol/mqtt/broker/Connection.hh"
-#include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
 
 using toad::communication_protocol::mqtt::Connection;
 using toad::communication_protocol::mqtt::content_t;
@@ -41,6 +40,16 @@ TEST_F(SubscriptionManagerTestFixture, twoClientsSubscribingToTheSameTopicShould
 
     EXPECT_CALL(*subscriber1, publish(topic, content, testing::_));
     EXPECT_CALL(*subscriber2, publish(topic, content, testing::_));
+    sut.publish(topic, content, {QualityOfService::atMostOnce});
+}
+
+TEST_F(SubscriptionManagerTestFixture, clientWhoDoesNotPublishInTopicShouldNotCallPublishMethod)
+{
+    auto subscriber = std::make_shared<MockSubscriber>();
+
+    EXPECT_CALL(*subscriber, publish(testing::_, testing::_, testing::_)).Times(0);
+    const auto topic = "test_topic";
+    const auto content = "content";
     sut.publish(topic, content, {QualityOfService::atMostOnce});
 }
 
