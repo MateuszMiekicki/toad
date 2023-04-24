@@ -11,7 +11,7 @@
 # general example
 git branch git branch <category/reference/description-in-kebab-case>
 # for github issue
-git branch feature/issue-42
+git branch feature/github-42
 # for zenhub issue
 git branch feature/zenhub-42
 # if issue is not officially specified
