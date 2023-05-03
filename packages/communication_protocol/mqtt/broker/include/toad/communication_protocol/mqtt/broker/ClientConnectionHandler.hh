@@ -2,12 +2,14 @@
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
 #include "toad/communication_protocol/mqtt/broker/interface/ClientConnectionHandler.hh"
 #include "toad/communication_protocol/mqtt/broker/SubscriptionManager.hh"
+#include "toad/storage/database/questdb/QuestDB.hh"
 
 namespace toad::communication_protocol::mqtt
 {
 class ClientConnectionHandler : public interface::ClientConnectionHandler
 {
   private:
+    std::unique_ptr<storage::database::QuestDB> storage_{nullptr};
     std::unique_ptr<ConnectionManager> connectionManager_{nullptr};
     SubscriptionManager subscriptionManager_{};
 

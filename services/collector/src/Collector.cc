@@ -3,12 +3,12 @@
 #include "toad/communication_protocol/mqtt/broker/BrokerEventHandler.hh"
 #include "toad/communication_protocol/mqtt/broker/ClientConnectionHandler.hh"
 #include <memory>
-#include <spdlog/spdlog.h>
+#include <spdlog/spdlog.h> //ToDo(miekicki): moe this to logger class
 #include <thread>
 
 int main(int argc, char* argv[])
 {
-    spdlog::set_level(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::trace); // and this
     using namespace toad::communication_protocol;
     using namespace toad::communication_protocol::mqtt;
     auto endpoint = Endpoint();

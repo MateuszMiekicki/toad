@@ -5,8 +5,10 @@
 #include "toad/communication_protocol/mqtt/broker/SubscriptionOptions.hh"
 #include "toad/communication_protocol/mqtt/client_validator/Client.hh"
 #include "toad/communication_protocol/mqtt/Logger.hh"
+#include "toad/storage/database/questdb/QuestDB.hh"
 #include <exception>
 #include <mqtt/reason_code.hpp>
+#include <questdb/ilp/line_sender.hpp>
 
 namespace
 {
@@ -123,6 +125,7 @@ toad::communication_protocol::mqtt::Client buildClient(const ::MQTT_NS::buffer& 
 namespace toad::communication_protocol::mqtt
 {
 ClientConnectionHandler::ClientConnectionHandler(std::unique_ptr<ConnectionManager> connectionManager) :
+    storage_(std::make_unique<storage::database::QuestDB>("localhost", "9009")),
     connectionManager_{std::move(connectionManager)}, subscriptionManager_{}
 {
 }
@@ -197,6 +200,9 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
         subscriptionManager_.publish(toStringView(topic),
                                      toStringView(content),
                                      convertToPublishOptions(publishOptions));
+        storage::database::model::SensorData data{1, 2, 32.43};
+        storage_->insert(data);
+        storage_->commit();
         return true;
     });
 }

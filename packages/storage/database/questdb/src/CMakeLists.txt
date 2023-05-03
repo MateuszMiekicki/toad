@@ -2,6 +2,7 @@ project(
   ${MODULE_NAME}
   VERSION 0.1.0
   LANGUAGES CXX)
+
 aux_source_directory(. SOURCE)
 add_library(${PROJECT_NAME} ${SOURCE})
 add_library(${CMAKE_PROJECT_NAME}::${PACKAGE_NAME}::${COMPONENT_NAME}::${MODULE_NAME} ALIAS ${PROJECT_NAME})
@@ -18,18 +19,7 @@ set_target_properties(
              CXX_STANDARD_REQUIRED ON)
 
 add_logger(${PROJECT_NAME})
-find_package(mqtt_cpp 13 QUIET REQUIRED)
-find_package(OpenSSL QUIET REQUIRED)
-target_link_libraries(
-  ${PROJECT_NAME}
-  PUBLIC mqtt_cpp::mqtt_cpp
-  PRIVATE OpenSSL::Crypto
-  PRIVATE OpenSSL::SSL)
-target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::mqtt::client_validator)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::storage::database)
-
+target_link_libraries(${PROJECT_NAME} PUBLIC questdb_client)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_options(
   ${PROJECT_NAME}
