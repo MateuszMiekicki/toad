@@ -3,7 +3,8 @@
 namespace toad::storage::database
 {
 QuestDB::QuestDB(const std::string& address, const std::string& port) :
-    sender_(std::make_unique<questdb::ilp::line_sender>(questdb::ilp::opts{address, port}))
+    sender_(std::make_unique<questdb::ilp::line_sender>(questdb::ilp::opts{address, port})),
+    buffer_{std::make_unique<questdb::ilp::line_sender_buffer>()}
 {
 }
 
