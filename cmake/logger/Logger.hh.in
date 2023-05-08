@@ -15,18 +15,16 @@ namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
 {
 class Logger
 {
-  public:
+  private:
     Logger(const Logger &) = delete;
     Logger(Logger &&) = delete;
 
     Logger &operator=(const Logger &) = delete;
     Logger &operator=(Logger &&) = delete;
 
-  private:
-    std::shared_ptr<spdlog::logger> logger_{nullptr};
+    using logger_t = std::shared_ptr<spdlog::logger>;
+    logger_t logger_{nullptr};
     std::mutex mutex_{};
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-    static Logger instance_;
 
     Logger()
     try
@@ -63,19 +61,25 @@ class Logger
     {
         std::cerr << "Log init failed: " << ex.what() << std::endl;
     }
+    public:
+    static logger_t getLogger(const std::string& loggerName)
+    {
+        static Logger instance_;
+        return spdlog::get(loggerName);
+    }
 };
-} // namespace toad::communication_protocol::mqtt
+} // namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
 
-#define TRACE_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::trace, __VA_ARGS__) // NOLINT
+#define TRACE_LOG(...) SPDLOG_LOGGER_CALL(toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger::getLogger(COMPONENT_NAME), spdlog::level::trace, __VA_ARGS__) // NOLINT
 #ifndef NDEBUG
-    #define DEBUG_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::debug, __VA_ARGS__) // NOLINT
+    #define DEBUG_LOG(...) SPDLOG_LOGGER_CALL(toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger::getLogger(COMPONENT_NAME), spdlog::level::debug, __VA_ARGS__) // NOLINT
 #else
     #define DEBUG_LOG(...) void() // NOLINT
 #endif
-#define INFO_LOG(...)  SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::info, __VA_ARGS__) // NOLINT
-#define WARN_LOG(...)  SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::warn, __VA_ARGS__) // NOLINT
-#define ERROR_LOG(...) SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::err, __VA_ARGS__) // NOLINT
+#define INFO_LOG(...)  SPDLOG_LOGGER_CALL(toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger::getLogger(COMPONENT_NAME), spdlog::level::info, __VA_ARGS__) // NOLINT
+#define WARN_LOG(...)  SPDLOG_LOGGER_CALL(toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger::getLogger(COMPONENT_NAME), spdlog::level::warn, __VA_ARGS__) // NOLINT
+#define ERROR_LOG(...) SPDLOG_LOGGER_CALL(toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger::getLogger(COMPONENT_NAME), spdlog::level::err, __VA_ARGS__) // NOLINT
 // NOLINTNEXTLINE
 #define CRITICAL_LOG(...) \
-    SPDLOG_LOGGER_CALL(spdlog::get(COMPONENT_NAME), spdlog::level::critical, __VA_ARGS__) // NOLINT
+    SPDLOG_LOGGER_CALL(toad::@PACKAGE_NAME@::@COMPONENT_NAME@::Logger::getLogger(COMPONENT_NAME), spdlog::level::critical, __VA_ARGS__) // NOLINT
 // clang-format on
