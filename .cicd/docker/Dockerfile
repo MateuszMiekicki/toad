@@ -17,6 +17,10 @@ RUN apt-get update && \
     apt-get install -y ruby-dev && \
     apt-get install -y clang-format-15
 
+#install Rust
+RUN wget -O - https://sh.rustup.rs | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 #install tools for check coverage
 RUN pip install gcovr
 RUN gem install coveralls-lcov
