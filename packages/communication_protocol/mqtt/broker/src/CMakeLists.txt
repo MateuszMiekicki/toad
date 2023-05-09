@@ -20,12 +20,14 @@ set_target_properties(
 add_logger(${PROJECT_NAME})
 find_package(mqtt_cpp 13 QUIET REQUIRED)
 find_package(OpenSSL QUIET REQUIRED)
+find_package(RapidJSON REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC mqtt_cpp::mqtt_cpp
   PRIVATE OpenSSL::Crypto
   PRIVATE OpenSSL::SSL)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
+target_link_libraries(${PROJECT_NAME} PRIVATE RapidJSON::RapidJSON)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::mqtt::client_validator)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::storage::database)
