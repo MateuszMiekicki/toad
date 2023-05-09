@@ -6,7 +6,7 @@ project(
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
 
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
 string(TIMESTAMP BUILD_TIME "%Y-%m-%d")
 set(CURRENT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${BUILD_TIME}")
 message(STATUS "version: ${CURRENT_VERSION}")
@@ -31,8 +31,11 @@ include(use_sanitizer)
 include(enable_tests)
 include(logger/add_logger)
 
+include(fetch_content/c-questdb-client)
+
 # include(enable_docs) include(enable_benchmarks) include(enable_examples) add_subdirectory(packages/data_reader)
 
 add_subdirectory(packages/communication_protocol)
+add_subdirectory(packages/storage)
 
 add_subdirectory(services/collector)

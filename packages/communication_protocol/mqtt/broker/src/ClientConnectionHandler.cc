@@ -1,12 +1,15 @@
 #include "toad/communication_protocol/mqtt/broker/ClientConnectionHandler.hh"
+#include "rapidjson/error/error.h" // rapidjson::ParseResult
 #include "toad/communication_protocol/mqtt/broker/ConnectionManager.hh"
 #include "toad/communication_protocol/mqtt/broker/PublishOptions.hh"
 #include "toad/communication_protocol/mqtt/broker/Subscription.hh"
 #include "toad/communication_protocol/mqtt/broker/SubscriptionOptions.hh"
 #include "toad/communication_protocol/mqtt/client_validator/Client.hh"
 #include "toad/communication_protocol/mqtt/Logger.hh"
+#include "toad/storage/database/questdb/QuestDB.hh"
 #include <exception>
 #include <mqtt/reason_code.hpp>
+#include <rapidjson/document.h>
 
 namespace
 {
@@ -118,11 +121,44 @@ toad::communication_protocol::mqtt::Client buildClient(const ::MQTT_NS::buffer& 
 {
     return {clientId.data(), convertToAuthenticationData(username, password)};
 }
+
+auto is_valid_json(const std::string& json_str)
+{
+    auto out = std::optional<rapidjson::Document>();
+
+    rapidjson::Document document;
+    rapidjson::ParseResult ok = document.Parse(json_str.c_str());
+    if(!document.HasParseError())
+    {
+        out = std::make_optional<rapidjson::Document>(std::move(document));
+    }
+    else
+    {
+        INFO_LOG("Error parsing JSON: {}", ok.Code());
+    }
+    INFO_LOG("{},{}", json_str, out.has_value());
+    return out;
+}
+
+auto buildSensorDataObject(const std::string& json)
+{
+    auto out = std::optional<toad::storage::database::model::SensorData>();
+    if(const auto parsedJson = is_valid_json(json); parsedJson.has_value())
+    {
+        toad::storage::database::model::SensorData data;
+        data.device_id = parsedJson.value()["device_id"].GetInt64();
+        data.sensor_id = parsedJson.value()["sensor_id"].GetInt64();
+        data.value = parsedJson.value()["value"].GetDouble();
+        out = std::make_optional(data);
+    }
+    return out;
+}
 } // namespace
 
 namespace toad::communication_protocol::mqtt
 {
 ClientConnectionHandler::ClientConnectionHandler(std::unique_ptr<ConnectionManager> connectionManager) :
+    storage_(std::make_unique<storage::database::QuestDB>("localhost", "9009")),
     connectionManager_{std::move(connectionManager)}, subscriptionManager_{}
 {
 }
@@ -197,6 +233,12 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
         subscriptionManager_.publish(toStringView(topic),
                                      toStringView(content),
                                      convertToPublishOptions(publishOptions));
+        if(const auto output = buildSensorDataObject({content.data(), content.size()}); output.has_value())
+        {
+            DEBUG_LOG("content added");
+            storage_->insert(*output);
+            storage_->commit();
+        }
         return true;
     });
 }
