@@ -136,16 +136,15 @@ auto is_valid_json(const std::string& json_str)
     {
         INFO_LOG("Error parsing JSON: {}", ok.Code());
     }
-    INFO_LOG("{},{}", json_str, out.has_value());
     return out;
 }
 
 auto buildSensorDataObject(const std::string& json)
 {
-    auto out = std::optional<toad::storage::database::model::SensorData>();
+    auto out = std::optional<toad::storage::database::entities::SensorData>();
     if(const auto parsedJson = is_valid_json(json); parsedJson.has_value())
     {
-        toad::storage::database::model::SensorData data;
+        toad::storage::database::entities::SensorData data;
         data.device_id = parsedJson.value()["device_id"].GetInt64();
         data.sensor_id = parsedJson.value()["sensor_id"].GetInt64();
         data.value = parsedJson.value()["value"].GetDouble();

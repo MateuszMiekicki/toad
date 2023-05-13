@@ -1,5 +1,5 @@
 #pragma once
-#include "toad/storage/database/model/SensorData.hh"
+#include "toad/storage/database/entities/SensorData.hh"
 #include <memory>
 #include <questdb/ilp/line_sender.hpp>
 #include <string>
@@ -17,7 +17,7 @@ class QuestDB
     QuestDB& operator=(const QuestDB&) = delete;
 
     QuestDB(const std::string&, const std::string&);
-    void insert(const model::SensorData&);
+    void insert(const entities::SensorData&);
     void commit();
     void rollback();
 };
