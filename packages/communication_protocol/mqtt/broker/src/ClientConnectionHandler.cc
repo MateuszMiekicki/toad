@@ -122,7 +122,7 @@ toad::communication_protocol::mqtt::Client buildClient(const ::MQTT_NS::buffer& 
     return {clientId.data(), convertToAuthenticationData(username, password)};
 }
 
-auto is_valid_json(const std::string& json_str)
+auto isValidJson(const std::string& json_str)
 {
     auto out = std::optional<rapidjson::Document>();
 
@@ -134,22 +134,42 @@ auto is_valid_json(const std::string& json_str)
     }
     else
     {
-        INFO_LOG("Error parsing JSON: {}", ok.Code());
+        WARN_LOG("Error during parsing JSON: {}", ok.Code());
     }
-    INFO_LOG("{},{}", json_str, out.has_value());
     return out;
 }
 
-auto buildSensorDataObject(const std::string& json)
+auto buildSensorDataEntity(const std::string& json)
 {
-    auto out = std::optional<toad::storage::database::model::SensorData>();
-    if(const auto parsedJson = is_valid_json(json); parsedJson.has_value())
+    auto out = std::optional<toad::storage::database::entities::sensorDatalist_t>();
+    if(const auto parsedJson = isValidJson(json); parsedJson.has_value())
     {
-        toad::storage::database::model::SensorData data;
-        data.device_id = parsedJson.value()["device_id"].GetInt64();
-        data.sensor_id = parsedJson.value()["sensor_id"].GetInt64();
-        data.value = parsedJson.value()["value"].GetDouble();
-        out = std::make_optional(data);
+        if(parsedJson.value().IsArray())
+        {
+            toad::storage::database::entities::sensorDatalist_t sensorDatalist;
+            sensorDatalist.reserve(parsedJson.value().Size());
+            for(rapidjson::SizeType i = 0; i < parsedJson.value().Size(); i++)
+            {
+                if(parsedJson.value()[i].IsObject())
+                {
+                    toad::storage::database::entities::SensorData data;
+                    if(parsedJson.value()[i].HasMember("device_id") && parsedJson.value()[i]["device_id"].IsInt64())
+                    {
+                        data.device_id = parsedJson.value()[i]["device_id"].GetInt64();
+                    }
+                    if(parsedJson.value()[i].HasMember("sensor_id") && parsedJson.value()[i]["sensor_id"].IsInt64())
+                    {
+                        data.sensor_id = parsedJson.value()[i]["sensor_id"].GetInt64();
+                    }
+                    if(parsedJson.value()[i].HasMember("value") && parsedJson.value()[i]["value"].IsNumber())
+                    {
+                        data.value = parsedJson.value()[i]["value"].GetDouble();
+                    }
+                    sensorDatalist.emplace_back(std::move(data));
+                }
+            }
+            out = std::make_optional(sensorDatalist);
+        }
     }
     return out;
 }
@@ -233,10 +253,12 @@ void ClientConnectionHandler::onPublish(std::shared_ptr<Connection> connection)
         subscriptionManager_.publish(toStringView(topic),
                                      toStringView(content),
                                      convertToPublishOptions(publishOptions));
-        if(const auto output = buildSensorDataObject({content.data(), content.size()}); output.has_value())
+        if(const auto output = buildSensorDataEntity({content.data(), content.size()}); output.has_value())
         {
-            DEBUG_LOG("content added");
-            storage_->insert(*output);
+            for(const auto& data: *output)
+            {
+                storage_->insert(data);
+            }
             storage_->commit();
         }
         return true;

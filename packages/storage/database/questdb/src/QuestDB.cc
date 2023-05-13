@@ -8,7 +8,7 @@ QuestDB::QuestDB(const std::string& address, const std::string& port) :
 {
 }
 
-void QuestDB::insert(const model::SensorData& sensorData)
+void QuestDB::insert(const entities::SensorData& sensorData)
 {
     buffer_->table(sensorData.table)
         .column("device_id", sensorData.device_id)
