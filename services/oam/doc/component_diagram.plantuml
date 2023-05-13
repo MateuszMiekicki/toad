@@ -1,0 +1,13 @@
+@startuml
+component "security" as alias <<component>> {
+   namespace toad::security::algorithms::hash_functions {
+        interface HashFunction {
+            + {abstract} strign hash(string input) const = 0
+            + {abstract} HashType type() const = 0
+        }
+        enum Type {
+            sha3_512
+        }
+    }
+}
+@enduml
