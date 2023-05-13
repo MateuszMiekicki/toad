@@ -1,15 +1,17 @@
 #pragma once
 #include <cstddef>
 #include <string>
+#include <vector>
 
 namespace toad::storage::database::entities
 {
 struct SensorData
 {
-    static SensorData fromJson(const std::string&);
     std::int64_t device_id{};
     std::int64_t sensor_id{};
     double value{};
-    std::string table = "sensor_data";
+    const std::string table = "sensor_data";
 };
+
+using sensorDatalist_t = std::vector<SensorData>;
 } // namespace toad::storage::database::entities
