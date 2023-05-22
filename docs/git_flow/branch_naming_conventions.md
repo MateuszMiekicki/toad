@@ -9,11 +9,11 @@
 
 ```bash
 # general example
-git branch git branch <category/reference/description-in-kebab-case>
+git checkout -b <category/reference/description-in-kebab-case>
 # for github issue
-git branch feature/github-42
+git checkout -b feature/github-XX
 # for zenhub issue
-git branch feature/zenhub-42
+git checkout -b feature/zenhub-XX
 # if issue is not officially specified
-git branch feature/create-new-button-component
+git checkout -b feature/create-new-button-component
 ```
