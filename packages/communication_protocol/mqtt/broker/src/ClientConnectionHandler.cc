@@ -178,7 +178,7 @@ auto buildSensorDataEntity(const std::string& json)
 namespace toad::communication_protocol::mqtt
 {
 ClientConnectionHandler::ClientConnectionHandler(std::unique_ptr<ConnectionManager> connectionManager) :
-    storage_(std::make_unique<storage::database::QuestDB>("localhost", "9009")),
+    storage_(std::make_unique<storage::database::QuestDB>("questdb", "9009")),
     connectionManager_{std::move(connectionManager)}, subscriptionManager_{}
 {
 }
