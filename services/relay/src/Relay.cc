@@ -1,5 +1,5 @@
-#include <iostream>
 #include <boost/asio.hpp>
+#include "toad/services/relay/Logger.hh"
 
 using boost::asio::ip::tcp;
 
@@ -21,14 +21,14 @@ private:
                     handleClient(std::move(newConnection));
                 }
 
-                startAccept(); // Kolejne akceptowanie połączeń
-            });
+            startAccept();
+        });
     }
 
-    void handleClient(std::shared_ptr<tcp::socket> socket) {
-        std::cout << "Nowe połączenie" << std::endl;
+    void handleClient(std::shared_ptr<tcp::socket> socket)
+    {
+        INFO_LOG("New connection");
 
-        // Odbierz pierwszą wiadomość (handshake)
         socket->async_read_some(boost::asio::buffer(buffer_),
             [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
                 if (!error) {
@@ -41,24 +41,26 @@ private:
 
     void handleHandshake(std::shared_ptr<tcp::socket> socket, std::size_t length) {
         std::string message(buffer_.data(), length);
-        std::cout << "Odebrano handshake: " << message << std::endl;
+        DEBUG_LOG("Handshake: {}", message);
 
-        // Przetwarzaj handshake
-
-        // Kontynuuj odbieranie danych od klienta
         socket->async_read_some(boost::asio::buffer(buffer_),
-            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-                if (!error) {
-                    handleReceivedData(socket, bytes_transferred);
-                } else {
-                    handleDisconnect(socket);
-                }
-            });
+                                [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
+                                {
+            if(!error)
+            {
+                handleReceivedData(socket, bytes_transferred);
+            }
+            else
+            {
+                WARN_LOG("Error during handshake: {}", error.message());
+                handleDisconnect(socket);
+            }
+        });
     }
 
     void handleReceivedData(std::shared_ptr<tcp::socket> socket, std::size_t length) {
         std::string message(buffer_.data(), length);
-        std::cout << "Odebrano wiadomość: " << message << std::endl;
+        DEBUG_LOG("Message recived: {}", message);
 
         // Przetwarzaj odebrane dane
 
@@ -75,17 +77,23 @@ private:
 
         // Kontynuuj odbieranie danych od klienta
         socket->async_read_some(boost::asio::buffer(buffer_),
-            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-                if (!error) {
-                    handleReceivedData(socket, bytes_transferred);
-                } else {
-                    handleDisconnect(socket);
-                }
-            });
+                                [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
+                                {
+            if(!error)
+            {
+                handleReceivedData(socket, bytes_transferred);
+            }
+            else
+            {
+                WARN_LOG("Error during receive data: {}", error.message());
+                handleDisconnect(socket);
+            }
+        });
     }
 
-    void handleDisconnect(std::shared_ptr<tcp::socket> socket) {
-        std::cout << "Rozłączono klienta" << std::endl;
+    void handleDisconnect(std::shared_ptr<tcp::socket> socket)
+    {
+        INFO_LOG("The client was disconnected.");
     }
 
     tcp::acceptor acceptor_;
