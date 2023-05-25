@@ -1,5 +1,5 @@
 #include <boost/asio.hpp>
-#include <iostream>
+#include "toad/services/relay/Logger.hh"
 
 using boost::asio::ip::tcp;
 
@@ -25,15 +25,14 @@ class TCPServer
                 handleClient(std::move(newConnection));
             }
 
-            startAccept(); // Kolejne akceptowanie połączeń
+            startAccept();
         });
     }
 
     void handleClient(std::shared_ptr<tcp::socket> socket)
     {
-        std::cout << "Nowe połączenie" << std::endl;
+        INFO_LOG("New connection");
 
-        // Odbierz pierwszą wiadomość (handshake)
         socket->async_read_some(boost::asio::buffer(buffer_),
                                 [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
                                 {
@@ -51,11 +50,8 @@ class TCPServer
     void handleHandshake(std::shared_ptr<tcp::socket> socket, std::size_t length)
     {
         std::string message(buffer_.data(), length);
-        std::cout << "Odebrano handshake: " << message << std::endl;
+        DEBUG_LOG("Handshake: {}", message);
 
-        // Przetwarzaj handshake
-
-        // Kontynuuj odbieranie danych od klienta
         socket->async_read_some(boost::asio::buffer(buffer_),
                                 [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
                                 {
@@ -65,6 +61,7 @@ class TCPServer
             }
             else
             {
+                WARN_LOG("Error during handshake: {}", error.message());
                 handleDisconnect(socket);
             }
         });
@@ -73,7 +70,7 @@ class TCPServer
     void handleReceivedData(std::shared_ptr<tcp::socket> socket, std::size_t length)
     {
         std::string message(buffer_.data(), length);
-        std::cout << "Odebrano wiadomość: " << message << std::endl;
+        DEBUG_LOG("Message recived: {}", message);
 
         // Przetwarzaj odebrane dane
 
@@ -98,6 +95,7 @@ class TCPServer
             }
             else
             {
+                WARN_LOG("Error during receive data: {}", error.message());
                 handleDisconnect(socket);
             }
         });
@@ -105,7 +103,7 @@ class TCPServer
 
     void handleDisconnect(std::shared_ptr<tcp::socket> socket)
     {
-        std::cout << "Rozłączono klienta" << std::endl;
+        INFO_LOG("The client was disconnected.");
     }
 
     tcp::acceptor acceptor_;
