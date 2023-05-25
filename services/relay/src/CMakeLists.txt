@@ -1,4 +1,4 @@
-set(COMPONENT_NAME "collector")
+set(COMPONENT_NAME "relay")
 
 project(
   ${SERVICE_NAME}
@@ -20,10 +20,9 @@ set_target_properties(
              CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-target_link_libraries(${PROJECT_NAME} PRIVATE toad::communication_protocol::mqtt)
 add_logger(${PROJECT_NAME})
-
-target_compile_options(
-  ${PROJECT_NAME}
-  PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>
-  PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Debug>:${GCC_FLAGS_DEBUG}>>)
+find_package(Boost QUIET REQUIRED COMPONENTS system)
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
+# target_compile_options( ${PROJECT_NAME} PRIVATE
+# $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>> PRIVATE
+# $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Debug>:${GCC_FLAGS_DEBUG}>>)
