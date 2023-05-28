@@ -1,7 +1,15 @@
 #include <boost/asio.hpp>
+#include <boost/thread/thread.hpp>
+#include <thread>
 #include "toad/services/relay/Logger.hh"
 
 using boost::asio::ip::tcp;
+
+std::string longFOO(int t)
+{
+            std::this_thread::sleep_for(std::chrono::milliseconds(t));
+    return "udalo sie";
+}
 
 class TCPServer {
 public:
@@ -21,8 +29,8 @@ private:
                     handleClient(std::move(newConnection));
                 }
 
-            startAccept();
-        });
+                startAccept();
+            });
     }
 
     void handleClient(std::shared_ptr<tcp::socket> socket)
@@ -44,51 +52,56 @@ private:
         DEBUG_LOG("Handshake: {}", message);
 
         socket->async_read_some(boost::asio::buffer(buffer_),
-                                [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
-                                {
-            if(!error)
+            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
             {
-                handleReceivedData(socket, bytes_transferred);
-            }
-            else
-            {
-                WARN_LOG("Error during handshake: {}", error.message());
-                handleDisconnect(socket);
-            }
-        });
+                if (!error)
+                {
+                    handleReceivedData(socket, bytes_transferred);
+                }
+                else
+                {
+                    WARN_LOG("Error during handshake: {}", error.message());
+                    handleDisconnect(socket);
+                }
+            });
     }
 
     void handleReceivedData(std::shared_ptr<tcp::socket> socket, std::size_t length) {
         std::string message(buffer_.data(), length);
-        DEBUG_LOG("Message recived: {}", message);
+        DEBUG_LOG("Message received: {}", message);
 
-        // Przetwarzaj odebrane dane
+        std::string response = "Odpowiedź serwera";
 
-        // Odpowiedz do klienta (opcjonalnie)
-        // std::string response = "Odpowiedź serwera";
-        // socket->async_write_some(boost::asio::buffer(response),
-        //     [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-        //         if (!error) {
-        //             // Obsłużono wysłanie odpowiedzi
-        //         } else {
-        //             handleDisconnect(socket);
-        //         }
-        //     });
-
-        // Kontynuuj odbieranie danych od klienta
-        socket->async_read_some(boost::asio::buffer(buffer_),
-                                [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
-                                {
-            if(!error)
-            {
-                handleReceivedData(socket, bytes_transferred);
-            }
-            else
-            {
-                WARN_LOG("Error during receive data: {}", error.message());
-                handleDisconnect(socket);
-            }
+        std::thread th([this, socket, response, message]() {
+        DEBUG_LOG("Message received in thread: {}", message);
+            auto r = longFOO(std::stoi(message));
+            
+            boost::asio::post(socket->get_executor(),
+                [this, socket, r]() {
+                    socket->async_write_some(boost::asio::buffer(r),
+                        [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
+                            if (!error) {
+                            } else {
+                                handleDisconnect(socket);
+                            }
+                        });
+                });
         });
+        th.detach();
+
+        socket->async_read_some(boost::asio::buffer(buffer_),
+            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
+            {
+                if (!error)
+                {
+                    handleReceivedData(socket, bytes_transferred);
+                }
+                else
+                {
+                    WARN_LOG("Error during receive data: {}", error.message());
+                    handleDisconnect(socket);
+                }
+            });
     }
 
     void handleDisconnect(std::shared_ptr<tcp::socket> socket)
@@ -97,7 +110,7 @@ private:
     }
 
     tcp::acceptor acceptor_;
-    std::array<char, 1024> buffer_;
+    std::array<char, 1'000'000> buffer_;
 };
 
 int main() {
