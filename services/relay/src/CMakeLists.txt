@@ -22,6 +22,9 @@ set_target_properties(
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_logger(${PROJECT_NAME})
 find_package(Boost QUIET REQUIRED COMPONENTS system)
+find_package(cppzmq)
+target_link_libraries(${PROJECT_NAME} PRIVATE cppzmq)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 # target_compile_options( ${PROJECT_NAME} PRIVATE
 # $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>> PRIVATE
