@@ -38,4 +38,4 @@ include(fetch_content/c-questdb-client)
 add_subdirectory(packages/communication_protocol)
 add_subdirectory(packages/storage)
 
-add_subdirectory(services/collector)
+add_subdirectory(services)

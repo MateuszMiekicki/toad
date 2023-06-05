@@ -9,7 +9,7 @@
 #include "toad/storage/database/questdb/QuestDB.hh"
 #include <exception>
 #include <mqtt/reason_code.hpp>
-#include <rapidjson/document.h>
+#include <  /document.h>
 
 namespace
 {
@@ -153,9 +153,9 @@ auto buildSensorDataEntity(const std::string& json)
                 if(parsedJson.value()[i].IsObject())
                 {
                     toad::storage::database::entities::SensorData data;
-                    if(parsedJson.value()[i].HasMember("mac_address") && parsedJson.value()[i]["mac_address"].IsInt64())
+                    if(parsedJson.value()[i].HasMember("mac_address") && parsedJson.value()[i]["mac_address"].IsString())
                     {
-                        data.mac_address = parsedJson.value()[i]["mac_address"].GetInt64();
+                        data.mac_address = parsedJson.value()[i]["mac_address"].GetString();
                     }
                     if(parsedJson.value()[i].HasMember("pin_number") && parsedJson.value()[i]["pin_number"].IsInt64())
                     {
