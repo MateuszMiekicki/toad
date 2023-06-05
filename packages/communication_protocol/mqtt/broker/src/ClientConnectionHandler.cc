@@ -153,13 +153,13 @@ auto buildSensorDataEntity(const std::string& json)
                 if(parsedJson.value()[i].IsObject())
                 {
                     toad::storage::database::entities::SensorData data;
-                    if(parsedJson.value()[i].HasMember("device_id") && parsedJson.value()[i]["device_id"].IsInt64())
+                    if(parsedJson.value()[i].HasMember("mac_address") && parsedJson.value()[i]["mac_address"].IsInt64())
                     {
-                        data.device_id = parsedJson.value()[i]["device_id"].GetInt64();
+                        data.mac_address = parsedJson.value()[i]["mac_address"].GetInt64();
                     }
-                    if(parsedJson.value()[i].HasMember("sensor_id") && parsedJson.value()[i]["sensor_id"].IsInt64())
+                    if(parsedJson.value()[i].HasMember("pin_number") && parsedJson.value()[i]["pin_number"].IsInt64())
                     {
-                        data.sensor_id = parsedJson.value()[i]["sensor_id"].GetInt64();
+                        data.pin_number = parsedJson.value()[i]["pin_number"].GetInt64();
                     }
                     if(parsedJson.value()[i].HasMember("value") && parsedJson.value()[i]["value"].IsNumber())
                     {
