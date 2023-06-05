@@ -7,7 +7,7 @@ namespace toad::storage::database::entities
 {
 struct SensorData
 {
-    std::int64_t mac_address{};
+    std::string mac_address{};
     std::int64_t pin_number{};
     double value{};
     const std::string table = "sensor_data";
