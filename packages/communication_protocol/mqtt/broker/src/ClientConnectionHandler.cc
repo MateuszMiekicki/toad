@@ -9,7 +9,7 @@
 #include "toad/storage/database/questdb/QuestDB.hh"
 #include <exception>
 #include <mqtt/reason_code.hpp>
-#include <  /document.h>
+#include <rapidjson/document.h>
 
 namespace
 {
