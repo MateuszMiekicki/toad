@@ -70,11 +70,17 @@ private:
         std::string message(buffer_.data(), length);
         DEBUG_LOG("Message received: {}", message);
 
-        std::string response = "Odpowiedź serwera";
-
-        std::thread th([this, socket, response, message]() {
-        DEBUG_LOG("Message received in thread: {}", message);
-            auto r = longFOO(std::stoi(message));
+        std::thread th([this, socket, message]() {
+            auto r = std::string();
+            try
+            {
+                r = longFOO(std::stoi(message));
+            }
+            catch(const std::exception& e)
+            {
+                r= message;
+            }
+            DEBUG_LOG("Message send: {}", r);
             
             boost::asio::post(socket->get_executor(),
                 [this, socket, r]() {
