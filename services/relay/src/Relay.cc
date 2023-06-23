@@ -159,6 +159,8 @@ class Worker
     Worker(TCPServer& ser, zmq::context_t& context) : tcp{ser}, workerSocket_(context, ZMQ_DEALER)
     {
         id_ = id++;
+        const auto size = 1'000'000;
+        workerSocket_.setsockopt(ZMQ_RCVBUF, &size, sizeof(size));
     }
 
     void work()
@@ -172,10 +174,27 @@ class Worker
 
             workerSocket_.recv(&identity);
             workerSocket_.recv(&request);
-            std::string id = "identity: " + std::string(static_cast<char*>(identity.data()), identity.size());
-            std::string response = "request: " + std::string(static_cast<char*>(request.data()), request.size());
-            DEBUG_LOG("Worker {} received {} {}", id_, id, response);
+            std::string id = std::string(static_cast<char*>(identity.data()), identity.size());
+            std::string response = std::string(static_cast<char*>(request.data()), request.size());
+
+            DEBUG_LOG("Worker {} received from {}: ({}) {}", id_, id,response.size(), response);
             // Przetwarzanie żądania
+            if(tcp.clients_.find(id) != tcp.clients_.end())
+            {
+                auto tcpClient = tcp.clients_[id].get();
+                tcpClient->write_some(boost::asio::buffer(response));
+            }
+            else
+            {
+                WARN_LOG("Client {} not found", id);
+            workerSocket_.send(identity, ZMQ_SNDMORE);
+            response = "chuj dupa";
+            zmq::message_t replyResponse(response.size());
+            memcpy(replyResponse.data(), response.data(), response.size());
+            INFO_LOG("test3");
+            workerSocket_.send(replyResponse);
+            continue;
+            }
             auto tcpClientsh = tcp.clients_[std::string(static_cast<char*>(identity.data()), identity.size())];
             auto tcpClient = tcpClientsh.get();
             //  boost::asio::async_write(tcpClient, boost::asio::buffer(response));
@@ -190,6 +209,7 @@ class Worker
             //             });
             // Oczekiwanie na odpowiedź
             boost::asio::streambuf resp;
+            INFO_LOG("test1");
             response = std::string("dupda");
             {
                 // Odczytaj wszystkie dostępne dane z gniazda
@@ -221,14 +241,19 @@ class Worker
                 // });
                 // boost::asio::read_until(tcpClient, resp, '\n');
             }
+            INFO_LOG("test2");
+
             // std::this_thread::sleep_for(std::chrono::milliseconds(5000));
             // Odpowiedź na żądanie
             // zmq::message_t replyIdentity(identity.data(), identity.size());
             zmq::message_t replyResponse(response.size());
             memcpy(replyResponse.data(), response.data(), response.size());
+            INFO_LOG("test3");
 
             workerSocket_.send(identity, ZMQ_SNDMORE);
             workerSocket_.send(replyResponse);
+            INFO_LOG("test4");
+
             tcp.setDefaultRec(tcpClientsh);
         }
     }
