@@ -153,7 +153,8 @@ auto buildSensorDataEntity(const std::string& json)
                 if(parsedJson.value()[i].IsObject())
                 {
                     toad::storage::database::entities::SensorData data;
-                    if(parsedJson.value()[i].HasMember("mac_address") && parsedJson.value()[i]["mac_address"].IsString())
+                    if(parsedJson.value()[i].HasMember("mac_address") &&
+                       parsedJson.value()[i]["mac_address"].IsString())
                     {
                         data.mac_address = parsedJson.value()[i]["mac_address"].GetString();
                     }

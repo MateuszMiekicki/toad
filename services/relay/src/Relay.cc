@@ -42,7 +42,7 @@ class TCPServer
 
     void handleClient(std::shared_ptr<tcp::socket> socket)
     {
-        INFO_LOG("New connection");
+        DEBUG_LOG("New connection");
 
         socket->async_read_some(boost::asio::buffer(buffer_),
                                 [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
@@ -98,7 +98,7 @@ class TCPServer
     void handleReceivedData(std::shared_ptr<tcp::socket> socket, std::size_t length)
     {
         std::string message(buffer_.data(), length);
-        DEBUG_LOG("Message received: {}", message);
+        TRACE_LOG("Message received: {}", message);
 
         std::thread th(
             [this, socket, message]()
@@ -112,7 +112,7 @@ class TCPServer
             {
                 r = message;
             }
-            DEBUG_LOG("Message send: {}", r);
+            TRACE_LOG("Message send: {}", r);
 
             boost::asio::post(socket->get_executor(),
                               [this, socket, r]()
@@ -138,7 +138,7 @@ class TCPServer
 
     void handleDisconnect(std::shared_ptr<tcp::socket> socket)
     {
-        INFO_LOG("The client was disconnected.");
+        DEBUG_LOG("Client disconnected");
     }
 
     tcp::acceptor acceptor_;
@@ -177,8 +177,7 @@ class Worker
             std::string id = std::string(static_cast<char*>(identity.data()), identity.size());
             std::string response = std::string(static_cast<char*>(request.data()), request.size());
 
-            DEBUG_LOG("Worker {} received from {}: ({}) {}", id_, id,response.size(), response);
-            // Przetwarzanie żądania
+            DEBUG_LOG("Worker {} received from {}: ({}) {}", id_, id, response.size(), response);
             if(tcp.clients_.find(id) != tcp.clients_.end())
             {
                 auto tcpClient = tcp.clients_[id].get();
@@ -187,72 +186,37 @@ class Worker
             else
             {
                 WARN_LOG("Client {} not found", id);
-            workerSocket_.send(identity, ZMQ_SNDMORE);
-            response = "chuj dupa";
-            zmq::message_t replyResponse(response.size());
-            memcpy(replyResponse.data(), response.data(), response.size());
-            INFO_LOG("test3");
-            workerSocket_.send(replyResponse);
-            continue;
+                workerSocket_.send(identity, ZMQ_SNDMORE);
+                response = "client not found";
+                zmq::message_t replyResponse(response.size());
+                memcpy(replyResponse.data(), response.data(), response.size());
+                INFO_LOG("test3");
+                workerSocket_.send(replyResponse);
+                break;
             }
-            auto tcpClientsh = tcp.clients_[std::string(static_cast<char*>(identity.data()), identity.size())];
+            auto tcpClientsh = tcp.clients_[id];
             auto tcpClient = tcpClientsh.get();
-            //  boost::asio::async_write(tcpClient, boost::asio::buffer(response));
-            tcpClient->write_some(boost::asio::buffer(response));
-            //  tcpClient->write_some(boost::asio::buffer(response),
-            //             [this, tcpClient](const boost::system::error_code& error, std::size_t bytes_transferred)
-            //             {
-            //                 if (!error) {
-            //                 } else {
-            //                     // handleDisconnect(socket);
-            //                 }
-            //             });
-            // Oczekiwanie na odpowiedź
             boost::asio::streambuf resp;
-            INFO_LOG("test1");
             response = std::string("dupda");
             {
-                // Odczytaj wszystkie dostępne dane z gniazda
                 std::array<char, 1000> buf;
                 boost::system::error_code ec;
-                // std::size_t n = boost::asio::read(
-                //     *tcpClient, boost::asio::buffer(buf),
-                //     boost::asio::transfer_all(), ec);
-
-                // }
                 auto size =
                     boost::asio::read(*tcpClient, boost::asio::buffer(buf), boost::asio::transfer_at_least(1), ec);
-                // boost::asio::read(*tcpClient, boost::asio::buffer(buf), ec);
                 if(ec)
                 {
                     // An error occurred.
                 }
                 else
                 {
-                    // n == 128
                     response = std::string(std::begin(buf), size);
                 }
-                // tcpClient->read_some(boost::asio::buffer(response),
-                // [this, tcpClient](const boost::system::error_code& error, std::size_t bytes_transferred) {
-                //     if (!error) {
-                //     } else {
-                //         // handleDisconnect(socket);
-                //     }
-                // });
-                // boost::asio::read_until(tcpClient, resp, '\n');
             }
-            INFO_LOG("test2");
-
-            // std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-            // Odpowiedź na żądanie
-            // zmq::message_t replyIdentity(identity.data(), identity.size());
             zmq::message_t replyResponse(response.size());
             memcpy(replyResponse.data(), response.data(), response.size());
-            INFO_LOG("test3");
 
             workerSocket_.send(identity, ZMQ_SNDMORE);
             workerSocket_.send(replyResponse);
-            INFO_LOG("test4");
 
             tcp.setDefaultRec(tcpClientsh);
         }
