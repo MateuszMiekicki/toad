@@ -238,7 +238,7 @@ class Server
 
     void run()
     {
-        frontendSocket_.bind("tcp://*:5570");
+        frontendSocket_.bind("tcp://*:5571");
         backendSocket_.bind("inproc://backend");
 
         std::vector<std::thread> workerThreads;
@@ -276,7 +276,7 @@ class Server
 int main()
 {
     boost::asio::io_context io_context;
-    unsigned short port = 6666;
+    unsigned short port = 5570;
     TCPServer server(io_context, port);
     Server zmq(server);
 
