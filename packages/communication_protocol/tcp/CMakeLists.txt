@@ -1,5 +1,8 @@
 set(COMPONENT_NAME "tcp")
 add_subdirectory(broker)
+add_subdirectory(requester)
+add_subdirectory(message)
+
 project(
   ${COMPONENT_NAME}
   VERSION 0.1.0
@@ -18,4 +21,8 @@ set_target_properties(
              CXX_STANDARD 17
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
-target_link_libraries(${PROJECT_NAME} INTERFACE toad::communication_protocol::mqtt::broker)
+target_link_libraries(${PROJECT_NAME} 
+  INTERFACE toad::communication_protocol::tcp::tcp_broker
+  INTERFACE toad::communication_protocol::tcp::message
+  INTERFACE toad::communication_protocol::tcp::requester
+  )

@@ -1,56 +1,120 @@
-#include "toad/communication_protocol/mqtt/broker/Broker.hh"
-#include "toad/communication_protocol/endpoint/Endpoint.hh"
-#include "toad/communication_protocol/mqtt/broker/Connection.hh"
-#include "toad/communication_protocol/mqtt/broker/ErrorCode.hh"
-#include "toad/communication_protocol/mqtt/Logger.hh"
+#include "toad/communication_protocol/tcp/broker/Broker.hh"
+#include "toad/communication_protocol/tcp/Logger.hh"
 
 namespace toad::communication_protocol::tcp
 {
-Broker::Broker(const Endpoint& endpoint, std::unique_ptr<interface::BrokerEventHandler> brokerEventHandler) :
-    brokerEventHandler_{std::move(brokerEventHandler)}, brokerAcceptor_{}, broker_(endpoint.endpoint(), brokerAcceptor_)
+Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{},  acceptor_(ioContext_, endpoint.endpoint())
 {
-    INFO_LOG("MQTT broker: {{\"mqtt_broker:\": {{\"version\": \"3.1.1\", {}}}}}", endpoint);
-    broker_.set_protocol_version(::MQTT_NS::protocol_version::v3_1_1);
+    INFO_LOG("TCP broker setup on {}", endpoint);
 }
 
-bool Broker::start()
+void Broker::handleDisconnect(connection_t)
 {
-    setupHandleOnConnection();
-    setupHandleOnError();
-    INFO_LOG("MQTT broker: start lisen and accept connection");
-    listen();
-    accept();
-    return true;
-}
-
-void Broker::setupHandleOnConnection()
-{
-    broker_.set_accept_handler(
-        [&](Connection::con_sp_t con)
-        {
-        auto connection = std::make_shared<Connection>(std::move(con));
-        brokerEventHandler_->onAccept(connection);
-    });
-}
-
-void Broker::setupHandleOnError()
-{
-    broker_.set_error_handler(
-        [&](::MQTT_NS::error_code ec)
-        {
-        WARN_LOG("Broker handled error code: {}", ec.message());
-        ErrorCode errorCode;
-        brokerEventHandler_->onError(errorCode);
-    });
+    DEBUG_LOG("Client disconnected");
 }
 
 void Broker::listen()
 {
-    broker_.listen();
+    ioContext_.run();
 }
 
-void Broker::accept()
+void Broker::setAcceptHandler()
 {
-    brokerAcceptor_.run();
+    auto newConnection = std::make_shared<boost::asio::ip::tcp::socket>(acceptor_.get_executor());
+
+    acceptor_.async_accept(*newConnection,
+                           [this, newConnection](const boost::system::error_code& error)
+                           {
+        if(!error)
+        {
+            handleClient(newConnection);
+        }
+
+        setAcceptHandler();
+    });
+}
+
+bool Broker::handleHandshake(connection_t socket, std::size_t length)
+{
+    std::string message(buffer_.data(), length - 1);
+    DEBUG_LOG("Handshake: {}", message);
+    if(clients_.find(message) != clients_.end())
+    {
+        WARN_LOG("Client {} already connected", message);
+        return false;
+    }
+    clients_[message] = socket;
+    return true;
+}
+
+void Broker::setReader(connection_t socket)
+{
+    socket->async_read_some(boost::asio::buffer(buffer_),
+                            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
+                            {
+        if(!error)
+        {
+            TRACE_LOG("Received data: {}", std::string(buffer_.data(), bytes_transferred));
+            auto payload = PayloadFactory::createBytes(std::string(buffer_.data(), bytes_transferred));
+            auto msg = MessageFactory::createAlert(payload);
+            hub_.push(msg);
+            setReader(socket);
+        }
+        else
+        {
+            WARN_LOG("Error during handshake: {}", error.message());
+            handleDisconnect(socket);
+        }
+    });
+}
+
+void Broker::send(connection_t socket, const std::string& message)
+{
+     boost::asio::post(socket->get_executor(),
+                              [this, socket, message]()
+                              {
+                socket->async_write_some(
+                    boost::asio::buffer(message),
+                    [this, socket](const boost::system::error_code& error, std::size_t )
+                    {
+                    if(error)
+                    {
+                        handleDisconnect(socket);
+                    }
+                    });
+            });
+}
+
+void Broker::handleClient(connection_t socket)
+{
+    INFO_LOG("New connection");
+
+    socket->async_read_some(boost::asio::buffer(buffer_),
+                            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
+                            {
+        if(!error)
+        {
+            if(handleHandshake(socket, bytes_transferred))
+            {
+                setReader(socket);
+            }
+            else
+            {
+                send(socket, "Client already connected");
+                socket->close();
+            }
+        }
+        else
+        {
+            handleDisconnect(socket);
+        }
+    });
+}
+
+void Broker::start()
+{
+    INFO_LOG("Starting tcp broker");
+    setAcceptHandler();
+    listen();
 }
 } // namespace toad::communication_protocol::tcp

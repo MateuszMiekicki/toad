@@ -9,7 +9,7 @@ target_link_libraries(
   PRIVATE GTest::gtest_main
   PRIVATE GTest::gmock
   PRIVATE GTest::gmock_main
-  PRIVATE toad::communication_protocol::tcp::broker)
+  PRIVATE toad::communication_protocol::tcp::message)
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
