@@ -14,12 +14,13 @@ class Requester
     zmq::context_t context_;
     zmq::socket_t frontendSocket_;
     zmq::socket_t backendSocket_;
-
+    zmq::socket_t sender_;
     Worker workerTask();
     void dispatch();
 
   public:
     Requester(Hub&);
     void start();
+    void send(const Message&);
 };
 } // namespace toad::communication_protocol::tcp
