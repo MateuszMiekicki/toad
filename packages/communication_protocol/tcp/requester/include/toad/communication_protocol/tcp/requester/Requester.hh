@@ -1,24 +1,25 @@
 #pragma once
 #include "toad/communication_protocol/endpoint/Endpoint.hh"
-#include <zmq.hpp>
 #include "toad/communication_protocol/tcp/message/Hub.hh"
+#include "toad/communication_protocol/tcp/requester/Worker.hh"
+#include <map>
+#include <zmq.hpp>
 
 namespace toad::communication_protocol::tcp
 {
 class Requester
 {
-private:
-    Hub& hub_; 
+  private:
+    Hub& hub_;
     zmq::context_t context_;
     zmq::socket_t frontendSocket_;
     zmq::socket_t backendSocket_;
+
+    Worker workerTask();
+    void dispatch();
+
   public:
     Requester(Hub&);
-
     void start();
-  private:
-    void workerTask();
-    std::vector<std::thread> workers{};
-
 };
-} // namespace toad::communication_protocol::mqtt
+} // namespace toad::communication_protocol::tcp

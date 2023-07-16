@@ -16,9 +16,15 @@ struct Payload
     const Type type;
 };
 
+struct Detail
+{
+    int workerId;
+};
+using clientId_t = std::string;
 struct Message
 {
     const MessageId id_;
+    const clientId_t clientId_;
     enum class Type
     {
         unknown,
@@ -27,43 +33,33 @@ struct Message
         alert,
     };
     const Type type_;
-    
+
     const Payload payload_;
-    Message(const Type& type, const Payload &payload) :
-        id_{}, type_{type}, payload_{payload}
+
+    Message(const clientId_t& clientId, const Type &type, const Payload &payload) : id_{},clientId_{clientId}, type_{type}, payload_{payload}
     {
     }
 };
+
 class PayloadFactory
 {
-    public:
-        static Payload createProto(const std::string &payload)
-        {
-            return Payload{payload, Payload::Type::proto};
-        }
-        static Payload createJson(const std::string &payload)
-        {
-            return Payload{payload, Payload::Type::json};
-        }
-        static Payload createBytes(const std::string &payload)
-        {
-            return Payload{payload, Payload::Type::bytes};
-        }
+  public:
+    static Payload createJson(const std::string &payload)
+    {
+        return Payload{payload, Payload::Type::json};
+    }
 };
+
 class MessageFactory
 {
   public:
-    static Message createRequest(const Payload &payload)
+    static Message createRequest(const clientId_t &clientId, const Payload &payload)
     {
-        return Message{Message::Type::request, payload};
+        return Message{clientId, Message::Type::request, payload};
     }
-    static Message createResponse(const Payload &payload)
+    static Message createAlert(const clientId_t &clientId, const Payload &payload)
     {
-        return Message{Message::Type::response, payload};
-    }
-    static Message createAlert(const Payload &payload)
-    {
-        return Message{Message::Type::alert, payload};
+        return Message{clientId, Message::Type::alert, payload};
     }
 };
 } // namespace toad::communication_protocol::tcp

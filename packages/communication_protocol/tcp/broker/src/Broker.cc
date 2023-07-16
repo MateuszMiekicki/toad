@@ -3,7 +3,23 @@
 
 namespace toad::communication_protocol::tcp
 {
-Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{},  acceptor_(ioContext_, endpoint.endpoint())
+namespace
+{
+    std::string findClientId(const  Broker::clients_t , const Broker::connection_t& )
+    {
+        // auto pos = message.find("clientId");
+        // if(pos == std::string::npos)
+        // {
+        //     return std::nullopt;
+        // }
+        // auto start = message.find("\"", pos);
+        // auto end = message.find("\"", start + 1);
+        // return message.substr(start + 1, end - start - 1);
+        return "test";
+    }
+}
+
+Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
 {
     INFO_LOG("TCP broker setup on {}", endpoint);
 }
@@ -54,9 +70,9 @@ void Broker::setReader(connection_t socket)
                             {
         if(!error)
         {
-            TRACE_LOG("Received data: {}", std::string(buffer_.data(), bytes_transferred));
-            auto payload = PayloadFactory::createBytes(std::string(buffer_.data(), bytes_transferred));
-            auto msg = MessageFactory::createAlert(payload);
+            DEBUG_LOG("Received data: {}", std::string(buffer_.data(), bytes_transferred));
+            auto payload = PayloadFactory::createJson(std::string(buffer_.data(), bytes_transferred));
+            auto msg = MessageFactory::createAlert(findClientId(clients_, socket), payload);
             hub_.push(msg);
             setReader(socket);
         }
@@ -70,19 +86,18 @@ void Broker::setReader(connection_t socket)
 
 void Broker::send(connection_t socket, const std::string& message)
 {
-     boost::asio::post(socket->get_executor(),
-                              [this, socket, message]()
-                              {
-                socket->async_write_some(
-                    boost::asio::buffer(message),
-                    [this, socket](const boost::system::error_code& error, std::size_t )
-                    {
-                    if(error)
-                    {
-                        handleDisconnect(socket);
-                    }
-                    });
-            });
+    boost::asio::post(socket->get_executor(),
+                      [this, socket, message]()
+                      {
+        socket->async_write_some(boost::asio::buffer(message),
+                                 [this, socket](const boost::system::error_code& error, std::size_t)
+                                 {
+            if(error)
+            {
+                handleDisconnect(socket);
+            }
+        });
+    });
 }
 
 void Broker::handleClient(connection_t socket)

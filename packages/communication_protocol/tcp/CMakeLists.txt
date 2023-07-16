@@ -21,8 +21,8 @@ set_target_properties(
              CXX_STANDARD 17
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(
+  ${PROJECT_NAME}
   INTERFACE toad::communication_protocol::tcp::tcp_broker
   INTERFACE toad::communication_protocol::tcp::message
-  INTERFACE toad::communication_protocol::tcp::requester
-  )
+  INTERFACE toad::communication_protocol::tcp::requester)

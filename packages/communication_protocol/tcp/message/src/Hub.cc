@@ -13,7 +13,11 @@ void Hub::push(const Message &message)
 Message Hub::pop()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    cond_.wait(lock, [this] { return !queue_.empty(); });
+    cond_.wait(lock,
+               [this]
+               {
+        return !queue_.empty();
+    });
     auto message = queue_.front();
     queue_.pop();
     return message;
@@ -21,13 +25,13 @@ Message Hub::pop()
 
 void Hub::printAllMessages()
 {
-    INFO_LOG("Printing all messages");
     std::unique_lock<std::mutex> lock(mutex_);
-    while (!queue_.empty())
+    if(!queue_.empty())
     {
+        INFO_LOG("Printing top message");
         auto message = queue_.front();
-        queue_.pop();
         TRACE_LOG("Message: {}", message.id_.id);
     }
 }
-}
+
+} // namespace toad::communication_protocol::tcp
