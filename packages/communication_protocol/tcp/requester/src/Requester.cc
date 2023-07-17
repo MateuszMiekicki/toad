@@ -17,32 +17,30 @@ Requester::Requester(Hub& hub) :
 
 void Requester::start()
 {
-    const auto numOfWorker = 50;
-     auto workers = std::vector<std::thread>();
-     workers.reserve(numOfWorker);
-     std::generate_n(std::back_inserter(workers), numOfWorker, [this]() { return std::thread(&Requester::workerTask, this); });
-     
-    std::thread thread(&Requester::dispatch, this);
-    thread.detach();
+    const auto numOfWorker = 5;
+    auto workers = std::vector<std::thread>();
+    workers.reserve(numOfWorker);
+    std::generate_n(std::back_inserter(workers),
+                    numOfWorker,
+                    [this]()
+                    {
+        return std::thread(&Requester::workerTask, this);
+    });
+
+    std::for_each(workers.begin(),
+                  workers.end(),
+                  [](auto& worker)
+                  {
+        worker.detach();
+    });
     zmq::proxy(frontendSocket_, backendSocket_);
-    std::for_each(workers.begin(), workers.end(), [](auto& worker) { worker.join(); });
 }
 
 void Requester::send(const Message& message)
 {
-        auto sendIdStatus = sender_.send(zmq::message_t(message.clientId_), zmq::send_flags::sndmore);
-        auto sendResponseStatus = sender_.send(zmq::message_t(message.payload_.payload), zmq::send_flags::none);
-        INFO_LOG("sendIdStatus: {}, sendResponseStatus: {}", sendIdStatus.value_or(0), sendResponseStatus.value_or(0));
-}
-
-void Requester::dispatch()
-{
-    while(true)
-    {
-        auto msg = hub_.pop();
-        INFO_LOG("dispatching: {}", msg.payload_.payload);
-        send(msg);
-    }
+    auto sendIdStatus = sender_.send(zmq::message_t(message.clientId_), zmq::send_flags::sndmore);
+    auto sendResponseStatus = sender_.send(zmq::message_t(message.payload_.payload), zmq::send_flags::none);
+    INFO_LOG("sendIdStatus: {}, sendResponseStatus: {}", sendIdStatus.value_or(0), sendResponseStatus.value_or(0));
 }
 
 Worker Requester::workerTask()

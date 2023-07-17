@@ -16,7 +16,6 @@ class Requester
     zmq::socket_t backendSocket_;
     zmq::socket_t sender_;
     Worker workerTask();
-    void dispatch();
 
   public:
     Requester(Hub&);

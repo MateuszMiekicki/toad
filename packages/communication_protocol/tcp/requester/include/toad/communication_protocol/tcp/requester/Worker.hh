@@ -12,6 +12,7 @@ class Worker
     zmq::socket_t workerSocket_;
     void connect();
     void handleConnection();
+
   public:
     Worker(Hub&, zmq::context_t&);
     void work();

@@ -4,27 +4,27 @@
 
 namespace
 {
-    std::string convertRecvBufferResultToPrintable(const zmq::recv_result_t& result)
+std::string convertRecvBufferResultToPrintable(const zmq::recv_result_t& result)
+{
+    if(result.has_value())
     {
-        if(result.has_value())
-        {
-            return std::to_string(result.value());
-        }
-        else
-        {
-            return "recv_buffer_result_t is empty";
-        }
+        return std::to_string(result.value());
     }
-    std::string zmqMessageToString(const zmq::message_t& message)
+    else
     {
-        return std::string(static_cast<const char*>(message.data()), message.size());
+        return "recv_buffer_result_t is empty";
     }
 }
 
+std::string zmqMessageToString(const zmq::message_t& message)
+{
+    return std::string(static_cast<const char*>(message.data()), message.size());
+}
+} // namespace
+
 namespace toad::communication_protocol::tcp
 {
-Worker::Worker(Hub& hub, zmq::context_t& context) :
-    hub_{hub}, workerSocket_(context, zmq::socket_type::dealer)
+Worker::Worker(Hub& hub, zmq::context_t& context) : hub_{hub}, workerSocket_(context, zmq::socket_type::dealer)
 {
 }
 
@@ -57,7 +57,9 @@ void Worker::handleConnection()
 
         const auto identityRecvBufferResult = workerSocket_.recv(identity);
         const auto requestRecvBufferResult = workerSocket_.recv(request);
-        DEBUG_LOG("idStatus: {}, requestStatus: {}", convertRecvBufferResultToPrintable(identityRecvBufferResult), convertRecvBufferResultToPrintable(requestRecvBufferResult));
+        DEBUG_LOG("idStatus: {}, requestStatus: {}",
+                  convertRecvBufferResultToPrintable(identityRecvBufferResult),
+                  convertRecvBufferResultToPrintable(requestRecvBufferResult));
         if(!identityRecvBufferResult.has_value() || !requestRecvBufferResult.has_value())
         {
             ERROR_LOG("Worker::handleConnection: recv failed");
@@ -65,6 +67,8 @@ void Worker::handleConnection()
         }
         const auto payload = PayloadFactory::createJson(zmqMessageToString(request));
         const auto message = MessageFactory::createRequest(zmqMessageToString(identity), payload);
+        TRACE_LOG("Worker::handleConnection: {} {}", zmqMessageToString(identity), payload.payload);
+
         hub_.push(message);
     }
 }

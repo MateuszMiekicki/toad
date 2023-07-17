@@ -1,31 +1,33 @@
 #include "toad/communication_protocol/tcp/broker/Broker.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
+#include <rapidjson/document.h>
 
 namespace toad::communication_protocol::tcp
 {
 namespace
 {
-    std::string findClientId(const  Broker::clients_t , const Broker::connection_t& )
+std::string findClientId(const Broker::clients_t clients, const Broker::connection_t& connection)
+{
+    for(const auto& client: clients)
     {
-        // auto pos = message.find("clientId");
-        // if(pos == std::string::npos)
-        // {
-        //     return std::nullopt;
-        // }
-        // auto start = message.find("\"", pos);
-        // auto end = message.find("\"", start + 1);
-        // return message.substr(start + 1, end - start - 1);
-        return "test";
+        if(client.second == connection)
+        {
+            return client.first;
+        }
     }
+    return {};
 }
+} // namespace
 
 Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
 {
     INFO_LOG("TCP broker setup on {}", endpoint);
 }
 
-void Broker::handleDisconnect(connection_t)
+void Broker::handleDisconnect(connection_t connection)
 {
+    auto clientId = findClientId(clients_, connection);
+    clients_.erase(clientId);
     DEBUG_LOG("Client disconnected");
 }
 
@@ -70,10 +72,48 @@ void Broker::setReader(connection_t socket)
                             {
         if(!error)
         {
-            DEBUG_LOG("Received data: {}", std::string(buffer_.data(), bytes_transferred));
-            auto payload = PayloadFactory::createJson(std::string(buffer_.data(), bytes_transferred));
-            auto msg = MessageFactory::createAlert(findClientId(clients_, socket), payload);
-            hub_.push(msg);
+            const auto recivedData = std::string(buffer_.data(), bytes_transferred - 1);
+            DEBUG_LOG("Received data: {}", recivedData);
+            rapidjson::Document document;
+            document.Parse(recivedData.c_str());
+            if(document.HasParseError())
+            {
+                WARN_LOG("Parse error: {}", document.GetParseError());
+                setReader(socket);
+                return;
+            }
+            if(document.HasMember("type"))
+            {
+                auto convertTypeToEnum = [](std::string type)
+                {
+                    std::transform(type.begin(),
+                                   type.end(),
+                                   type.begin(),
+                                   [](unsigned char c)
+                                   {
+                        return std::tolower(c);
+                    });
+                    if(type == "response")
+                    {
+                        return Message::Type::response;
+                    }
+                    else if(type == "alert")
+                    {
+                        return Message::Type::alert;
+                    }
+                    else
+                    {
+                        return Message::Type::unknown;
+                    }
+                }(document["type"].GetString());
+                auto payload = PayloadFactory::createJson(std::move(recivedData));
+                hub_.push(Message(findClientId(clients_, socket), convertTypeToEnum, payload));
+            }
+            else
+            {
+                WARN_LOG("Received message without type");
+            }
+
             setReader(socket);
         }
         else
@@ -98,6 +138,17 @@ void Broker::send(connection_t socket, const std::string& message)
             }
         });
     });
+}
+
+void Broker::send(const Message& message)
+{
+    auto clientId = message.clientId_;
+    if(clients_.find(clientId) == clients_.end())
+    {
+        WARN_LOG("Client {} not connected", clientId);
+        return;
+    }
+    send(clients_[clientId], message.payload_.payload);
 }
 
 void Broker::handleClient(connection_t socket)

@@ -16,11 +16,8 @@ struct Payload
     const Type type;
 };
 
-struct Detail
-{
-    int workerId;
-};
 using clientId_t = std::string;
+
 struct Message
 {
     const MessageId id_;
@@ -36,7 +33,8 @@ struct Message
 
     const Payload payload_;
 
-    Message(const clientId_t& clientId, const Type &type, const Payload &payload) : id_{},clientId_{clientId}, type_{type}, payload_{payload}
+    Message(const clientId_t &clientId, const Type &type, const Payload &payload) :
+        id_{}, clientId_{clientId}, type_{type}, payload_{payload}
     {
     }
 };
@@ -57,6 +55,12 @@ class MessageFactory
     {
         return Message{clientId, Message::Type::request, payload};
     }
+
+    static Message createResponse(const clientId_t &clientId, const Payload &payload)
+    {
+        return Message{clientId, Message::Type::response, payload};
+    }
+
     static Message createAlert(const clientId_t &clientId, const Payload &payload)
     {
         return Message{clientId, Message::Type::alert, payload};

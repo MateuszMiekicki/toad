@@ -2,6 +2,7 @@ set(COMPONENT_NAME "tcp")
 add_subdirectory(broker)
 add_subdirectory(requester)
 add_subdirectory(message)
+add_subdirectory(dispatcher)
 
 project(
   ${COMPONENT_NAME}
@@ -25,4 +26,5 @@ target_link_libraries(
   ${PROJECT_NAME}
   INTERFACE toad::communication_protocol::tcp::tcp_broker
   INTERFACE toad::communication_protocol::tcp::message
-  INTERFACE toad::communication_protocol::tcp::requester)
+  INTERFACE toad::communication_protocol::tcp::requester
+  INTERFACE toad::communication_protocol::tcp::tcp_dispatcher)
