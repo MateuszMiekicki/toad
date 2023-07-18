@@ -7,6 +7,7 @@ libpq/14.5
 redboltz-mqtt_cpp/13.0.0
 openssl/1.1.1t
 rapidjson/cci.20220822
+zeromq/4.3.4
 cppzmq/4.9.0
 
 [generators]

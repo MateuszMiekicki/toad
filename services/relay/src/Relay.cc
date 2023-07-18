@@ -5,7 +5,8 @@
 #include "toad/communication_protocol/tcp/requester/Requester.hh"
 
 int main()
-{
+{ 
+    spdlog::set_level(spdlog::level::trace); // and this
     toad::communication_protocol::tcp::Hub hub;
     toad::communication_protocol::tcp::Requester requester(hub);
     auto endpoint = toad::communication_protocol::Endpoint("0.0.0.0", 5570);
