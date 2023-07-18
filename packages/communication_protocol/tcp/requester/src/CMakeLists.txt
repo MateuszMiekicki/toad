@@ -23,6 +23,8 @@ target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE OpenSSL::Crypto
   PRIVATE OpenSSL::SSL)
+find_package(cppzmq)
+target_link_libraries(${PROJECT_NAME} PRIVATE cppzmq)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::message)

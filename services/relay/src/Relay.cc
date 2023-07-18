@@ -5,7 +5,7 @@
 #include "toad/communication_protocol/tcp/requester/Requester.hh"
 
 int main()
-{ 
+{
     toad::communication_protocol::tcp::Hub hub;
     toad::communication_protocol::tcp::Requester requester(hub);
     auto endpoint = toad::communication_protocol::Endpoint("0.0.0.0", 5570);
