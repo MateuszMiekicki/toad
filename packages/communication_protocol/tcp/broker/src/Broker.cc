@@ -21,7 +21,8 @@ std::string findClientId(const Broker::clients_t clients, const Broker::connecti
 
 Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
 {
-    INFO_LOG("TCP broker setup on {}", endpoint);
+    //todo: problem with formatter 
+    INFO_LOG("TCP broker setup on {}", "endpoint");
 }
 
 void Broker::handleDisconnect(connection_t connection)
@@ -78,7 +79,7 @@ void Broker::setReader(connection_t socket)
             document.Parse(recivedData.c_str());
             if(document.HasParseError())
             {
-                WARN_LOG("Parse error: {}", document.GetParseError());
+                WARN_LOG("Parse error: {}", "document.GetParseError()");
                 setReader(socket);
                 return;
             }
