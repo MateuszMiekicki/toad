@@ -134,7 +134,7 @@ auto isValidJson(const std::string& json_str)
     }
     else
     {
-        WARN_LOG("Error during parsing JSON: {}", ok.Code());
+        WARN_LOG("Error during parsing JSON: {}", "ok.Code()");
     }
     return out;
 }
