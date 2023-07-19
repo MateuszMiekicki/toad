@@ -21,7 +21,7 @@ std::string findClientId(const Broker::clients_t clients, const Broker::connecti
 
 Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
 {
-    //todo: problem with formatter 
+    // todo: problem with formatter
     INFO_LOG("TCP broker setup on {}", "endpoint");
 }
 
