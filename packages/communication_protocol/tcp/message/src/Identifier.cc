@@ -5,5 +5,10 @@
 
 namespace toad::communication_protocol::tcp
 {
+template<typename T>
+Identifier<T>::Identifier() : id{boost::uuids::to_string(boost::uuids::random_generator()())}
+{
+}
+Identifier<struct StrongTypeMessageId> id{};
 
 } // namespace toad::communication_protocol::tcp
