@@ -127,7 +127,7 @@ auto isValidJson(const std::string& json_str)
     auto out = std::optional<rapidjson::Document>();
 
     rapidjson::Document document;
-    rapidjson::ParseResult ok = document.Parse(json_str.c_str());
+    /*rapidjson::ParseResult ok =*/ document.Parse(json_str.c_str());
     if(!document.HasParseError())
     {
         out = std::make_optional<rapidjson::Document>(std::move(document));
