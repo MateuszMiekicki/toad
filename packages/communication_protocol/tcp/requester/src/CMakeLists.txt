@@ -17,11 +17,14 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_logger(${PROJECT_NAME})
+find_package(cppzmq QUIET REQUIRED)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${cppzmq_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq::cppzmq)
+target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
+target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::message)
 
-find_package(Boost QUIET REQUIRED COMPONENTS system)
-target_link_libraries(${PROJECT_NAME} PUBLIC Boost::system)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_options(
   ${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>

@@ -127,14 +127,14 @@ auto isValidJson(const std::string& json_str)
     auto out = std::optional<rapidjson::Document>();
 
     rapidjson::Document document;
-    rapidjson::ParseResult ok = document.Parse(json_str.c_str());
+    /*rapidjson::ParseResult ok =*/document.Parse(json_str.c_str());
     if(!document.HasParseError())
     {
         out = std::make_optional<rapidjson::Document>(std::move(document));
     }
     else
     {
-        WARN_LOG("Error during parsing JSON: {}", ok.Code());
+        WARN_LOG("Error during parsing JSON: {}", "ok.Code()");
     }
     return out;
 }
@@ -153,7 +153,8 @@ auto buildSensorDataEntity(const std::string& json)
                 if(parsedJson.value()[i].IsObject())
                 {
                     toad::storage::database::entities::SensorData data;
-                    if(parsedJson.value()[i].HasMember("mac_address") && parsedJson.value()[i]["mac_address"].IsString())
+                    if(parsedJson.value()[i].HasMember("mac_address") &&
+                       parsedJson.value()[i]["mac_address"].IsString())
                     {
                         data.mac_address = parsedJson.value()[i]["mac_address"].GetString();
                     }

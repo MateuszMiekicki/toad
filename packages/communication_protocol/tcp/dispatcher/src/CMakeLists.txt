@@ -17,11 +17,23 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_logger(${PROJECT_NAME})
+find_package(OpenSSL QUIET REQUIRED)
+find_package(RapidJSON REQUIRED)
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE OpenSSL::Crypto
+  PRIVATE OpenSSL::SSL)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
+target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
+target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::message)
+target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::requester)
+target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::tcp_broker)
 
 find_package(Boost QUIET REQUIRED COMPONENTS system)
-target_link_libraries(${PROJECT_NAME} PUBLIC Boost::system)
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_options(
   ${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>

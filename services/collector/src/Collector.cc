@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
     spdlog::set_level(spdlog::level::trace); // and this
     using namespace toad::communication_protocol;
     using namespace toad::communication_protocol::mqtt;
-    auto endpoint = Endpoint();
+    auto endpoint = Endpoint("0.0.0.0", 1883);
     if(argc == 3)
     {
         auto address = argv[1];

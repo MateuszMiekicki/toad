@@ -1,104 +1,34 @@
-#include <iostream>
-#include <boost/asio.hpp>
+#include "toad/communication_protocol/endpoint/Endpoint.hh"
+#include "toad/communication_protocol/tcp/broker/Broker.hh"
+#include "toad/communication_protocol/tcp/dispatcher/Dispatcher.hh"
+#include "toad/communication_protocol/tcp/message/Hub.hh"
+#include "toad/communication_protocol/tcp/requester/Requester.hh"
 
-using boost::asio::ip::tcp;
+int main()
+{
+    toad::communication_protocol::tcp::Hub hub;
+    auto endpointForRequester = toad::communication_protocol::Endpoint("0.0.0.0", 5571);
+    toad::communication_protocol::tcp::Requester requester(endpointForRequester, hub);
+    auto endpointForTcpBroker = toad::communication_protocol::Endpoint("0.0.0.0", 5570);
+    auto server = toad::communication_protocol::tcp::Broker(endpointForTcpBroker, hub);
+    std::thread th(
+        [&]()
+        {
+        requester.start();
+    });
+    std::thread th2(
+        [&]()
+        {
+        server.start();
+    });
+    std::thread th3(
+        [&]()
+        {
+        auto dispatcher = toad::communication_protocol::tcp::Dispatcher(hub, server, requester);
+        dispatcher.start();
+    });
 
-class TCPServer {
-public:
-    TCPServer(boost::asio::io_context& io_context, unsigned short port)
-        : acceptor_(io_context, tcp::endpoint(tcp::v4(), port))
-    {
-        startAccept();
-    }
-
-private:
-    void startAccept() {
-        auto newConnection = std::make_shared<tcp::socket>(acceptor_.get_executor());
-
-        acceptor_.async_accept(*newConnection,
-            [this, newConnection](const boost::system::error_code& error) {
-                if (!error) {
-                    handleClient(std::move(newConnection));
-                }
-
-                startAccept(); // Kolejne akceptowanie połączeń
-            });
-    }
-
-    void handleClient(std::shared_ptr<tcp::socket> socket) {
-        std::cout << "Nowe połączenie" << std::endl;
-
-        // Odbierz pierwszą wiadomość (handshake)
-        socket->async_read_some(boost::asio::buffer(buffer_),
-            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-                if (!error) {
-                    handleHandshake(socket, bytes_transferred);
-                } else {
-                    handleDisconnect(socket);
-                }
-            });
-    }
-
-    void handleHandshake(std::shared_ptr<tcp::socket> socket, std::size_t length) {
-        std::string message(buffer_.data(), length);
-        std::cout << "Odebrano handshake: " << message << std::endl;
-
-        // Przetwarzaj handshake
-
-        // Kontynuuj odbieranie danych od klienta
-        socket->async_read_some(boost::asio::buffer(buffer_),
-            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-                if (!error) {
-                    handleReceivedData(socket, bytes_transferred);
-                } else {
-                    handleDisconnect(socket);
-                }
-            });
-    }
-
-    void handleReceivedData(std::shared_ptr<tcp::socket> socket, std::size_t length) {
-        std::string message(buffer_.data(), length);
-        std::cout << "Odebrano wiadomość: " << message << std::endl;
-
-        // Przetwarzaj odebrane dane
-
-        // Odpowiedz do klienta (opcjonalnie)
-        // std::string response = "Odpowiedź serwera";
-        // socket->async_write_some(boost::asio::buffer(response),
-        //     [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-        //         if (!error) {
-        //             // Obsłużono wysłanie odpowiedzi
-        //         } else {
-        //             handleDisconnect(socket);
-        //         }
-        //     });
-
-        // Kontynuuj odbieranie danych od klienta
-        socket->async_read_some(boost::asio::buffer(buffer_),
-            [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred) {
-                if (!error) {
-                    handleReceivedData(socket, bytes_transferred);
-                } else {
-                    handleDisconnect(socket);
-                }
-            });
-    }
-
-    void handleDisconnect(std::shared_ptr<tcp::socket> socket) {
-        std::cout << "Rozłączono klienta" << std::endl;
-    }
-
-    tcp::acceptor acceptor_;
-    std::array<char, 1024> buffer_;
-};
-
-int main() {
-    boost::asio::io_context io_context;
-    unsigned short port = 6666;
-
-    TCPServer server(io_context, port);
-
-    io_context.run();
-
+    th.join();
+    th2.join();
     return 0;
 }
