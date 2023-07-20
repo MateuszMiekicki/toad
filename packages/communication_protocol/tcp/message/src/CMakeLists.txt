@@ -19,9 +19,8 @@ set_target_properties(
 
 add_logger(${PROJECT_NAME})
 
-find_package(Boost REQUIRED)
-add_library(boost_uuid_interface INTERFACE ${Boost_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PUBLIC boost_uuid_interface)
+find_package(Boost QUIET REQUIRED COMPONENTS headers)
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::headers)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_options(
