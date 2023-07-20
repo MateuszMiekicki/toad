@@ -1,6 +1,7 @@
 #include "toad/communication_protocol/tcp/broker/Broker.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 namespace toad::communication_protocol::tcp
 {
@@ -19,7 +20,7 @@ std::string findClientId(const Broker::clients_t clients, const Broker::connecti
 }
 } // namespace
 
-Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
+Broker::Broker(const Endpoint& endpoint, Hub& hub) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
 {
     INFO_LOG("TCP broker setup on {}", endpoint);
 }
@@ -76,7 +77,7 @@ void Broker::setReader(connection_t socket)
             document.Parse(recivedData.c_str());
             if(document.HasParseError())
             {
-                WARN_LOG("Parse error: {}", "document.GetParseError()");
+                WARN_LOG("Parse error: {}", GetParseError_En(document.GetParseError()));
                 setReader(socket);
                 return;
             }
@@ -116,7 +117,7 @@ void Broker::setReader(connection_t socket)
         }
         else
         {
-            WARN_LOG("Error during handshake: {}", error.message());
+            WARN_LOG("Error: {}", error.message());
             handleDisconnect(socket);
         }
     });
@@ -146,7 +147,7 @@ void Broker::send(const Message& message)
         WARN_LOG("Client {} not connected", clientId);
         return;
     }
-    send(clients_[clientId], message.payload_.payload);
+    send(clients_[clientId], message.payload_.getPayload());
 }
 
 void Broker::handleClient(connection_t socket)

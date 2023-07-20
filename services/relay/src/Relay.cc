@@ -7,9 +7,10 @@
 int main()
 {
     toad::communication_protocol::tcp::Hub hub;
-    toad::communication_protocol::tcp::Requester requester(hub);
-    auto endpoint = toad::communication_protocol::Endpoint("0.0.0.0", 5570);
-    auto server = toad::communication_protocol::tcp::Broker(hub, endpoint);
+    auto endpointForRequester = toad::communication_protocol::Endpoint("0.0.0.0", 5571);
+    toad::communication_protocol::tcp::Requester requester(endpointForRequester, hub);
+    auto endpointForTcpBroker = toad::communication_protocol::Endpoint("0.0.0.0", 5570);
+    auto server = toad::communication_protocol::tcp::Broker(endpointForTcpBroker, hub);
     std::thread th(
         [&]()
         {

@@ -24,15 +24,17 @@ std::string zmqMessageToString(const zmq::message_t& message)
 
 namespace toad::communication_protocol::tcp
 {
-Worker::Worker(Hub& hub, zmq::context_t& context) : hub_{hub}, workerSocket_(context, zmq::socket_type::dealer)
+Worker::Worker(const std::string& workerAddress, Hub& hub, zmq::context_t& context) :
+    hub_{hub}, workerSocket_(context, zmq::socket_type::dealer)
 {
+    connect(workerAddress);
 }
 
-void Worker::connect()
+void Worker::connect(const std::string& workerAddress)
 {
     try
     {
-        workerSocket_.connect("inproc://backend");
+        workerSocket_.connect(workerAddress);
     }
     catch(const zmq::error_t& e)
     {
@@ -67,7 +69,7 @@ void Worker::handleConnection()
         }
         const auto payload = PayloadFactory::createJson(zmqMessageToString(request));
         const auto message = MessageFactory::createRequest(zmqMessageToString(identity), payload);
-        TRACE_LOG("Worker::handleConnection: {} {}", zmqMessageToString(identity), payload.payload);
+        TRACE_LOG("Worker::handleConnection: {} {}", zmqMessageToString(identity), payload.getPayload());
 
         hub_.push(message);
     }
@@ -75,7 +77,6 @@ void Worker::handleConnection()
 
 void Worker::work()
 {
-    connect();
     handleConnection();
 }
 } // namespace toad::communication_protocol::tcp

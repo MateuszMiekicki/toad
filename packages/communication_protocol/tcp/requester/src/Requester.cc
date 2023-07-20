@@ -5,14 +5,16 @@
 
 namespace toad::communication_protocol::tcp
 {
-Requester::Requester(Hub& hub) :
+Requester::Requester(const Endpoint& endpoint, Hub& hub) :
     hub_{hub}, context_(1), frontendSocket_(context_, zmq::socket_type::router),
     backendSocket_(context_, zmq::socket_type::dealer), sender_(context_, zmq::socket_type::dealer)
 {
-    INFO_LOG("Requester  setup on {}", "5571");
-    frontendSocket_.bind("tcp://*:5571");
-    backendSocket_.bind("inproc://backend");
-    sender_.connect("inproc://backend");
+    INFO_LOG("Requester setup on {}", endpoint);
+    const auto address =
+        "tcp://" + endpoint.endpoint().address().to_string() + ":" + std::to_string(endpoint.endpoint().port());
+    frontendSocket_.bind(address);
+    backendSocket_.bind(workerAddress_);
+    sender_.connect(workerAddress_);
 }
 
 void Requester::start()
@@ -39,13 +41,13 @@ void Requester::start()
 void Requester::send(const Message& message)
 {
     auto sendIdStatus = sender_.send(zmq::message_t(message.clientId_), zmq::send_flags::sndmore);
-    auto sendResponseStatus = sender_.send(zmq::message_t(message.payload_.payload), zmq::send_flags::none);
-    INFO_LOG("sendIdStatus: {}, sendResponseStatus: {}", sendIdStatus.value_or(0), sendResponseStatus.value_or(0));
+    auto sendResponseStatus = sender_.send(zmq::message_t(message.payload_.getPayload()), zmq::send_flags::none);
+    DEBUG_LOG("sendIdStatus: {}, sendResponseStatus: {}", sendIdStatus.value_or(0), sendResponseStatus.value_or(0));
 }
 
 Worker Requester::workerTask()
 {
-    Worker worker(hub_, context_);
+    Worker worker(workerAddress_, hub_, context_);
     worker.work();
     return worker;
 }

@@ -33,7 +33,7 @@ class Broker
   public:
     connection_t getConnection(const ipAddress_t&);
     void send(const Message&);
-    Broker(Hub&, const Endpoint&);
+    Broker(const Endpoint&, Hub&);
     void start();
 };
 } // namespace toad::communication_protocol::tcp

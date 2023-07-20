@@ -10,6 +10,7 @@ namespace toad::communication_protocol::tcp
 class Requester
 {
   private:
+    const std::string workerAddress_ = "inproc://requester_backend";
     Hub& hub_;
     zmq::context_t context_;
     zmq::socket_t frontendSocket_;
@@ -18,7 +19,7 @@ class Requester
     Worker workerTask();
 
   public:
-    Requester(Hub&);
+    Requester(const Endpoint&, Hub&);
     void start();
     void send(const Message&);
 };

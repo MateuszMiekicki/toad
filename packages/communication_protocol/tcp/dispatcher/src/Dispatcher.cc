@@ -13,9 +13,9 @@ void Dispatcher::start()
     while(true)
     {
         const auto message = hub_.pop();
-        INFO_LOG("Dispatcher received message");
-        INFO_LOG("Message clientId: {}", message.clientId_);
-        INFO_LOG("Message payload: {}", message.payload_.payload);
+        INFO_LOG("Dispatch message: {}", message.getId());
+        DEBUG_LOG("Message clientId: {}", message.clientId_);
+        TRACE_LOG("Message payload: {}", message.payload_.getPayload());
         switch(message.type_)
         {
             case Message::Type::request:
