@@ -1,8 +1,0 @@
-// clang-format off
-//#include "toad/@PACKAGE_NAME@/@COMPONENT_NAME@/Logger.hh"
-namespace toad::@PACKAGE_NAME@::@COMPONENT_NAME@
-{
-    // NOLINTNEXTLINE
-    //Logger Logger::instance_;
-}
-// clang-format on

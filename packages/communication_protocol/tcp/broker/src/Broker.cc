@@ -21,8 +21,7 @@ std::string findClientId(const Broker::clients_t clients, const Broker::connecti
 
 Broker::Broker(Hub& hub, const Endpoint& endpoint) : hub_{hub}, ioContext_{}, acceptor_(ioContext_, endpoint.endpoint())
 {
-    // todo: problem with formatter
-    INFO_LOG("TCP broker setup on {}", "endpoint");
+    INFO_LOG("TCP broker setup on {}", endpoint);
 }
 
 void Broker::handleDisconnect(connection_t connection)
@@ -40,7 +39,6 @@ void Broker::listen()
 void Broker::setAcceptHandler()
 {
     auto newConnection = std::make_shared<boost::asio::ip::tcp::socket>(acceptor_.get_executor());
-
     acceptor_.async_accept(*newConnection,
                            [this, newConnection](const boost::system::error_code& error)
                            {
@@ -48,21 +46,20 @@ void Broker::setAcceptHandler()
         {
             handleClient(newConnection);
         }
-
         setAcceptHandler();
     });
 }
 
 bool Broker::handleHandshake(connection_t socket, std::size_t length)
 {
-    std::string message(buffer_.data(), length - 1);
-    DEBUG_LOG("Handshake: {}", message);
-    if(clients_.find(message) != clients_.end())
+    const auto macAddress = std::string(buffer_.data(), length);
+    DEBUG_LOG("Recived handshake: {}", macAddress);
+    if(clients_.find(macAddress) != clients_.end())
     {
-        WARN_LOG("Client {} already connected", message);
+        WARN_LOG("Client {} already connected", macAddress);
         return false;
     }
-    clients_[message] = socket;
+    clients_[macAddress] = socket;
     return true;
 }
 
@@ -154,8 +151,7 @@ void Broker::send(const Message& message)
 
 void Broker::handleClient(connection_t socket)
 {
-    INFO_LOG("New connection");
-
+    DEBUG_LOG("New connection");
     socket->async_read_some(boost::asio::buffer(buffer_),
                             [this, socket](const boost::system::error_code& error, std::size_t bytes_transferred)
                             {
@@ -180,7 +176,7 @@ void Broker::handleClient(connection_t socket)
 
 void Broker::start()
 {
-    INFO_LOG("Starting tcp broker");
+    INFO_LOG("Starting TCP broker");
     setAcceptHandler();
     listen();
 }
