@@ -4,7 +4,7 @@
 
 namespace
 {
-std::string convertRecvBufferResultToPrintable(const zmq::recv_result_t& result)
+[[maybe_unused]] std::string convertRecvBufferResultToPrintable(const zmq::recv_result_t& result)
 {
     if(result.has_value())
     {
@@ -57,9 +57,9 @@ void Worker::handleConnection()
         zmq::message_t identity;
         zmq::message_t request;
 
-        const auto identityRecvBufferResult = workerSocket_.recv(identity);
-        const auto requestRecvBufferResult = workerSocket_.recv(request);
-        DEBUG_LOG("idStatus: {}, requestStatus: {}",
+        [[maybe_unused]] const auto identityRecvBufferResult = workerSocket_.recv(identity);
+        [[maybe_unused]] const auto requestRecvBufferResult = workerSocket_.recv(request);
+        DEBUG_LOG("identityRecvBufferResult: {}, requestRecvBufferResult: {}",
                   convertRecvBufferResultToPrintable(identityRecvBufferResult),
                   convertRecvBufferResultToPrintable(requestRecvBufferResult));
         if(!identityRecvBufferResult.has_value() || !requestRecvBufferResult.has_value())
