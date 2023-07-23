@@ -3,8 +3,8 @@
 
 namespace toad::communication_protocol::tcp
 {
-Dispatcher::Dispatcher(Hub& hub, Broker& broker, Requester& requester) :
-    hub_{hub}, broker_{broker}, requester_{requester}
+Dispatcher::Dispatcher(Hub& hub, Broker& broker, Requester& requester, Notifier& notifier) :
+    hub_{hub}, broker_{broker}, requester_{requester}, notifier_{notifier}
 {
 }
 
@@ -33,7 +33,7 @@ void Dispatcher::start()
             case Message::Type::alert:
             {
                 DEBUG_LOG("Alert processing");
-                // push alert
+                notifier_.send(message);
             }
             break;
             case Message::Type::unknown:

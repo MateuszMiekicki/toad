@@ -3,6 +3,7 @@ add_subdirectory(broker)
 add_subdirectory(requester)
 add_subdirectory(message)
 add_subdirectory(dispatcher)
+add_subdirectory(notifier)
 
 project(
   ${COMPONENT_NAME}
@@ -22,9 +23,11 @@ set_target_properties(
              CXX_STANDARD 17
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
+
 target_link_libraries(
   ${PROJECT_NAME}
   INTERFACE toad::communication_protocol::tcp::tcp_broker
   INTERFACE toad::communication_protocol::tcp::message
   INTERFACE toad::communication_protocol::tcp::requester
-  INTERFACE toad::communication_protocol::tcp::tcp_dispatcher)
+  INTERFACE toad::communication_protocol::tcp::tcp_dispatcher
+  INTERFACE toad::communication_protocol::tcp::notifier)

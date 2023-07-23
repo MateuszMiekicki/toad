@@ -18,21 +18,11 @@ set_target_properties(
              CXX_STANDARD_REQUIRED ON)
 
 add_logger(${PROJECT_NAME})
-find_package(OpenSSL QUIET REQUIRED)
-find_package(RapidJSON REQUIRED)
-target_link_libraries(
-  ${PROJECT_NAME}
-  PRIVATE OpenSSL::Crypto
-  PRIVATE OpenSSL::SSL)
-target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
+find_package(cppzmq QUIET REQUIRED)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${cppzmq_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq::cppzmq)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::message)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::requester)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::tcp_broker)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::notifier)
-
-find_package(Boost QUIET REQUIRED COMPONENTS system)
-target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_compile_options(

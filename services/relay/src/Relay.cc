@@ -11,6 +11,8 @@ int main()
     toad::communication_protocol::tcp::Requester requester(endpointForRequester, hub);
     auto endpointForTcpBroker = toad::communication_protocol::Endpoint("0.0.0.0", 5570);
     auto server = toad::communication_protocol::tcp::Broker(endpointForTcpBroker, hub);
+    auto endpointForNotifier = toad::communication_protocol::Endpoint("0.0.0.0", 5573);
+    auto notifier = toad::communication_protocol::tcp::Notifier(endpointForNotifier);
     std::thread th(
         [&]()
         {
@@ -21,14 +23,20 @@ int main()
         {
         server.start();
     });
+    std::thread th4(
+        [&]()
+        {
+        notifier.start();
+    });
     std::thread th3(
         [&]()
         {
-        auto dispatcher = toad::communication_protocol::tcp::Dispatcher(hub, server, requester);
+        auto dispatcher = toad::communication_protocol::tcp::Dispatcher(hub, server, requester, notifier);
         dispatcher.start();
     });
-
     th.join();
     th2.join();
+    th3.join();
+    th4.join();
     return 0;
 }
