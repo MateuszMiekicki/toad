@@ -21,6 +21,18 @@ class Payload
     Payload(const buffer_t &, const Type &);
     Type getType() const;
     buffer_t getPayload() const;
+
+    static std::string serialize(const Payload::Type &type)
+    {
+        switch(type)
+        {
+            case Payload::Type::json:
+                return "json";
+            case Payload::Type::unknown:
+            default:
+                return "unknown";
+        }
+    }
 };
 
 struct PayloadFactory
@@ -29,3 +41,5 @@ struct PayloadFactory
     static Payload createJson(const std::string &);
 };
 } // namespace toad::communication_protocol::tcp
+
+#include "toad/communication_protocol/tcp/message/formatter/Payload.tpp"

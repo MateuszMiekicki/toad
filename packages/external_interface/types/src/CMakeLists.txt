@@ -19,11 +19,6 @@ set_target_properties(
 
 add_logger(${PROJECT_NAME})
 find_package(RapidJSON REQUIRED)
-find_package(cppzmq QUIET REQUIRED)
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${cppzmq_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq::cppzmq)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
-target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::message)
 target_link_libraries(${PROJECT_NAME} PRIVATE RapidJSON::RapidJSON)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)

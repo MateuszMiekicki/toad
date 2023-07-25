@@ -30,7 +30,7 @@ void Dispatcher::start()
                 requester_.send(message);
             }
             break;
-            case Message::Type::alert:
+            case Message::Type::report:
             {
                 DEBUG_LOG("Alert processing");
                 notifier_.send(message);

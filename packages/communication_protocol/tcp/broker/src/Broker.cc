@@ -2,6 +2,8 @@
 #include "toad/communication_protocol/tcp/Logger.hh"
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 namespace toad::communication_protocol::tcp
 {
@@ -17,6 +19,14 @@ std::string findClientId(const Broker::clients_t clients, const Broker::connecti
         }
     }
     return {};
+}
+
+std::string toString(const rapidjson::Value& document)
+{
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
+    return buffer.GetString();
 }
 } // namespace
 
@@ -71,8 +81,8 @@ void Broker::setReader(connection_t socket)
                             {
         if(!error)
         {
-            const auto recivedData = std::string(buffer_.data(), bytes_transferred - 1);
-            DEBUG_LOG("Received data: {}", recivedData);
+            const auto recivedData = std::string(buffer_.data(), bytes_transferred);
+            TRACE_LOG("Received data: {}", recivedData);
             rapidjson::Document document;
             document.Parse(recivedData.c_str());
             if(document.HasParseError())
@@ -81,36 +91,18 @@ void Broker::setReader(connection_t socket)
                 setReader(socket);
                 return;
             }
-            if(document.HasMember("type"))
+            if(document.HasMember("type") and document.HasMember("purpose") and document.HasMember("payload"))
             {
-                auto convertTypeToEnum = [](std::string type)
-                {
-                    std::transform(type.begin(),
-                                   type.end(),
-                                   type.begin(),
-                                   [](unsigned char c)
-                                   {
-                        return std::tolower(c);
-                    });
-                    if(type == "response")
-                    {
-                        return Message::Type::response;
-                    }
-                    else if(type == "alert")
-                    {
-                        return Message::Type::alert;
-                    }
-                    else
-                    {
-                        return Message::Type::unknown;
-                    }
-                }(document["type"].GetString());
-                auto payload = PayloadFactory::createJson(std::move(recivedData));
-                hub_.push(Message(findClientId(clients_, socket), convertTypeToEnum, payload));
+                const auto messageType = Message::deserializeType(document["type"].GetString());
+                const auto messagePurpose = Message::deserializePurpose(document["purpose"].GetString());
+                const auto payload = PayloadFactory::createJson(toString(document["payload"]));
+                const auto message = Message(findClientId(clients_, socket), messageType, messagePurpose, payload);
+                DEBUG_LOG("TCP broker received message: {}", message);
+                hub_.push(message);
             }
             else
             {
-                WARN_LOG("Received message without type");
+                WARN_LOG("Received message without type or purpose or payload");
             }
 
             setReader(socket);

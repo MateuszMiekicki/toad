@@ -20,11 +20,7 @@ void Notifier::start()
 void Notifier::send(const Message& message)
 {
     [[maybe_unused]] const auto sendResponseStatus =
-        socket_.send(zmq::message_t(message.payload_.getPayload()), zmq::send_flags::none);
+        socket_.send(zmq::message_t(message.getRawPayload()), zmq::send_flags::none);
     DEBUG_LOG("sendResponseStatus: {}", sendResponseStatus.value_or(0));
 }
 } // namespace toad::communication_protocol::tcp
-
-// Requester::Requester(const Endpoint& endpoint, Hub& hub) :
-//     hub_{hub}, context_(1), frontendSocket_(context_, zmq::socket_type::router),
-//     backendSocket_(context_, zmq::socket_type::dealer), sender_(context_, zmq::socket_type::dealer)
