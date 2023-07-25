@@ -38,12 +38,15 @@ class Logger
         else
         {
             spdlog::init_thread_pool(8192, 1);
-            auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(
+            auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/toad/toad.log");
+            auto fileSinkForComponent = std::make_shared<spdlog::sinks::basic_file_sink_mt>(
                 fmt::format("logs/{}/{}.log", PACKAGE_NAME, COMPONENT_NAME).data());
             auto colorConsoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
             static auto threadPool = spdlog::thread_pool();
             logger_ = std::make_shared<spdlog::async_logger>(COMPONENT_NAME,
-                                                             spdlog::sinks_init_list{colorConsoleSink, fileSink},
+                                                             spdlog::sinks_init_list{colorConsoleSink,
+                                                                                     fileSinkForComponent,
+                                                                                     fileSink},
                                                              threadPool);
             logger_->set_pattern("[%Y-%m-%dT%T.%eZ] [%n] [%l] [%P:%t] communication_protocol/network/%s:%#: %v",
                                  spdlog::pattern_time_type::utc);
@@ -59,8 +62,8 @@ class Logger
         spdlog::cfg::load_env_levels();
         const auto logLevel = logger_->level();
         const auto logOutputDir = std::dynamic_pointer_cast<spdlog::sinks::basic_file_sink_mt>(logger_->sinks().at(1))->filename();
-        std::cout << fmt::format(
-            "Logger << {} >> set at level: << {} >>. Output file << {} >>.",
+
+        logger_->info("Logger << {} >> set at level: << {} >>. Output file << {} >>.",
             logger_->name(),
             spdlog::level::to_string_view(logLevel),
             logOutputDir);
