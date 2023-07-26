@@ -22,16 +22,4 @@ Message Hub::pop()
     queue_.pop();
     return message;
 }
-
-void Hub::printAllMessages()
-{
-    std::unique_lock<std::mutex> lock(mutex_);
-    if(!queue_.empty())
-    {
-        INFO_LOG("Printing top message");
-        auto message = queue_.front();
-        TRACE_LOG("Message: {}", message.id_.id);
-    }
-}
-
 } // namespace toad::communication_protocol::tcp
