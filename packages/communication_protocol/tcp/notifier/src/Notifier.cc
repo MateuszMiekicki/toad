@@ -1,4 +1,4 @@
-#include "toad/communication_protocol/tcp/notifier/notifier.hh"
+#include "toad/communication_protocol/tcp/notifier/Notifier.hh"
 #include "toad/communication_protocol/endpoint/Endpoint.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
 #include "toad/communication_protocol/tcp/message/Message.hh"
