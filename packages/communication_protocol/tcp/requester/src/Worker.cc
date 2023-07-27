@@ -3,6 +3,8 @@
 #include <chrono>
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 namespace toad::communication_protocol::tcp
 {
@@ -25,13 +27,14 @@ std::string zmqMessageToString(const zmq::message_t& message)
     return std::string(static_cast<const char*>(message.data()), message.size());
 }
 
-Message buildMessage(const zmq::message_t& identity, const rapidjson::Document& document)
+std::string toString(const rapidjson::Value& document)
 {
-    const auto messageType = Message::deserializeType(document["type"].GetString());
-    const auto messagePurpose = Message::deserializePurpose(document["purpose"].GetString());
-    const auto payload = PayloadFactory::createJson(document["payload"].GetString());
-    return {zmqMessageToString(identity), messageType, messagePurpose, payload};
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    document.Accept(writer);
+    return buffer.GetString();
 }
+
 } // namespace
 
 Worker::Worker(const std::string& workerAddress, Hub& hub, zmq::context_t& context) :
@@ -77,23 +80,27 @@ void Worker::handleConnection()
             ERROR_LOG("Worker::handleConnection: recv failed");
             continue;
         }
-        const auto payload = zmqMessageToString(request);
+        const auto recivedData = zmqMessageToString(request);
         rapidjson::Document document;
-        document.Parse(payload.c_str());
+        document.Parse(recivedData.c_str());
         if(document.HasParseError())
         {
-            ERROR_LOG("Worker::handleConnection: JSON parse error: {}",
-                      rapidjson::GetParseError_En(document.GetParseError()));
+            WARN_LOG("Parse error: {}", GetParseError_En(document.GetParseError()));
             continue;
         }
-        if(!document.HasMember("type") || !document.HasMember("purpose") || !document.HasMember("payload"))
+        if(document.HasMember("type") and document.HasMember("purpose") and document.HasMember("payload"))
         {
-            ERROR_LOG("Worker::handleConnection: Received message without type or purpose or payload");
-            continue;
+            const auto messageType = Message::deserializeType(document["type"].GetString());
+            const auto messagePurpose = Message::deserializePurpose(document["purpose"].GetString());
+            const auto payload = PayloadFactory::createJson(toString(document["payload"]));
+            const auto message = Message(zmqMessageToString(identity), messageType, messagePurpose, payload);
+            DEBUG_LOG("Worker received message: {}", message);
+            hub_.push(message);
         }
-        const auto message = buildMessage(identity, document);
-        TRACE_LOG("Worker::handleConnection: {} {}", message.getClientId(), message.getRawPayload());
-        hub_.push(message);
+        else
+        {
+            WARN_LOG("Received message without type or purpose or payload");
+        }
     }
 }
 
