@@ -1,0 +1,15 @@
+{
+	"name": "toad-dev-container",
+	"image": "0xd00d2bad/toad_cicd:latest",
+	"forwardPorts": [
+		"1883:188", // mqtt
+		"5570:5570", // tcp
+		"5571:5571", // zmq requester
+		"5572:5572" // zmq for alerts
+	],
+	"remoteUser": "root",
+	"mounts": [
+		// replace with your local path to the repo
+		"source=C:\\Users\\haven\\Desktop\\smart-terrarium\\toad,target=/fpwork/toad,type=bind"
+	]
+}
