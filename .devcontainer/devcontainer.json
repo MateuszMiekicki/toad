@@ -1,7 +1,7 @@
 {
 	"name": "toad-dev-container",
 	"image": "0xd00d2bad/toad_cicd:latest",
-	"forwardPorts": [
+	"appPort": [
 		"1883:188", // mqtt
 		"5570:5570", // tcp
 		"5571:5571", // zmq requester
