@@ -38,5 +38,4 @@ int main()
     th2.join();
     th3.join();
     th4.join();
-    return 0;
 }

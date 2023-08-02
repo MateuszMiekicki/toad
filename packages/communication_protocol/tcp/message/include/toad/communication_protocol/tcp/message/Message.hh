@@ -16,15 +16,20 @@ struct Message
         unknown,
         request,
         response,
-        report
+        report,
+        required,
+        confirm
     };
     const Type type_;
     enum class Purpose : std::uint8_t
     {
         unknown,
         failure,
-        configuration,
-        alert
+        getConfiguration,
+        setConfiguration,
+        alert,
+        ping,
+        pong
     };
     const Purpose purpose_;
     const Payload payload_;
@@ -78,10 +83,15 @@ struct Message
         {
             return Type::report;
         }
-        else
+        else if(type == "required")
         {
-            return Type::unknown;
+            return Type::required;
         }
+        else if(type == "confirm")
+        {
+            return Type::confirm;
+        }
+        return Type::unknown;
     }
 
     static Purpose deserializePurpose(const std::string &purpose)
@@ -90,50 +100,27 @@ struct Message
         {
             return Purpose::failure;
         }
-        else if(purpose == "configuration")
+        else if(purpose == "set_configuration")
         {
-            return Purpose::configuration;
+            return Purpose::setConfiguration;
+        }
+        else if(purpose == "get_configuration")
+        {
+            return Purpose::getConfiguration;
         }
         else if(purpose == "alert")
         {
             return Purpose::alert;
         }
-        else
+        else if(purpose == "ping")
         {
-            return Purpose::unknown;
+            return Purpose::ping;
         }
-    }
-
-    static std::string serialize(const Type &type)
-    {
-        switch(type)
+        else if(purpose == "pong")
         {
-            case Type::request:
-                return "request";
-            case Type::response:
-                return "response";
-            case Type::report:
-                return "report";
-            case Type::unknown:
-            default:
-                return "unknown";
+            return Purpose::pong;
         }
-    }
-
-    static std::string serialize(const Purpose &purpose)
-    {
-        switch(purpose)
-        {
-            case Purpose::failure:
-                return "failure";
-            case Purpose::configuration:
-                return "configuration";
-            case Purpose::alert:
-                return "alert";
-            case Purpose::unknown:
-            default:
-                return "unknown";
-        }
+        return Purpose::unknown;
     }
 };
 
@@ -145,14 +132,19 @@ class MessageFactory
         return Message{clientId, Message::Type::report, Message::Purpose::alert, payload};
     }
 
-    static Message createConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload)
+    static Message createGetConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload)
     {
-        return Message{clientId, Message::Type::request, Message::Purpose::configuration, payload};
+        return Message{clientId, Message::Type::request, Message::Purpose::getConfiguration, payload};
     }
 
-    static Message createConfigurationResponse(const Message::clientId_t &clientId, const Payload &payload)
+    static Message createGetConfigurationResponse(const Message::clientId_t &clientId, const Payload &payload)
     {
-        return Message{clientId, Message::Type::response, Message::Purpose::configuration, payload};
+        return Message{clientId, Message::Type::response, Message::Purpose::getConfiguration, payload};
+    }
+
+    static Message createFailreResponse(const Message::clientId_t &clientId, const Payload &payload)
+    {
+        return Message{clientId, Message::Type::response, Message::Purpose::failure, payload};
     }
 };
 } // namespace toad::communication_protocol::tcp

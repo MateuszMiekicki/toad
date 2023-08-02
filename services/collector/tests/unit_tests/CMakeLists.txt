@@ -1,7 +1,7 @@
 project(${SERVICE_NAME}_ut LANGUAGES CXX)
 find_package(GTest 1.13 QUIET REQUIRED)
 include(GoogleTest)
-aux_source_directory(. SOURCE)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(
   ${PROJECT_NAME}

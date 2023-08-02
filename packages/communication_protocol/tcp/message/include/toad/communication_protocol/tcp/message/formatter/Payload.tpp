@@ -5,6 +5,18 @@ template<>
 struct fmt::formatter<toad::communication_protocol::tcp::Payload>
 {
   private:
+    std::string serialize(const toad::communication_protocol::tcp::Payload::Type& type)
+    {
+        switch(type)
+        {
+            case toad::communication_protocol::tcp::Payload::Type::json:
+                return "json";
+            case toad::communication_protocol::tcp::Payload::Type::unknown:
+            default:
+                return "unknown";
+        }
+    }
+
   public:
     template<typename ParseContext>
     constexpr auto parse(ParseContext& ctx)
@@ -17,7 +29,7 @@ struct fmt::formatter<toad::communication_protocol::tcp::Payload>
     {
         return format_to(ctx.out(),
                          R"("payload": {{"type": "{}", "size": {}}})",
-                         toad::communication_protocol::tcp::Payload::serialize(payload.getType()),
+                         serialize(payload.getType()),
                          payload.getPayload().size());
     }
 };

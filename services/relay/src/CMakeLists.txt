@@ -5,7 +5,7 @@ project(
   VERSION 0.1.0
   LANGUAGES CXX)
 
-aux_source_directory(. SOURCE)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
 add_executable(${PROJECT_NAME} ${SOURCE})
 set_target_properties(
   ${PROJECT_NAME}

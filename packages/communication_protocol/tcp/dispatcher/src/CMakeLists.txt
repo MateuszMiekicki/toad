@@ -2,7 +2,7 @@ project(
   ${MODULE_NAME}
   VERSION 0.1.0
   LANGUAGES CXX)
-aux_source_directory(. SOURCE)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
 add_library(${PROJECT_NAME} ${SOURCE})
 add_library(${CMAKE_PROJECT_NAME}::${PACKAGE_NAME}::${COMPONENT_NAME}::${MODULE_NAME} ALIAS ${PROJECT_NAME})
 set_target_properties(
@@ -19,7 +19,6 @@ set_target_properties(
 
 add_logger(${PROJECT_NAME})
 find_package(OpenSSL QUIET REQUIRED)
-find_package(RapidJSON REQUIRED)
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE OpenSSL::Crypto

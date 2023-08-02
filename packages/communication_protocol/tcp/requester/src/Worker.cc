@@ -77,10 +77,11 @@ void Worker::handleConnection()
                   convertRecvBufferResultToPrintable(requestRecvBufferResult));
         if(!identityRecvBufferResult.has_value() || !requestRecvBufferResult.has_value())
         {
-            ERROR_LOG("Worker::handleConnection: recv failed");
+            ERROR_LOG("ZMQ recv failed");
             continue;
         }
         const auto recivedData = zmqMessageToString(request);
+        TRACE_LOG("ZMQ worker received data: {}", recivedData);
         rapidjson::Document document;
         document.Parse(recivedData.c_str());
         if(document.HasParseError())

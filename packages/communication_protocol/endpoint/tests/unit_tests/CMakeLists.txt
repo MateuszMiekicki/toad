@@ -1,6 +1,6 @@
 project(${MODULE_NAME}_ut LANGUAGES CXX)
 
-aux_source_directory(. SOURCE)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(
   ${PROJECT_NAME} # PRIVATE GTest::gtest PRIVATE GTest::gmock_main

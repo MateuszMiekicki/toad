@@ -1,6 +1,7 @@
 #include "toad/communication_protocol/tcp/requester/Requester.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
 #include "toad/communication_protocol/tcp/message/Hub.hh"
+#include "toad/communication_protocol/tcp/message/serializer/MessageSerializer.hh"
 #include "toad/communication_protocol/tcp/requester/Worker.hh"
 
 namespace toad::communication_protocol::tcp
@@ -43,7 +44,7 @@ void Requester::send(const Message& message)
     [[maybe_unused]] const auto sendIdStatus =
         sender_.send(zmq::message_t(message.clientId_), zmq::send_flags::sndmore);
     [[maybe_unused]] const auto sendResponseStatus =
-        sender_.send(zmq::message_t(message.payload_.getPayload()), zmq::send_flags::none);
+        sender_.send(zmq::message_t(serialize(message)), zmq::send_flags::none);
     DEBUG_LOG("sendIdStatus: {}, sendResponseStatus: {}", sendIdStatus.value_or(0), sendResponseStatus.value_or(0));
 }
 

@@ -1,8 +1,9 @@
 project(${MODULE_NAME}_ut LANGUAGES CXX)
 find_package(GTest 1.13 QUIET REQUIRED)
 include(GoogleTest)
-aux_source_directory(. SOURCE)
-add_executable(${PROJECT_NAME} ${SOURCE})
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/serializer SERIALIZER_SOURCE)
+add_executable(${PROJECT_NAME} ${SOURCE} ${SERIALIZER_SOURCE})
 target_link_libraries(
   ${PROJECT_NAME}
   PRIVATE GTest::gtest
@@ -19,4 +20,4 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-# gtest_discover_tests(${PROJECT_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+gtest_discover_tests(${PROJECT_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

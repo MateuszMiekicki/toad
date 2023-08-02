@@ -1,5 +1,6 @@
 #include "toad/communication_protocol/tcp/broker/Broker.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
+#include "toad/communication_protocol/tcp/message/serializer/MessageSerializer.hh"
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
@@ -137,9 +138,24 @@ void Broker::send(const Message& message)
     if(clients_.find(clientId) == clients_.end())
     {
         WARN_LOG("Client {} not connected", clientId);
+        hub_.push(Message(clientId,
+                          Message::Type::response,
+                          Message::Purpose::failure,
+                          PayloadFactory::createFailureDetail("Client not connected")));
         return;
     }
-    send(clients_[clientId], message.payload_.getPayload());
+    try
+    {
+        send(clients_[clientId], serialize(message));
+    }
+    catch(const std::exception& e)
+    {
+        WARN_LOG("Error durring send to TCP client: {}", e.what());
+        hub_.push(Message(clientId,
+                          Message::Type::response,
+                          Message::Purpose::failure,
+                          PayloadFactory::createFailureDetail(e.what())));
+    }
 }
 
 void Broker::handleClient(connection_t socket)
