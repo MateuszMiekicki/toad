@@ -8,5 +8,5 @@
 
 // namespace toad::external_interface
 // {
-// types::Purpose deserializePurpose(const std::string_view);
+// types::Purpose deserializeurpose(const std::string_view);
 // } // namespace toad::external_interface

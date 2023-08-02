@@ -36,6 +36,7 @@ void Requester::start()
                   {
         worker.detach();
     });
+    DEBUG_LOG("All workers(number: {}) detached", numOfWorker);
     zmq::proxy(frontendSocket_, backendSocket_);
 }
 

@@ -20,9 +20,9 @@ std::string serialize(const Payload &payload)
     {
         throw std::runtime_error("Payload is not valid json");
     }
-    DEBUG_LOG("Payload is {}", static_cast<int>(document.GetType()));
     if(not document.IsObject())
     {
+        DEBUG_LOG("Payload is {} type", static_cast<int>(document.GetType()));
         throw std::runtime_error("Payload must be an object");
     }
     rapidjson::StringBuffer buffer;

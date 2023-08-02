@@ -22,7 +22,7 @@ add_logger(${PROJECT_NAME})
 
 find_package(Boost QUIET REQUIRED COMPONENTS headers)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::headers)
-find_package(RapidJSON REQUIRED)
+find_package(RapidJSON QUIET REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE RapidJSON::RapidJSON)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)

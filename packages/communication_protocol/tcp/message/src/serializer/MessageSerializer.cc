@@ -14,21 +14,25 @@ namespace toad::communication_protocol::tcp
 {
 std::string serialize(const Message &message)
 {
-    TRACE_LOG("Serializing message: {}", message);
-    rapidjson::Document document;
-    document.SetObject();
-    rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
-    rapidjson::Value type(serialize(message.getType()).c_str(), allocator);
-    document.AddMember("type", type, allocator);
-    rapidjson::Value purpose(serialize(message.getPurpose()).c_str(), allocator);
-    document.AddMember("purpose", purpose, allocator);
-    rapidjson::Value payload(serialize(message.getPayload()).c_str(), allocator);
-    document.AddMember("payload", payload, allocator);
+    DEBUG_LOG("Serializing message: {}", message);
+    TRACE_LOG("Raw payload: {}", message.getRawPayload());
 
+    const auto type = R"("type":")" + serialize(message.getType()) + R"(")";
+    const auto purpose = R"("purpose":")" + serialize(message.getPurpose()) + R"(")";
+    const auto payload = R"("payload":)" + serialize(message.getPayload());
+    const auto stringToParse = R"({)" + type + R"(,)" + purpose + R"(,)" + payload + R"(})";
+    TRACE_LOG("String to parse: {}", stringToParse);
+    rapidjson::Document document;
+    document.Parse(stringToParse.c_str());
+    if(document.HasParseError())
+    {
+        throw std::runtime_error("Message is not valid json");
+    }
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     document.Accept(writer);
-
-    return buffer.GetString();
+    const auto serializedMessage = buffer.GetString();
+    TRACE_LOG("Serialized message: {}", serializedMessage);
+    return serializedMessage;
 }
 } // namespace toad::communication_protocol::tcp

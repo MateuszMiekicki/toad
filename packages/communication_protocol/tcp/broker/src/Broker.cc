@@ -138,24 +138,10 @@ void Broker::send(const Message& message)
     if(clients_.find(clientId) == clients_.end())
     {
         WARN_LOG("Client {} not connected", clientId);
-        hub_.push(Message(clientId,
-                          Message::Type::response,
-                          Message::Purpose::failure,
-                          PayloadFactory::createFailureDetail("Client not connected")));
+        throw std::runtime_error("Client not connected");
         return;
     }
-    try
-    {
-        send(clients_[clientId], serialize(message));
-    }
-    catch(const std::exception& e)
-    {
-        WARN_LOG("Error durring send to TCP client: {}", e.what());
-        hub_.push(Message(clientId,
-                          Message::Type::response,
-                          Message::Purpose::failure,
-                          PayloadFactory::createFailureDetail(e.what())));
-    }
+    send(clients_[clientId], serialize(message));
 }
 
 void Broker::handleClient(connection_t socket)

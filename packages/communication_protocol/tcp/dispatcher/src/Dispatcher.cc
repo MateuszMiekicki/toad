@@ -18,25 +18,44 @@ void Dispatcher::start()
         TRACE_LOG("Message payload: {}", message.payload_.getPayload());
         switch(message.type_)
         {
-            case Message::Type::request:
+            case Message::Message::Type::request:
             {
                 DEBUG_LOG("Request processing");
-                broker_.send(message);
+                try
+                {
+                    broker_.send(message);
+                }
+                catch(const std::exception& e)
+                {
+                    WARN_LOG("Exception during request processing: {}", e.what());
+                    hub_.push(MessageFactory::createFailureResponse(message.getClientId(),
+                                                                    PayloadFactory::createFailureDetail(e.what())));
+                }
             }
             break;
-            case Message::Type::response:
+            case Message::Message::Type::response:
             {
                 DEBUG_LOG("Response processing");
-                requester_.send(message);
+                try
+                {
+                    requester_.send(message);
+                }
+                catch(const std::exception& e)
+                {
+                    WARN_LOG("Exception during response processing: {}. Send response failure", e.what());
+                    requester_.send(
+                        MessageFactory::createFailureResponse(message.getClientId(),
+                                                              PayloadFactory::createFailureDetail(e.what())));
+                }
             }
             break;
-            case Message::Type::report:
+            case Message::Message::Type::report:
             {
                 DEBUG_LOG("Alert processing");
                 notifier_.send(message);
             }
             break;
-            case Message::Type::unknown:
+            case Message::Message::Type::unknown:
             {
                 WARN_LOG("Unknown message type");
             }

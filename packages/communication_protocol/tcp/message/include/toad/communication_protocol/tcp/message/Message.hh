@@ -8,19 +8,6 @@ namespace toad::communication_protocol::tcp
 {
 struct Message
 {
-    using clientId_t = std::string;
-    const MessageId id_;
-    const clientId_t clientId_;
-    enum class Type : std::uint8_t
-    {
-        unknown,
-        request,
-        response,
-        report,
-        required,
-        confirm
-    };
-    const Type type_;
     enum class Purpose : std::uint8_t
     {
         unknown,
@@ -31,6 +18,21 @@ struct Message
         ping,
         pong
     };
+    enum class Type : std::uint8_t
+    {
+        unknown,
+        request,
+        response,
+        report,
+        required,
+        confirm
+    };
+    using clientId_t = std::string;
+    const MessageId id_;
+    const clientId_t clientId_;
+
+    const Type type_;
+
     const Purpose purpose_;
     const Payload payload_;
 
@@ -142,7 +144,7 @@ class MessageFactory
         return Message{clientId, Message::Type::response, Message::Purpose::getConfiguration, payload};
     }
 
-    static Message createFailreResponse(const Message::clientId_t &clientId, const Payload &payload)
+    static Message createFailureResponse(const Message::clientId_t &clientId, const Payload &payload)
     {
         return Message{clientId, Message::Type::response, Message::Purpose::failure, payload};
     }

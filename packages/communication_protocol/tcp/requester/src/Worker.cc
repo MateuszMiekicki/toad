@@ -51,15 +51,15 @@ void Worker::connect(const std::string& workerAddress)
     }
     catch(const zmq::error_t& e)
     {
-        ERROR_LOG("Woker connection exception [zmq::error_t]: {}", e.what());
+        WARN_LOG("Woker connection exception [zmq::error_t]: {}", e.what());
     }
     catch(const std::exception& e)
     {
-        ERROR_LOG("Woker connection exception [std::exception] {}", e.what());
+        WARN_LOG("Woker connection exception [std::exception] {}", e.what());
     }
     catch(...)
     {
-        ERROR_LOG("Woker connection exception: UNKNOWN EXCEPTION");
+        WARN_LOG("Woker connection exception: UNKNOWN EXCEPTION");
     }
 }
 
@@ -77,16 +77,20 @@ void Worker::handleConnection()
                   convertRecvBufferResultToPrintable(requestRecvBufferResult));
         if(!identityRecvBufferResult.has_value() || !requestRecvBufferResult.has_value())
         {
-            ERROR_LOG("ZMQ recv failed");
+            WARN_LOG("ZMQ recv failed");
             continue;
         }
-        const auto recivedData = zmqMessageToString(request);
-        TRACE_LOG("ZMQ worker received data: {}", recivedData);
+        const auto receivedData = zmqMessageToString(request);
+        TRACE_LOG("ZMQ worker received data: {}", receivedData);
         rapidjson::Document document;
-        document.Parse(recivedData.c_str());
+        document.Parse(receivedData.c_str());
         if(document.HasParseError())
         {
             WARN_LOG("Parse error: {}", GetParseError_En(document.GetParseError()));
+            hub_.push(MessageFactory::createFailureResponse(
+                zmqMessageToString(identity),
+                PayloadFactory::createFailureDetail("Parse error: " +
+                                                    std::string(GetParseError_En(document.GetParseError())))));
             continue;
         }
         if(document.HasMember("type") and document.HasMember("purpose") and document.HasMember("payload"))

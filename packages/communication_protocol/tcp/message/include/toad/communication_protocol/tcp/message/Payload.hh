@@ -31,7 +31,7 @@ struct PayloadFactory
     static Payload createFailureDetail(const std::string &cause)
     {
         const auto detail = R"(
-        "payload": {
+        {
             "cause": {
                 "detail": ")" +
                             cause + R"("
