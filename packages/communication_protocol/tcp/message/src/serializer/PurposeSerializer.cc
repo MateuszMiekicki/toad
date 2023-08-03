@@ -19,6 +19,10 @@ std::string serialize(Message::Purpose purpose)
             return "ping";
         case Message::Purpose::pong:
             return "pong";
+        case Message::Purpose::getSensorsConfiguration:
+            return "get_sensors_configuration";
+        case Message::Purpose::setSensorsConfiguration:
+            return "set_sensors_configuration";
         case Message::Purpose::unknown:
         default:
             return "unknown";
