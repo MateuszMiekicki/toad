@@ -14,7 +14,6 @@ struct Message
         failure,
         getConfiguration,
         setConfiguration,
-        getSensorsConfiguration,
         setSensorsConfiguration,
         alert,
         ping,
