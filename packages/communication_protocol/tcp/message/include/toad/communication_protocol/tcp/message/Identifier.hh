@@ -8,7 +8,7 @@ using uuid = std::string;
 template<typename T>
 struct Identifier
 {
-    uuid id;
+    const uuid id;
     Identifier();
 };
 
