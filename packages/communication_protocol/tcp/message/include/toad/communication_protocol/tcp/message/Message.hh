@@ -7,8 +7,9 @@
 
 namespace toad::communication_protocol::tcp
 {
-struct Message
+class Message
 {
+  public:
     using clientId_t = std::string;
     enum class Purpose : std::uint8_t
     {
@@ -42,28 +43,21 @@ struct Message
     Message(const clientId_t &, const Type &, const Purpose &, const Payload &);
 
     uuid getId() const;
-
     clientId_t getClientId() const;
-
     Payload::buffer_t getRawPayload() const;
-
     Payload getPayload() const;
-
     Type getType() const;
-
     Purpose getPurpose() const;
-
+    
     static Type deserializeType(const std::string &);
-
     static Purpose deserializePurpose(const std::string &);
 
     bool operator==(const Message &) const;
     bool operator!=(const Message &) const;
 };
 
-class MessageFactory
+struct MessageFactory
 {
-  public:
     static Message createAlertReport(const Message::clientId_t &clientId, const Payload &payload);
     static Message createGetConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload);
     static Message createGetConfigurationResponse(const Message::clientId_t &clientId, const Payload &payload);
