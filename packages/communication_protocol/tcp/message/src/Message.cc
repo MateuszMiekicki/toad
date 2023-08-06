@@ -42,60 +42,6 @@ Message::Purpose Message::getPurpose() const
     return purpose_;
 }
 
-Message::Type Message::deserializeType(const std::string &type)
-{
-    if(type == "request")
-    {
-        return Type::request;
-    }
-    else if(type == "response")
-    {
-        return Type::response;
-    }
-    else if(type == "report")
-    {
-        return Type::report;
-    }
-    else if(type == "required")
-    {
-        return Type::required;
-    }
-    else if(type == "confirm")
-    {
-        return Type::confirm;
-    }
-    return Type::unknown;
-}
-
-Message::Purpose Message::deserializePurpose(const std::string &purpose)
-{
-    if(purpose == "failure")
-    {
-        return Purpose::failure;
-    }
-    else if(purpose == "set_configuration")
-    {
-        return Purpose::setConfiguration;
-    }
-    else if(purpose == "get_configuration")
-    {
-        return Purpose::getConfiguration;
-    }
-    else if(purpose == "alert")
-    {
-        return Purpose::alert;
-    }
-    else if(purpose == "ping")
-    {
-        return Purpose::ping;
-    }
-    else if(purpose == "pong")
-    {
-        return Purpose::pong;
-    }
-    return Purpose::unknown;
-}
-
 bool Message::operator==(const Message &rhs) const
 {
     return std::tie(clientId_, type_, purpose_, payload_) ==

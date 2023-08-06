@@ -4,7 +4,8 @@ project(
   LANGUAGES CXX)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/serializer SERIALIZER_SOURCE)
-add_library(${PROJECT_NAME} ${SOURCE} ${SERIALIZER_SOURCE})
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/deserializer DESERIALIZER_SOURCE)
+add_library(${PROJECT_NAME} ${SOURCE} ${SERIALIZER_SOURCE} ${DESERIALIZER_SOURCE})
 add_library(${CMAKE_PROJECT_NAME}::${PACKAGE_NAME}::${COMPONENT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 set_target_properties(
   ${PROJECT_NAME}

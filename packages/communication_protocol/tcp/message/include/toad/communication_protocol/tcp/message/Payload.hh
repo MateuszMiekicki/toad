@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <tuple>
 
 namespace toad::communication_protocol::tcp
 {
@@ -20,32 +19,19 @@ class Payload
 
   public:
     Payload(const buffer_t &, const Type &);
+
     Type getType() const;
     buffer_t getPayload() const;
 
-    bool operator==(const Payload &) const
-    {
-        return std::tie(type_, payload_) == std::tie(type_, payload_);
-    }
+    bool operator==(const Payload &) const;
+    bool operator!=(const Payload &) const;
 };
 
 struct PayloadFactory
 {
-    static Payload create(const std::string &);
-    static Payload createJson(const std::string &);
-
-    static Payload createFailureDetail(const std::string &cause)
-    {
-        const auto detail = R"(
-        {
-            "cause": {
-                "detail": ")" +
-                            cause + R"("
-            }
-        }
-    )";
-        return PayloadFactory::createJson(detail);
-    }
+    static Payload create(const Payload::buffer_t &);
+    static Payload createJson(const Payload::buffer_t &);
+    static Payload createFailureDetail(const Payload::buffer_t &);
 };
 } // namespace toad::communication_protocol::tcp
 

@@ -48,9 +48,6 @@ class Message
     Payload getPayload() const;
     Type getType() const;
     Purpose getPurpose() const;
-    
-    static Type deserializeType(const std::string &);
-    static Purpose deserializePurpose(const std::string &);
 
     bool operator==(const Message &) const;
     bool operator!=(const Message &) const;

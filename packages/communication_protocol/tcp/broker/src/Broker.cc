@@ -1,5 +1,7 @@
 #include "toad/communication_protocol/tcp/broker/Broker.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
+#include "toad/communication_protocol/tcp/message/deserializer/PurposeDeserializer.hh"
+#include "toad/communication_protocol/tcp/message/deserializer/TypDeserializer.hh"
 #include "toad/communication_protocol/tcp/message/serializer/MessageSerializer.hh"
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -94,8 +96,8 @@ void Broker::setReader(connection_t socket)
             }
             if(document.HasMember("type") and document.HasMember("purpose") and document.HasMember("payload"))
             {
-                const auto messageType = Message::deserializeType(document["type"].GetString());
-                const auto messagePurpose = Message::deserializePurpose(document["purpose"].GetString());
+                const auto messageType = deserializeMessageType(document["type"].GetString());
+                const auto messagePurpose = deserializeMessagePurpose(document["purpose"].GetString());
                 const auto payload = PayloadFactory::createJson(toString(document["payload"]));
                 const auto message = Message(findClientId(clients_, socket), messageType, messagePurpose, payload);
                 DEBUG_LOG("TCP broker received message: {}", message);

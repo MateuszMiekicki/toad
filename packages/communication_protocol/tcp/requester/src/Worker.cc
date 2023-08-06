@@ -1,5 +1,7 @@
 #include "toad/communication_protocol/tcp/requester/Worker.hh"
 #include "toad/communication_protocol/tcp/Logger.hh"
+#include "toad/communication_protocol/tcp/message/deserializer/PurposeDeserializer.hh"
+#include "toad/communication_protocol/tcp/message/deserializer/TypDeserializer.hh"
 #include <chrono>
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -95,8 +97,8 @@ void Worker::handleConnection()
         }
         if(document.HasMember("type") and document.HasMember("purpose") and document.HasMember("payload"))
         {
-            const auto messageType = Message::deserializeType(document["type"].GetString());
-            const auto messagePurpose = Message::deserializePurpose(document["purpose"].GetString());
+            const auto messageType = deserializeMessageType(document["type"].GetString());
+            const auto messagePurpose = deserializeMessagePurpose(document["purpose"].GetString());
             const auto payload = PayloadFactory::createJson(toString(document["payload"]));
             const auto message = Message(zmqMessageToString(identity), messageType, messagePurpose, payload);
             DEBUG_LOG("Worker received message: {}", message);
