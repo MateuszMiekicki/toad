@@ -17,9 +17,9 @@ Payload::buffer_t Payload::getPayload() const
     return payload_;
 }
 
-bool Payload::operator==(const Payload &) const
+bool Payload::operator==(const Payload &rhs) const
 {
-    return std::tie(type_, payload_) == std::tie(type_, payload_);
+    return std::tie(type_, payload_) == std::tie(rhs.type_, rhs.payload_);
 }
 
 bool Payload::operator!=(const Payload &rhs) const
