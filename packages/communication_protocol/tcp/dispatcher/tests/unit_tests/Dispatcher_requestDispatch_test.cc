@@ -33,12 +33,19 @@ class DispatcherFixture : public ::testing::Test
         payload};
 
     toad::communication_protocol::tcp::Message
-    createMessage(const toad::communication_protocol::tcp::Message::Type &type)
+    createMessage(const toad::communication_protocol::tcp::Message::Type& type)
     {
         return toad::communication_protocol::tcp::Message{clientId,
                                                           type,
                                                           toad::communication_protocol::tcp::Message::Purpose::unknown,
                                                           payload};
+    }
+
+    toad::communication_protocol::tcp::Message createFailureResponse(const std::string& purpose)
+    {
+        return toad::communication_protocol::tcp::MessageFactory::createFailureResponse(
+            clientId,
+            toad::communication_protocol::tcp::PayloadFactory::createFailureDetail(purpose));
     }
 };
 
@@ -63,5 +70,26 @@ TEST_F(DispatcherFixture, whenPopMessageIsReportShouldSendResponseByNotifier)
     const auto message = createMessage(toad::communication_protocol::tcp::Message::Type::report);
     ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
     EXPECT_CALL(notifier_, send(message));
+    sut.dispatch();
+}
+
+TEST_F(DispatcherFixture, whenPopMessageIsUnknownShouldNotSendResponse)
+{
+    const auto message = createMessage(toad::communication_protocol::tcp::Message::Type::unknown);
+    ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
+    EXPECT_CALL(broker_, send(testing::_)).Times(0);
+    EXPECT_CALL(requester_, send(testing::_)).Times(0);
+    EXPECT_CALL(notifier_, send(testing::_)).Times(0);
+    sut.dispatch();
+}
+
+TEST_F(DispatcherFixture, whenSendRequestEndsThrowExceptionShouldSendFailureResponse)
+{
+    const auto messageWithThrowException = createMessage(toad::communication_protocol::tcp::Message::Type::request);
+    ON_CALL(hub_, pop()).WillByDefault(testing::Return(messageWithThrowException));
+    const auto failurePurpose = "message send failure";
+    EXPECT_CALL(broker_, send(messageWithThrowException)).WillOnce(testing::Throw(std::runtime_error(failurePurpose)));
+    const auto message = createFailureResponse(failurePurpose);
+    EXPECT_CALL(hub_, push(message));
     sut.dispatch();
 }
