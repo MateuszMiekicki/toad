@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <tuple>
 
 namespace toad::communication_protocol::tcp
 {
@@ -21,6 +22,11 @@ class Payload
     Payload(const buffer_t &, const Type &);
     Type getType() const;
     buffer_t getPayload() const;
+
+    bool operator==(const Payload &) const
+    {
+        return std::tie(type_, payload_) == std::tie(type_, payload_);
+    }
 };
 
 struct PayloadFactory

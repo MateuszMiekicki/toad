@@ -1,4 +1,6 @@
 #pragma once
+#include "toad/communication_protocol/tcp/interface/Sender.hh"
+#include "toad/communication_protocol/tcp/interface/Server.hh"
 #include <zmq.hpp>
 
 namespace toad::communication_protocol
@@ -10,7 +12,7 @@ namespace toad::communication_protocol::tcp
 {
 class Message;
 
-class Notifier
+class Notifier : public interface::Sender, public interface::Server
 {
   private:
     zmq::context_t context_;
@@ -18,7 +20,9 @@ class Notifier
 
   public:
     Notifier(const Endpoint &);
-    void start();
-    void send(const Message &);
+    virtual ~Notifier() = default;
+
+    void start() override;
+    virtual void send(const Message &) override;
 };
 } // namespace toad::communication_protocol::tcp

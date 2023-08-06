@@ -38,7 +38,8 @@ INSTANTIATE_TEST_SUITE_P(
                                                        toad::communication_protocol::tcp::Message::Purpose::getConfiguration,
                                                        toad::communication_protocol::tcp::Payload("{}",
                                                        toad::communication_protocol::tcp::Payload::Type::json)},
-            R"({"type":"request","purpose":"get_configuration","payload":{}})"},
+            R"({"type":"request","purpose":"get_configuration","payload":{}})"
+},
         MessageAndExpectedJSON{
             toad::communication_protocol::tcp::Message{
                 clientId,

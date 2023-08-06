@@ -1,4 +1,5 @@
 set(COMPONENT_NAME "tcp")
+add_subdirectory(tcp)
 add_subdirectory(broker)
 add_subdirectory(requester)
 add_subdirectory(message)

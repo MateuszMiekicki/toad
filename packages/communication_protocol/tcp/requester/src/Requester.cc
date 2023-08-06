@@ -43,7 +43,7 @@ void Requester::start()
 void Requester::send(const Message& message)
 {
     [[maybe_unused]] const auto sendIdStatus =
-        sender_.send(zmq::message_t(message.clientId_), zmq::send_flags::sndmore);
+        sender_.send(zmq::message_t(message.getClientId()), zmq::send_flags::sndmore);
     [[maybe_unused]] const auto sendResponseStatus =
         sender_.send(zmq::message_t(serialize(message)), zmq::send_flags::none);
     DEBUG_LOG("sendIdStatus: {}, sendResponseStatus: {}", sendIdStatus.value_or(0), sendResponseStatus.value_or(0));

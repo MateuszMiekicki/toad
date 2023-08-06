@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE $<$<BOOL:${WIN32}>:ws2_32>)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::network::endpoint)
 target_link_libraries(${PROJECT_NAME} PUBLIC toad::communication_protocol::tcp::message)
 target_link_libraries(${PROJECT_NAME} PRIVATE RapidJSON::RapidJSON)
+target_link_libraries(${PROJECT_NAME} PRIVATE toad::communication_protocol::tcp::tcp_interface)
 
 find_package(Boost QUIET REQUIRED COMPONENTS system)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)

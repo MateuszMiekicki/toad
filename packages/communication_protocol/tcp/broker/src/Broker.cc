@@ -134,7 +134,7 @@ void Broker::send(connection_t socket, const std::string& message)
 
 void Broker::send(const Message& message)
 {
-    auto clientId = message.clientId_;
+    auto clientId = message.getClientId();
     if(clients_.find(clientId) == clients_.end())
     {
         WARN_LOG("Client {} not connected", clientId);

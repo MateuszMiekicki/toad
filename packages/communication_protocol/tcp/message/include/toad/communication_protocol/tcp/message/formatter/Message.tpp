@@ -27,6 +27,6 @@ struct fmt::formatter<toad::communication_protocol::tcp::Message>
                          message.getClientId(),
                          toad::communication_protocol::tcp::serialize(message.getType()),
                          toad::communication_protocol::tcp::serialize(message.getPurpose()),
-                         message.payload_);
+                         message.getPayload());
     }
 };

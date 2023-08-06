@@ -3,11 +3,13 @@
 #include "toad/communication_protocol/tcp/message/Payload.hh"
 #include <cstdint>
 #include <string>
+#include <tuple>
 
 namespace toad::communication_protocol::tcp
 {
 struct Message
 {
+    using clientId_t = std::string;
     enum class Purpose : std::uint8_t
     {
         unknown,
@@ -28,127 +30,44 @@ struct Message
         required,
         confirm
     };
-    using clientId_t = std::string;
+
+  private:
     const MessageId id_;
     const clientId_t clientId_;
-
     const Type type_;
-
     const Purpose purpose_;
     const Payload payload_;
 
-    Message(const clientId_t &clientId, const Type &type, const Purpose &purpose, const Payload &payload) :
-        id_{}, clientId_{clientId}, type_{type}, purpose_{purpose}, payload_{payload}
-    {
-    }
+  public:
+    Message(const clientId_t &, const Type &, const Purpose &, const Payload &);
 
-    uuid getId() const
-    {
-        return id_.id;
-    }
+    uuid getId() const;
 
-    clientId_t getClientId() const
-    {
-        return clientId_;
-    }
+    clientId_t getClientId() const;
 
-    Payload::buffer_t getRawPayload() const
-    {
-        return payload_.getPayload();
-    }
+    Payload::buffer_t getRawPayload() const;
 
-    Payload getPayload() const
-    {
-        return payload_;
-    }
+    Payload getPayload() const;
 
-    Type getType() const
-    {
-        return type_;
-    }
+    Type getType() const;
 
-    Purpose getPurpose() const
-    {
-        return purpose_;
-    }
+    Purpose getPurpose() const;
 
-    static Type deserializeType(const std::string &type)
-    {
-        if(type == "request")
-        {
-            return Type::request;
-        }
-        else if(type == "response")
-        {
-            return Type::response;
-        }
-        else if(type == "report")
-        {
-            return Type::report;
-        }
-        else if(type == "required")
-        {
-            return Type::required;
-        }
-        else if(type == "confirm")
-        {
-            return Type::confirm;
-        }
-        return Type::unknown;
-    }
+    static Type deserializeType(const std::string &);
 
-    static Purpose deserializePurpose(const std::string &purpose)
-    {
-        if(purpose == "failure")
-        {
-            return Purpose::failure;
-        }
-        else if(purpose == "set_configuration")
-        {
-            return Purpose::setConfiguration;
-        }
-        else if(purpose == "get_configuration")
-        {
-            return Purpose::getConfiguration;
-        }
-        else if(purpose == "alert")
-        {
-            return Purpose::alert;
-        }
-        else if(purpose == "ping")
-        {
-            return Purpose::ping;
-        }
-        else if(purpose == "pong")
-        {
-            return Purpose::pong;
-        }
-        return Purpose::unknown;
-    }
+    static Purpose deserializePurpose(const std::string &);
+
+    bool operator==(const Message &) const;
+    bool operator!=(const Message &) const;
 };
 
 class MessageFactory
 {
   public:
-    static Message createAlertReport(const Message::clientId_t &clientId, const Payload &payload)
-    {
-        return Message{clientId, Message::Type::report, Message::Purpose::alert, payload};
-    }
-
-    static Message createGetConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload)
-    {
-        return Message{clientId, Message::Type::request, Message::Purpose::getConfiguration, payload};
-    }
-
-    static Message createGetConfigurationResponse(const Message::clientId_t &clientId, const Payload &payload)
-    {
-        return Message{clientId, Message::Type::response, Message::Purpose::getConfiguration, payload};
-    }
-
-    static Message createFailureResponse(const Message::clientId_t &clientId, const Payload &payload)
-    {
-        return Message{clientId, Message::Type::response, Message::Purpose::failure, payload};
-    }
+    static Message createAlertReport(const Message::clientId_t &clientId, const Payload &payload);
+    static Message createGetConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload);
+    static Message createGetConfigurationResponse(const Message::clientId_t &clientId, const Payload &payload);
+    static Message createFailureResponse(const Message::clientId_t &clientId, const Payload &payload);
 };
 } // namespace toad::communication_protocol::tcp
 

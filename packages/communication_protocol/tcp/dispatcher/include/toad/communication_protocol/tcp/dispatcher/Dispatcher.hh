@@ -10,12 +10,12 @@ class Dispatcher
 {
   private:
     Hub& hub_;
-    Broker& broker_;
-    Requester& requester_;
-    Notifier& notifier_;
+    interface::Sender& broker_;
+    interface::Sender& requester_;
+    interface::Sender& notifier_;
 
   public:
-    Dispatcher(Hub&, Broker&, Requester&, Notifier&);
-    void start();
+    Dispatcher(Hub&, interface::Sender&, interface::Sender&, interface::Sender&);
+    void dispatch();
 };
 } // namespace toad::communication_protocol::tcp

@@ -1,5 +1,7 @@
 #pragma once
 #include "toad/communication_protocol/endpoint/Endpoint.hh"
+#include "toad/communication_protocol/tcp/interface/Sender.hh"
+#include "toad/communication_protocol/tcp/interface/Server.hh"
 #include "toad/communication_protocol/tcp/message/Hub.hh"
 #include <array>
 #include <boost/asio.hpp>
@@ -8,7 +10,7 @@
 
 namespace toad::communication_protocol::tcp
 {
-class Broker
+class Broker : public interface::Sender, public interface::Server
 {
   public:
     using macAddress_t = std::string;
@@ -31,9 +33,12 @@ class Broker
     void send(connection_t, const std::string&);
 
   public:
-    connection_t getConnection(const ipAddress_t&);
-    void send(const Message&);
     Broker(const Endpoint&, Hub&);
-    void start();
+    virtual ~Broker() = default;
+
+    virtual void send(const Message&) override;
+    void start() override;
+
+    connection_t getConnection(const ipAddress_t&);
 };
 } // namespace toad::communication_protocol::tcp

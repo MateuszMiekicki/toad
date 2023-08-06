@@ -16,8 +16,9 @@ class Hub
 
   public:
     Hub() = default;
+    virtual ~Hub() = default;
 
-    void push(const Message &);
-    Message pop();
+    virtual void push(const Message &);
+    virtual Message pop();
 };
 } // namespace toad::communication_protocol::tcp
