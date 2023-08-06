@@ -7,6 +7,7 @@ project(
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
 add_executable(${PROJECT_NAME} ${SOURCE})
+
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES VERSION ${PROJECT_VERSION}
@@ -19,14 +20,16 @@ set_target_properties(
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-add_logger(${PROJECT_NAME})
 find_package(Boost QUIET REQUIRED COMPONENTS system)
-find_package(cppzmq)
-target_link_libraries(${PROJECT_NAME} PRIVATE cppzmq)
+find_package(cppzmq QUIET REQUIRED)
 
+add_logger(${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} PRIVATE cppzmq)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
 target_link_libraries(${PROJECT_NAME} PRIVATE toad::communication_protocol::tcp)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
 target_compile_options(
   ${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:CXX,GNU>:$<$<CONFIG:Release>:${GCC_FLAGS_RELEASE}>>

@@ -1,16 +1,9 @@
 project(${MODULE_NAME}_ut LANGUAGES CXX)
-find_package(GTest 1.13 QUIET REQUIRED)
-include(GoogleTest)
+
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE)
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/serializer SERIALIZER_SOURCE)
-add_executable(${PROJECT_NAME} ${SOURCE} ${SERIALIZER_SOURCE})
-target_link_libraries(
-  ${PROJECT_NAME}
-  PRIVATE GTest::gtest
-  PRIVATE GTest::gtest_main
-  PRIVATE GTest::gmock
-  PRIVATE GTest::gmock_main
-  PRIVATE toad::communication_protocol::tcp::message)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/serializer SERIALIZER_TESTS_SOURCE)
+add_executable(${PROJECT_NAME} ${SOURCE} ${SERIALIZER_TESTS_SOURCE})
+
 set_target_properties(
   ${PROJECT_NAME}
   PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
@@ -19,5 +12,18 @@ set_target_properties(
              CXX_STANDARD 17
              CXX_EXTENSIONS OFF
              CXX_STANDARD_REQUIRED ON)
+
+find_package(GTest 1.13 QUIET REQUIRED)
+include(GoogleTest)
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE GTest::gtest
+  PRIVATE GTest::gtest_main
+  PRIVATE GTest::gmock
+  PRIVATE GTest::gmock_main)
+target_link_libraries(
+  ${PROJECT_NAME}
+  PRIVATE
+  PRIVATE toad::communication_protocol::tcp::message)
 
 gtest_discover_tests(${PROJECT_NAME} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
