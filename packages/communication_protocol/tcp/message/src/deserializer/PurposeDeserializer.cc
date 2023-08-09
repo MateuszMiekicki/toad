@@ -17,6 +17,10 @@ Message::Purpose deserializeMessagePurpose(const std::string &purpose)
     {
         return Message::Purpose::getConfiguration;
     }
+    else if(boost::iequals(purpose, "set_sensors_configuration"))
+    {
+        return Message::Purpose::setSensorsConfiguration;
+    }
     else if(boost::iequals(purpose, "alert"))
     {
         return Message::Purpose::alert;
