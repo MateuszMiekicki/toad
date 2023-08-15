@@ -97,9 +97,7 @@ TEST_F(DispatcherFixture, whenSendRequestEndsThrowExceptionShouldSendFailureResp
 
 TEST_F(DispatcherFixture, whenPopMessageIsReportWithAlertPurposeShouldSendResponseByNotifier)
 {
-    const auto message = toad::communication_protocol::tcp::MessageFactory::createAlertReport(
-        clientId,
-        payload);
+    const auto message = toad::communication_protocol::tcp::MessageFactory::createAlertReport(clientId, payload);
     ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
     EXPECT_CALL(notifier_, send(message));
     sut.dispatch();
@@ -107,9 +105,8 @@ TEST_F(DispatcherFixture, whenPopMessageIsReportWithAlertPurposeShouldSendRespon
 
 TEST_F(DispatcherFixture, whenPopMessageIsReportWithAlertIndicationPurposeShouldSendResponseByBroker)
 {
-    const auto message = toad::communication_protocol::tcp::MessageFactory::createAlertIndicationReport(
-        clientId,
-        payload);
+    const auto message =
+        toad::communication_protocol::tcp::MessageFactory::createAlertIndicationReport(clientId, payload);
     ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
     EXPECT_CALL(broker_, send(message));
     sut.dispatch();
