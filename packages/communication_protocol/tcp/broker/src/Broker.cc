@@ -67,7 +67,7 @@ void Broker::setAcceptHandler()
 bool Broker::handleHandshake(connection_t socket, std::size_t length)
 {
     const auto macAddress = std::string(buffer_.data(), length);
-    DEBUG_LOG("Recived handshake: {}", macAddress);
+    DEBUG_LOG("Received handshake: {}", macAddress);
     if(clients_.find(macAddress) != clients_.end())
     {
         WARN_LOG("Client {} already connected", macAddress);
