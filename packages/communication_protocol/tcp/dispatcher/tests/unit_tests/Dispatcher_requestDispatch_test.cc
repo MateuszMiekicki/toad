@@ -65,11 +65,12 @@ TEST_F(DispatcherFixture, whenPopMessageIsResponseShouldSendResponseByRequester)
     sut.dispatch();
 }
 
-TEST_F(DispatcherFixture, whenPopMessageIsReportShouldSendResponseByNotifier)
+TEST_F(DispatcherFixture, whenPopMessageIsReportWithUnknowPurposeNotShouldSendAnything)
 {
     const auto message = createMessage(toad::communication_protocol::tcp::Message::Type::report);
     ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
-    EXPECT_CALL(notifier_, send(message));
+    EXPECT_CALL(notifier_, send(message)).Times(0);
+    EXPECT_CALL(broker_, send(message)).Times(0);
     sut.dispatch();
 }
 
@@ -91,5 +92,25 @@ TEST_F(DispatcherFixture, whenSendRequestEndsThrowExceptionShouldSendFailureResp
     EXPECT_CALL(broker_, send(messageWithThrowException)).WillOnce(testing::Throw(std::runtime_error(failurePurpose)));
     const auto message = createFailureResponse(failurePurpose);
     EXPECT_CALL(hub_, push(message));
+    sut.dispatch();
+}
+
+TEST_F(DispatcherFixture, whenPopMessageIsReportWithAlertPurposeShouldSendResponseByNotifier)
+{
+    const auto message = toad::communication_protocol::tcp::MessageFactory::createAlertReport(
+        clientId,
+        payload);
+    ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
+    EXPECT_CALL(notifier_, send(message));
+    sut.dispatch();
+}
+
+TEST_F(DispatcherFixture, whenPopMessageIsReportWithAlertIndicationPurposeShouldSendResponseByBroker)
+{
+    const auto message = toad::communication_protocol::tcp::MessageFactory::createAlertIndicationReport(
+        clientId,
+        payload);
+    ON_CALL(hub_, pop()).WillByDefault(testing::Return(message));
+    EXPECT_CALL(broker_, send(message));
     sut.dispatch();
 }

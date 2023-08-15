@@ -22,6 +22,7 @@ void Dispatcher::dispatch()
             try
             {
                 broker_.send(message);
+                DEBUG_LOG("Request sent");
             }
             catch(const std::exception& e)
             {
@@ -37,6 +38,7 @@ void Dispatcher::dispatch()
             try
             {
                 requester_.send(message);
+                DEBUG_LOG("Response sent");
             }
             catch(const std::exception& e)
             {
@@ -49,7 +51,26 @@ void Dispatcher::dispatch()
         case Message::Message::Type::report:
         {
             DEBUG_LOG("Alert processing");
-            notifier_.send(message);
+            switch(message.getPurpose())
+            {
+                case Message::Message::Purpose::alert:
+                {
+                    notifier_.send(message);
+                    DEBUG_LOG("Purpose alert send");
+                }
+                break;
+                case Message::Message::Purpose::alertIndication:
+                {
+                    broker_.send(message);
+                    DEBUG_LOG("Purpose alert indication send");
+                }
+                break;
+                default:
+                {
+                    WARN_LOG("Not implemented alert purpose");
+                }
+                break;
+            }
         }
         break;
         case Message::Message::Type::unknown:

@@ -21,7 +21,7 @@ std::string serialize(const Message &message)
     const auto purpose = R"("purpose":")" + serialize(message.getPurpose()) + R"(")";
     const auto payload = R"("payload":)" + serialize(message.getPayload());
     const auto stringToParse = R"({)" + type + R"(,)" + purpose + R"(,)" + payload + R"(})";
-    TRACE_LOG("String to parse: {}", stringToParse);
+    TRACE_LOG("Message serialization. String to parse: {}", stringToParse);
     rapidjson::Document document;
     document.Parse(stringToParse.c_str());
     if(document.HasParseError())

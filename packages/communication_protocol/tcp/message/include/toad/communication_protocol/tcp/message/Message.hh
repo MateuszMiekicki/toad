@@ -19,6 +19,7 @@ class Message
         setConfiguration,
         setSensorsConfiguration,
         alert,
+        alertIndication,
         ping,
         pong
     };
@@ -55,10 +56,11 @@ class Message
 
 struct MessageFactory
 {
-    static Message createAlertReport(const Message::clientId_t &clientId, const Payload &payload);
-    static Message createGetConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload);
-    static Message createGetConfigurationResponse(const Message::clientId_t &clientId, const Payload &payload);
-    static Message createFailureResponse(const Message::clientId_t &clientId, const Payload &payload);
+    static Message createAlertReport(const Message::clientId_t &, const Payload &);
+    static Message createAlertIndicationReport(const Message::clientId_t &, const Payload &);
+    static Message createGetConfigurationRequest(const Message::clientId_t &, const Payload &);
+    static Message createGetConfigurationResponse(const Message::clientId_t &, const Payload &);
+    static Message createFailureResponse(const Message::clientId_t &, const Payload &);
 };
 } // namespace toad::communication_protocol::tcp
 

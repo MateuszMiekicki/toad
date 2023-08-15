@@ -25,6 +25,10 @@ Message::Purpose deserializeMessagePurpose(const std::string &purpose)
     {
         return Message::Purpose::alert;
     }
+    else if(boost::iequals(purpose, "alert_indication"))
+    {
+        return Message::Purpose::alertIndication;
+    }
     else if(boost::iequals(purpose, "ping"))
     {
         return Message::Purpose::ping;

@@ -58,6 +58,11 @@ Message MessageFactory::createAlertReport(const Message::clientId_t &clientId, c
     return Message{clientId, Message::Type::report, Message::Purpose::alert, payload};
 }
 
+Message MessageFactory::createAlertIndicationReport(const Message::clientId_t &clientId, const Payload &payload)
+{
+    return Message{clientId, Message::Type::report, Message::Purpose::alertIndication, payload};
+}
+
 Message MessageFactory::createGetConfigurationRequest(const Message::clientId_t &clientId, const Payload &payload)
 {
     return Message{clientId, Message::Type::request, Message::Purpose::getConfiguration, payload};

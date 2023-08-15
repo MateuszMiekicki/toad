@@ -2,6 +2,7 @@
 #include "toad/communication_protocol/tcp/broker/Broker.hh"
 #include "toad/communication_protocol/tcp/dispatcher/Dispatcher.hh"
 #include "toad/communication_protocol/tcp/message/Hub.hh"
+#include "toad/communication_protocol/tcp/notifier/Notifier.hh"
 #include "toad/communication_protocol/tcp/requester/Requester.hh"
 
 int main()

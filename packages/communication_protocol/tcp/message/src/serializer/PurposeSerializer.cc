@@ -15,6 +15,8 @@ std::string serialize(Message::Purpose purpose)
             return "set_configuration";
         case Message::Purpose::alert:
             return "alert";
+        case Message::Purpose::alertIndication:
+            return "alert_indication";
         case Message::Purpose::ping:
             return "ping";
         case Message::Purpose::pong:
