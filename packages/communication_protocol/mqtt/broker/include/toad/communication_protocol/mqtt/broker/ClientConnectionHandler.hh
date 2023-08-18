@@ -15,8 +15,8 @@ class ClientConnectionHandler : public interface::ClientConnectionHandler
 
   public:
     ClientConnectionHandler(std::unique_ptr<ConnectionManager>);
-    void onClose(std::shared_ptr<Connection> connection) override;
-    void onError(std::shared_ptr<Connection> connection) override;
+    void onClose(std::shared_ptr<Connection>) override;
+    void onError(std::shared_ptr<Connection>) override;
     void onConnect(std::shared_ptr<Connection>) override;
     void onDisconnect(std::shared_ptr<Connection>) override;
     void onPublish(std::shared_ptr<Connection>) override;
