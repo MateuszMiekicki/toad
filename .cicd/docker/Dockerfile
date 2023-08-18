@@ -37,15 +37,15 @@ RUN pip install cmake-format
 COPY scripts /cicd/scripts
 WORKDIR /cicd/scripts
 
-# #install CMake
+#install CMake
 RUN chmod +x install-cmake.sh
 RUN ./install-cmake.sh
 
-# #install sonar scanner
+#install sonar scanner
 RUN chmod +x install-sonar_scanner.sh
 RUN ./install-sonar_scanner.sh
 
-# #clean
+#clean
 RUN apt-get autoremove && \
     apt-get autoclean && \
     apt-get clean
