@@ -84,10 +84,10 @@ void Broker::setReader(connection_t socket)
                             {
         if(!error)
         {
-            const auto recivedData = std::string(buffer_.data(), bytes_transferred);
-            TRACE_LOG("Received data: {}", recivedData);
+            const auto receivedData = std::string(buffer_.data(), bytes_transferred);
+            TRACE_LOG("Received data: {}", receivedData);
             rapidjson::Document document;
-            document.Parse(recivedData.c_str());
+            document.Parse(receivedData.c_str());
             if(document.HasParseError())
             {
                 WARN_LOG("Parse error: {}", GetParseError_En(document.GetParseError()));
